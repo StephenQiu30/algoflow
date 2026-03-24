@@ -56,4 +56,16 @@ public class ChunkSourceVO implements Serializable {
      */
     @Schema(description = "相似度分数")
     private Double score;
+
+    /**
+     * 标签列表 (算法名、数据结构等)
+     */
+    @Schema(description = "标签列表")
+    private String tags;
+
+    /**
+     * 是否包含代码
+     */
+    @Schema(description = "是否包含代码")
+    private Boolean hasCode;
 }
