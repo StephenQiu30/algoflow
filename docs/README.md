@@ -1,45 +1,51 @@
 # 衍序 · AlgoFlow 文档中心
 
-本目录汇集了 **衍序 · AlgoFlow** 系统的核心设计规范、教学设计标准以及系统化排序算法知识库文档。
+> **推衍秩序 · 步进数据心流**  
+> 衍序 (AlgoFlow) 统一工程与研发文档中心，遵循标准化软件工程生命周期：  
+> **需求定义 (Requirement) → 系统设计 (Design) → 产品规划 (PRD) → 交付计划 (Plan) → 领域知识库 (Algorithms)**。
 
 ---
 
-## 📂 目录结构
+## 🧭 全流程研发体系架构
 
-```text
-docs/
-├── README.md               # 文档索引（本文档）
-├── DESIGN.md               # Apple 设计哲学与全局设计系统规范
-├── design/
-│   └── DESIGN.md           # 设计系统规范备份与归档
-└── algorithms/             # 系统化排序算法知识库（19篇）
-    ├── 00-排序算法文档编写规范.md
-    ├── 01-冒泡排序.md
-    ├── 02-选择排序.md
-    ├── 03-插入排序.md
-    ├── 04-希尔排序.md
-    ├── 05-归并排序.md
-    ├── 06-快速排序.md
-    ├── 07-堆排序.md
-    ├── 08-基数排序.md
-    ├── 09-排序算法综合对比.md
-    ├── 10-排序算法的工程实践.md
-    ├── 11-排序算法的应用场景.md
-    ├── 12-排序算法的面试高频问题.md
-    ├── 13-计数排序.md
-    ├── 14-桶排序.md
-    ├── 15-TopK问题与排序选择.md
-    ├── 16-外部排序与海量数据处理.md
-    ├── 17-排序算法的可视化教学设计.md
-    └── 18-排序算法学习路径与知识图谱.md
+AlgoFlow 采用全链路可追溯的工程文档架构。每一项功能演进均严格遵循从业务需求到技术设计、产品原型、开发计划与最终代码实现的端到端闭环：
+
+```mermaid
+flowchart LR
+    A["01. 需求体系<br/>(Requirement)"] --> B["02. 架构设计<br/>(Design)"]
+    B --> C["03. 产品规格<br/>(PRD)"]
+    C --> D["04. 交付计划<br/>(Plan)"]
+    D --> E["05. 核心代码工程<br/>(Frontend & Backend)"]
+    F["06. 算法知识库<br/>(Algorithms)"] -.->|领域支撑| A
+    F -.->|知识检索源| B
 ```
 
 ---
 
-## 🎨 视觉与交互规范
-* 详见 [DESIGN.md](./DESIGN.md)，系统采用摄影级质感、以产品/内容为先的 Apple 设计语言，主打 `#0066cc` 交互蓝、优雅留白与层次化灰阶。
+## 📂 文档中心目录索引
 
-## 📚 算法知识图谱与教学
-* 算法入门建议遵循 [18-排序算法学习路径与知识图谱.md](./algorithms/18-排序算法学习路径与知识图谱.md)；
-* 算法横向比对可参考 [09-排序算法综合对比.md](./algorithms/09-排序算法综合对比.md)；
-* 交互教学与动效呈现思路可查阅 [17-排序算法的可视化教学设计.md](./algorithms/17-排序算法的可视化教学设计.md)。
+| 阶段 / 模块 | 核心定位与说明 | 主要文档索引 |
+| :--- | :--- | :--- |
+| **00. Templates** | 标准工程写作模板库，约束技术设计、用户故事、PRD、实施计划与测试场景输出格式 | <ul><li>[模板导航库](./templates/00-模板导航.md)</li><li>[设计模板](./templates/01-设计模板.md)</li><li>[用户故事模板](./templates/02-用户故事模板.md)</li><li>[测试场景模板](./templates/03-测试场景模板.md)</li><li>[PRD 模板](./templates/04-PRD模板.md)</li><li>[实施计划模板](./templates/05-实施计划模板.md)</li></ul> |
+| **01. Requirement** | 业务背景、用户画像、核心痛点与系统需求规格说明书 (SRS/URS) | <ul><li>[需求体系导航](./requirement/00-需求导航.md) / [概览](./requirement/README.md)</li><li>[系统需求规格说明书](./requirement/system-requirements.md)</li><li>[用户故事与验收准则](./requirement/user-stories.md)</li></ul> |
+| **02. Design** | 微服务架构、Apple 极简设计系统、数据持久化与 RAG 向量引擎技术方案 | <ul><li>[技术设计导航](./design/00-设计导航.md) / [概览](./design/README.md)</li><li>[微服务架构与通信设计](./design/architecture.md)</li><li>[Apple 极简设计系统规范](./design/ui-ux.md)</li><li>[数据模型与缓存架构](./design/data-model.md)</li><li>[RAG 知识库与导师架构](./design/rag-architecture.md)</li></ul> |
+| **03. PRD** | 产品需求说明书、信息架构 (IA)、交互原型流程与各核心功能模块详设 | <ul><li>[PRD 文档导航](./prd/00-PRD导航.md) / [全景](./prd/README.md)</li><li>[算法演练工作台 PRD](./prd/prd-sorting-visualizer.md)</li><li>[RAG AI 算法导师 PRD](./prd/prd-ai-mentor.md)</li><li>[社区与学习成长体系 PRD](./prd/prd-community-and-learning.md)</li><li>[统一运营管理后台 PRD](./prd/prd-admin-ops.md)</li></ul> |
+| **04. Plan** | 迭代里程碑、排期路线图 (Roadmap)、测试策略与上线发布方案 | <ul><li>[交付计划导航](./plan/00-Plan导航.md) / [总览](./plan/README.md)</li><li>[里程碑与迭代路线图](./plan/milestone-roadmap.md)</li><li>[测试策略与交付发布方案](./plan/test-and-release-plan.md)</li></ul> |
+| **05. Algorithms** | 19 篇经典与现代排序算法深度解构、教学动画设计与应用场景知识库 | <ul><li>[算法知识库总览](./algorithms/README.md)</li><li>[00-排序算法编写规范](./algorithms/00-排序算法文档编写规范.md)</li><li>[18-学习路径与知识图谱](./algorithms/18-排序算法学习路径与知识图谱.md)</li><li>[01~17 经典算法专章](./algorithms/)</li></ul> |
+
+---
+
+## 📌 根目录状态协同文件
+
+为确保多人协作与多 Agent 协同的高效连续性，项目根目录维护两份动态跟踪看板：
+
+1. **[BACKLOG.md](../BACKLOG.md)**：项目任务积压池与实时执行状态看板（按 Epic 划分，清晰标注优先级、责任模块与交付进展）。
+2. **[HANDOVER.md](../HANDOVER.md)**：开发接力与工作交接单（包含当前编译运行快照、待解决阻断点、开发指引及下一步行动方案）。
+
+---
+
+## 📐 工程协同规范与守则
+
+* **架构分层与研发守则**：详见根目录 [PROJECT.md](../PROJECT.md)。
+* **多 Agent 研发与代码规范**：详见根目录 [AGENTS.md](../AGENTS.md)。
+* **代码贡献流程**：详见根目录 [CONTRIBUTING.md](../CONTRIBUTING.md)。

@@ -12,7 +12,9 @@
 AlgoFlow/
 ├── backend/                  # 后端微服务集群 (Java 21 / Spring Boot 3.5 / Spring Cloud Alibaba)
 ├── frontend/                 # 统一交互前端 (Next.js 15 / React 19 / Tailwind / shadcn/ui / GSAP)
-├── docs/                     # 统一文档中心 (UI/UX 规范、系统架构设计、算法教学知识库)
+├── docs/                     # 统一文档中心 (Requirement -> Design -> PRD -> Plan -> Algorithms)
+├── BACKLOG.md                # 研发任务积压与实时执行状态看板
+├── HANDOVER.md               # 项目研发交接单与上下文接力备忘
 ├── .github/                  # CI/CD 工作流、Issue/PR 协作模板
 ├── docker-compose.yml        # 应用服务容器编排配置
 ├── docker-compose-env.yml    # 中间件基础环境 (MySQL, Redis, RabbitMQ, Nacos, ES)
@@ -191,14 +193,48 @@ backend/
 
 ---
 
-## 4. 统一文档中心 (`docs/`)
+## 4. 统一研发全链路文档中心 (`docs/`)
 
-所有的项目规范与教学内容集中在 `docs/` 统一管理：
+所有的项目规范、系统架构、产品规划与教学内容在 `docs/` 统一管理，遵循标准化软件工程链路：
 ```text
 docs/
-├── algorithms/               # 19 篇经典与高级排序算法教学文档与深度分析 (单一可信源)
-├── DESIGN.md                 # UI/UX 设计规范 (Apple 极简风格, 色彩, 动效, 交互约束)
-└── README.md                 # 知识库索引与贡献文档说明
+├── README.md                 # 文档中心统一导航与全流程链路说明
+├── templates/                # 00 写作与工程模板库 (设计、用户故事、测试场景、PRD、实施计划)
+│   ├── 00-模板导航.md
+│   ├── 01-设计模板.md
+│   ├── 02-用户故事模板.md
+│   ├── 03-测试场景模板.md
+│   ├── 04-PRD模板.md
+│   └── 05-实施计划模板.md
+├── requirement/              # 01 需求体系 (业务背景、用户画像、SRS 规格、敏捷用户故事)
+│   ├── 00-需求导航.md
+│   ├── README.md
+│   ├── system-requirements.md
+│   └── user-stories.md
+├── design/                   # 02 架构与设计体系 (微服务架构、Apple 极简 UI/UX、数据模型、RAG)
+│   ├── 00-设计导航.md
+│   ├── README.md
+│   ├── architecture.md
+│   ├── ui-ux.md
+│   ├── data-model.md
+│   └── rag-architecture.md
+├── prd/                      # 03 产品需求文档体系 (信息架构、演练工作台、AI 导师、社区、Admin)
+│   ├── 00-PRD导航.md
+│   ├── README.md
+│   ├── prd-sorting-visualizer.md
+│   ├── prd-ai-mentor.md
+│   ├── prd-community-and-learning.md
+│   └── prd-admin-ops.md
+├── plan/                     # 04 研发与交付计划 (里程碑路线图 Roadmap、测试与发布策略)
+│   ├── 00-Plan导航.md
+│   ├── README.md
+│   ├── milestone-roadmap.md
+│   └── test-and-release-plan.md
+├── DESIGN.md                 # Apple 极简设计系统主入口 (指向 design/ui-ux.md)
+└── algorithms/               # 05 排序算法专业知识库 (19 篇官方深度解析文档，单一可信源)
+    ├── README.md
+    ├── 00-排序算法文档编写规范.md
+    └── 01~18 ...
 ```
 
 ---
