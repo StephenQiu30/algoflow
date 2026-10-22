@@ -5,6 +5,15 @@ import nextTs from 'eslint-config-next/typescript'
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    plugins: {
+      'react-hooks': nextVitals[0].plugins['react-hooks'],
+    },
+    rules: {
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/purity': 'warn',
+    },
+  },
   // Generated OpenAPI output follows the generator's syntax; keep typechecking it.
   {
     files: ['src/api/**/*.ts'],

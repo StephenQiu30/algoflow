@@ -31,53 +31,52 @@
         <!-- 项目版本 -->
         <algorithm-cloud.version>1.0.0</algorithm-cloud.version>
 
-        <spring-boot.version>3.5.9</spring-boot.version>
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
-        <spring-cloud-alibaba.version>2023.0.3.2</spring-cloud-alibaba.version>
-        <spring-cloud-gateway.version>5.0.1</spring-cloud-gateway.version>
+        <spring-boot.version>3.5.16</spring-boot.version>
+        <spring-cloud.version>2025.0.3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2023.0.3.4</spring-cloud-alibaba.version>
+        <spring-cloud-gateway.version>5.0.3</spring-cloud-gateway.version>
 
         <!-- 数据库相关 -->
         <mybatis.version>3.0.4</mybatis.version>
-        <mybatis-plus.version>3.5.12</mybatis-plus.version>
+        <mybatis-plus.version>3.5.16</mybatis-plus.version>
         <mysql.version>8.4.0</mysql.version>
 
         <!-- 中间件 -->
-        <redisson.version>3.48.0</redisson.version>
+        <redisson.version>3.52.0</redisson.version>
         <elasticsearch.version>9.3.0</elasticsearch.version>
 
         <!-- 工具类 -->
-        <hutool.version>5.8.40</hutool.version>
+        <hutool.version>5.8.48</hutool.version>
         <lombok.version>1.18.42</lombok.version>
         <knife4j.version>4.5.0</knife4j.version>
-        <sa-token.version>1.44.0</sa-token.version>
+        <sa-token.version>1.46.0</sa-token.version>
 
         <!-- OSS -->
-        <tencent-cos.version>5.6.227</tencent-cos.version>
+        <tencent-cos.version>5.6.283</tencent-cos.version>
         <okhttp.version>4.12.0</okhttp.version>
 
         <!-- 其他 -->
         <easyexcel.version>4.0.3</easyexcel.version>
-        <commons-lang3.version>3.18.0</commons-lang3.version>
-        <commons-io.version>2.19.0</commons-io.version>
+        <commons-lang3.version>3.21.0</commons-lang3.version>
+        <commons-io.version>2.22.0</commons-io.version>
         <commons-fileupload.version>1.6.0</commons-fileupload.version>
-        <caffeine.version>3.2.0</caffeine.version>
-        <netty.version>4.2.5.Final</netty.version>
-        <aliyun-sdk.version>4.7.5</aliyun-sdk.version>
-        <aliyun-sdk.version>4.7.5</aliyun-sdk.version>
-        <junit.version>5.13.0-RC1</junit.version>
-        <versions-maven-plugin.version>2.15.0</versions-maven-plugin.version>
-        <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <caffeine.version>3.3.1</caffeine.version>
+        <netty.version>4.2.11.Final</netty.version>
+        <aliyun-sdk.version>4.7.10</aliyun-sdk.version>
+        <junit.version>5.14.4</junit.version>
+        <versions-maven-plugin.version>2.23.0</versions-maven-plugin.version>
+        <maven-compiler-plugin.version>3.14.0</maven-compiler-plugin.version>
 
         <!-- AI -->
-        <spring-ai.version>1.1.2</spring-ai.version>
-        <spring-ai-alibaba.version>1.1.2.2</spring-ai-alibaba.version>
+        <spring-ai.version>1.1.8</spring-ai.version>
+        <spring-ai-alibaba.version>1.1.2.3</spring-ai-alibaba.version>
 
         <!-- Document & Excel -->
-        <openpdf.version>2.0.3</openpdf.version>
+        <openpdf.version>2.4.0</openpdf.version>
         <flexmark.version>0.64.8</flexmark.version>
-        <poi.version>5.3.0</poi.version>
+        <poi.version>5.5.1</poi.version>
         <ip2region.version>2.7.0</ip2region.version>
-        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+        <logstash-logback-encoder.version>9.0</logstash-logback-encoder.version>
     </properties>
 
     <dependencyManagement>
