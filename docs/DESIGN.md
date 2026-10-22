@@ -1,7 +1,7 @@
 # Apple 极简设计系统与视觉规范 (DESIGN.md)
 
 > 本文档为 AlgoFlow 全局视觉规范的主入口，详细规范已升级并收录至：  
-> **👉 [02. Design / UI-UX 设计系统规范 (docs/design/ui-ux.md)](./design/ui-ux.md)**
+> **👉 [02. Design / 02-Apple极简视觉与高帧率动效设计 (docs/design/02-Apple极简视觉与高帧率动效设计.md)](./design/02-Apple极简视觉与高帧率动效设计.md)**
 
 ---
 

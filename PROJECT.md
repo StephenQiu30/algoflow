@@ -208,29 +208,28 @@ docs/
 │   └── 05-实施计划模板.md
 ├── requirement/              # 01 需求体系 (业务背景、用户画像、SRS 规格、敏捷用户故事)
 │   ├── 00-需求导航.md
-│   ├── README.md
-│   ├── system-requirements.md
-│   └── user-stories.md
+│   ├── 01-产品总览与系统需求规格说明.md
+│   └── 02-敏捷用户故事与验收准则.md
 ├── design/                   # 02 架构与设计体系 (微服务架构、Apple 极简 UI/UX、数据模型、RAG)
 │   ├── 00-设计导航.md
-│   ├── README.md
-│   ├── architecture.md
-│   ├── ui-ux.md
-│   ├── data-model.md
-│   └── rag-architecture.md
+│   ├── 01-平台顶层微服务架构设计.md
+│   ├── 02-Apple极简视觉与高帧率动效设计.md
+│   ├── 03-数据模型持久化与缓存架构设计.md
+│   └── 04-RAG算法导师与知识检索设计.md
 ├── prd/                      # 03 产品需求文档体系 (信息架构、演练工作台、AI 导师、社区、Admin)
 │   ├── 00-PRD导航.md
-│   ├── README.md
-│   ├── prd-sorting-visualizer.md
-│   ├── prd-ai-mentor.md
-│   ├── prd-community-and-learning.md
-│   └── prd-admin-ops.md
-├── plan/                     # 04 研发与交付计划 (里程碑路线图 Roadmap、测试与发布策略)
+│   ├── 01-产品全景与信息架构PRD.md
+│   ├── 02-算法动态演练工作台PRD.md
+│   ├── 03-RAG增强型AI算法导师PRD.md
+│   ├── 04-社区讨论与题解博客PRD.md
+│   └── 05-统一运营与知识库切片管理后台PRD.md
+├── plan/                     # 04 研发与交付计划 (里程碑路线图 Roadmap、实施计划、测试策略)
 │   ├── 00-Plan导航.md
-│   ├── README.md
-│   ├── milestone-roadmap.md
-│   └── test-and-release-plan.md
-├── DESIGN.md                 # Apple 极简设计系统主入口 (指向 design/ui-ux.md)
+│   ├── 01-研发里程碑与工程路线图.md
+│   ├── 02-核心算法演练引擎实施计划.md
+│   ├── 03-RAG导师与演练快照联动实施计划.md
+│   └── 04-测试策略与发布交付方案.md
+├── DESIGN.md                 # Apple 极简设计系统主入口 (指向 design/02-Apple极简视觉与高帧率动效设计.md)
 └── algorithms/               # 05 排序算法专业知识库 (19 篇官方深度解析文档，单一可信源)
     ├── README.md
     ├── 00-排序算法文档编写规范.md

@@ -110,7 +110,7 @@ mvn clean test-compile -DskipTests
 
 * [ ] **行动点 1**：完善 `frontend/src/components/sorting/RAGChatPanel.tsx` 中的引用切片点击预览交互（对应任务 `TSK-202`）；
 * [ ] **行动点 2**：在 `frontend/src/app/admin/` 下补充知识库切片管理列表视图与手动重新向量化按钮（对应任务 `TSK-303`）；
-* [ ] **行动点 3**：参考 `docs/prd/prd-community-and-learning.md`，推进题解博客阅读器的目录大纲（TOC）监听组件开发（对应任务 `TSK-301`）。
+* [ ] **行动点 3**：参考 `docs/prd/04-社区讨论与题解博客PRD.md`，推进题解博客阅读器的目录大纲（TOC）监听组件开发（对应任务 `TSK-301`）。
 
 ---
 
@@ -120,3 +120,4 @@ mvn clean test-compile -DskipTests
 | :--- | :--- | :--- | :---: |
 | **2026-10-22** | Antigravity | 全面重构 `docs/` 研发体系（涵盖 `requirement` -> `design` -> `prd` -> `plan` -> `algorithms` 链路），并在根目录建立 `BACKLOG.md` 与 `HANDOVER.md` 任务跟踪体系 | 🟢 已交付 |
 | **2026-10-22** | Antigravity | 整理并迁入 `docs/templates/` 标准工程写作模板库（设计、故事、场景、PRD、计划），并建立全阶段 `00-xx导航.md` 矩阵 | 🟢 已交付 |
+| **2026-10-22** | Antigravity | 按模板全面重构 `requirement`、`design`、`prd`、`plan` 下各文档内容结构，并完成严格顺序连续编号与双向映射 | 🟢 已交付 |
