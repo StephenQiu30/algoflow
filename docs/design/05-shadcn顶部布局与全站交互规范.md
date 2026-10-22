@@ -23,7 +23,7 @@
 
 * **系统现状**：组件库基于 shadcn/ui（Radix UI Primitives）+ Tailwind CSS 构建；
 * **统一性要求**：全站前台与管理后台统一共享同一套 Layout 与全局 Provider，严禁出现割裂的视觉风格；
-* **设计原则**：以内容为先，去除多余厚重背景；Action Blue (`#0066cc`) 为核心可点击焦点，采用发丝线 (`hairline #e0e0e0`) 进行物理区隔。
+* **设计原则**：以内容为先，去除多余厚重背景；Action Blue (`#171717`) 为核心可点击焦点，采用发丝线 (`hairline #e0e0e0`) 进行物理区隔。
 
 ---
 
@@ -87,3 +87,15 @@
 * **实施依赖**：`@radix-ui/react-navigation-menu`、`@radix-ui/react-sheet`、`lucide-react`；
 * **正常场景验收**：全站所有路由顶栏正常吸顶渲染，无横向溢出；切换暗色模式时顶栏无白底闪烁；
 * **真实执行证据**：`tests/browser-smoke.sh` 冒烟测试全量通过；调度引用 [BACKLOG.md](../../BACKLOG.md)。
+
+
+## 9. Layout 实现与用户确认
+
+用户确认：顶部 NavigationMenu、右侧用户展示、黑白灰、主题切换。
+
+- SiteLayout 是根布局内共享的服务端容器，包含跳过链接、SiteHeader、main 和 Footer。交互下沉客户端叶子。
+- 桌面和移动 Sheet 均使用 NavigationMenu；当前页 aria-current，移动选项点击后关闭菜单。仅链接现有路由。
+- 右侧为搜索、通知、主题菜单、Avatar 用户菜单或登录按钮。移动端通知也可从用户菜单访问。
+- 主题使用 DropdownMenuRadioGroup，支持 light/dark/system，默认跟随系统，next-themes 持久化选择。
+- 算法灰阶状态同时提供文字、虚线和双线轮廓；危险操作通过明确文案与确认区分。
+- 本轮代码完成共享布局、导航、主题与账号交互以及主题 Token。完整管理端为 Figma 设计交付，生产 /admin 路由及接口接入仍待实现。
