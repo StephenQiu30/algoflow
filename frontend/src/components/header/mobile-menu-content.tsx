@@ -8,7 +8,7 @@ interface MobileMenuContentProps {
 }
 
 export function MobileMenuContent({ onClose }: MobileMenuContentProps) {
-  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || 'Stephen Radix'
+  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || '衍序 AlgoFlow'
   const logoLetter = siteName.charAt(0).toUpperCase()
 
   return (

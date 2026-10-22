@@ -121,3 +121,4 @@ mvn clean test-compile -DskipTests
 | **2026-10-22** | Antigravity | 全面重构 `docs/` 研发体系（涵盖 `requirement` -> `design` -> `prd` -> `plan` -> `algorithms` 链路），并在根目录建立 `BACKLOG.md` 与 `HANDOVER.md` 任务跟踪体系 | 🟢 已交付 |
 | **2026-10-22** | Antigravity | 整理并迁入 `docs/templates/` 标准工程写作模板库（设计、故事、场景、PRD、计划），并建立全阶段 `00-xx导航.md` 矩阵 | 🟢 已交付 |
 | **2026-10-22** | Antigravity | 按模板全面重构 `requirement`、`design`、`prd`、`plan` 下各文档内容结构，并完成严格顺序连续编号与双向映射 | 🟢 已交付 |
+| **2026-10-22** | Antigravity | 排查并修复 GitHub Actions CI 失败问题：升级前端 CI 流水线为 pnpm + frozen-lockfile，清理过时 package-lock.json，升级 setup-java@v5 | 🟢 已修复 |

@@ -3,72 +3,32 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { Menu } from 'lucide-react'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
 import { Button } from '@/components/ui/button'
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
+import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { SiteLogo } from '@/components/header/site-logo'
 import { Menus } from '@/components/header/menus'
 import { MobileMenuContent } from '@/components/header/mobile-menu-content'
 import { HeaderActions } from '@/components/header/header-actions'
 
 export function SiteHeader() {
-  const headerRef = React.useRef<HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [authModalOpen, setAuthModalOpen] = useState(false)
 
-  useGSAP(
-    () => {
-      const tl = gsap.timeline({
-        defaults: { ease: 'expo.out', duration: 1.2 },
-      })
-
-      // Initial state set immediately
-      gsap.set(headerRef.current, {
-        y: -40,
-        opacity: 0,
-        visibility: 'visible',
-      })
-
-      // Animate Header and all its children simultaneously
-      tl.to(headerRef.current, {
-        y: 0,
-        opacity: 1,
-        duration: 1.5,
-      })
-
-      // Simultaneous reveal of children with a subtle scale and lift
-      tl.from(
-        ['.site-logo', '.menu-item', '.action-item'],
-        {
-          opacity: 0,
-          y: 5,
-          scale: 0.98,
-          duration: 1.2,
-          stagger: 0, // No stagger - all at once as per user request
-          clearProps: 'all',
-        },
-        '-=1.2'
-      ) // Start at exactly the same time as the header animation
-    },
-    { scope: headerRef }
-  )
-
   return (
     <header
-      ref={headerRef}
-      className="bg-background/80 border-border/10 sticky top-0 z-50 w-full border-b backdrop-blur-md"
+      className="bg-background border-border sticky top-0 z-40 w-full border-b"
     >
-      <div className="container mx-auto grid h-20 grid-cols-3 items-center px-6">
+      <div className="mx-auto flex min-h-16 max-w-[1440px] items-center justify-between gap-6 px-4 lg:px-8">
         <div className="flex items-center gap-4">
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="lg:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle menu</span>
+                <Menu data-icon="inline-start" />
+                <span className="sr-only">打开导航菜单</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="left" className="w-full max-w-xs overflow-y-auto">
+              <SheetTitle className="sr-only">站点导航</SheetTitle>
               <MobileMenuContent onClose={() => setMobileMenuOpen(false)} />
             </SheetContent>
           </Sheet>
