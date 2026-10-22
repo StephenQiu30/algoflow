@@ -1,0 +1,121 @@
+'use client'
+
+import * as React from 'react'
+import { Loader2, MessageSquare } from 'lucide-react'
+import { CommentInput } from './comment-input'
+import { CommentItem } from './comment-item'
+import { listPostCommentVoByPage } from '@/api/post/postCommentController'
+
+interface CommentSectionProps {
+  postId: string
+  onTotalChange?: (total: number) => void
+}
+
+export function CommentSection({ postId, onTotalChange }: CommentSectionProps) {
+  const [flatComments, setFlatComments] = React.useState<PostAPI.PostCommentVO[]>([])
+  const [loading, setLoading] = React.useState(true)
+  const [total, setTotal] = React.useState(0)
+  const [page, setPage] = React.useState(1)
+
+  // Memoized comment tree
+  const treeComments = React.useMemo(() => {
+    if (!flatComments.length) return []
+
+    const commentMap = new Map<string, PostAPI.PostCommentVO>()
+    const roots: PostAPI.PostCommentVO[] = []
+
+    // First pass: create a map of all comments
+    flatComments.forEach(comment => {
+      if (comment.id) {
+        commentMap.set(String(comment.id), { ...comment, children: [] })
+      }
+    })
+
+    // Second pass: link children to parents
+    commentMap.forEach(comment => {
+      const parentIdStr = comment.parentId ? String(comment.parentId) : null
+      if (parentIdStr && parentIdStr !== '0' && commentMap.has(parentIdStr)) {
+        const parent = commentMap.get(parentIdStr)
+        if (parent) {
+          if (!parent.children) parent.children = []
+          parent.children.push(comment)
+        }
+      } else {
+        roots.push(comment)
+      }
+    })
+
+    // Sort roots by createTime (newest first)
+    return roots.sort((a, b) => {
+      return new Date(b.createTime || '').getTime() - new Date(a.createTime || '').getTime()
+    })
+  }, [flatComments])
+
+  const fetchComments = React.useCallback(async () => {
+    try {
+      // Sort by createTime descending to show newest first
+      const res = await listPostCommentVoByPage({
+        postId: postId as unknown as number,
+        current: 1,
+        pageSize: 20,
+      })
+      if (res.code === 0 && res.data) {
+        setFlatComments(res.data.records || [])
+        setTotal(res.data.total || 0)
+        onTotalChange?.(res.data.total || 0)
+      }
+    } catch (error) {
+      console.error('Failed to fetch comments:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [postId, onTotalChange])
+
+  React.useEffect(() => {
+    if (postId) {
+      fetchComments()
+    }
+  }, [postId, fetchComments])
+
+  return (
+    <div className="animate-in fade-in slide-in-from-bottom-8 bg-card/20 border-border/10 space-y-12 rounded-[3rem] border p-8 backdrop-blur-sm duration-1000 md:p-16">
+      <div className="flex items-center gap-6">
+        <div className="bg-primary h-14 w-2 rounded-full shadow-[0_0_30px_rgba(var(--primary),0.4)]" />
+        <div>
+          <h3 className="text-foreground text-3xl font-black tracking-tight uppercase">
+            参与讨论 <span className="text-primary/40 ml-2 font-mono">({total})</span>
+          </h3>
+          <p className="text-foreground/40 mt-2 ml-1 text-[11px] font-black tracking-[0.3em] uppercase">
+            已有 {total} 条深度见解 · 开启你的对话
+          </p>
+        </div>
+      </div>
+
+      {/* Main Input */}
+      <CommentInput postId={postId} onSuccess={fetchComments} />
+
+      {/* Comment List */}
+      <div className="mt-8 space-y-8">
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="text-muted-foreground/50 h-8 w-8 animate-spin" />
+          </div>
+        ) : treeComments.length > 0 ? (
+          treeComments.map(comment => (
+            <CommentItem
+              key={comment.id}
+              comment={comment}
+              postId={postId}
+              onReplySuccess={fetchComments}
+            />
+          ))
+        ) : (
+          <div className="text-muted-foreground flex flex-col items-center justify-center py-16 text-center">
+            <MessageSquare className="mb-3 h-6 w-6 opacity-30" />
+            <p className="text-sm">暂无评论，成为第一个留言的人吧。</p>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

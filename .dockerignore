@@ -1,45 +1,32 @@
-# 构建产物
-target/
-*.jar
-*.war
-*.ear
-*.class
-
-# IDE 配置
-.idea/
-.vscode/
-*.iml
-*.ipr
-*.iws
-.project
-.classpath
-.settings/
-
-# 版本控制
-.git/
+# Git & Metadata
+.git
 .gitignore
-.gitattributes
+.github
+.agent
 
-# 系统文件
+# Documentation & Markdown
+docs
+*.md
+
+# Node / Frontend
+frontend/.next
+frontend/out
+frontend/build
+frontend/node_modules
+frontend/npm-debug.log*
+
+# Java / Backend
+backend/**/target
+backend/**/*.class
+backend/**/*.jar
+backend/**/.idea
+
+# Environments & Secrets
+.env
+.env*.local
+*.secret.properties
+common-secret.properties
+
+# OS
 .DS_Store
 Thumbs.db
-*.log
-*.tmp
-
-# Maven
-.mvn/
-mvnw
-mvnw.cmd
-
-# 文档
-README.md
-LICENSE
-CHANGELOG.md
-
-# 配置文件（敏感信息）
-nacos-config/
-sql/
-
-# 环境变量文件
-.env.local
-.env.*.local

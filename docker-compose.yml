@@ -1,26 +1,45 @@
-# Alogrithm Cloud 微服务应用部署配置
-# 包含：Gateway、User、Post、File、Mail、Notification、Search、Log、AI 服务
-# 使用方式：docker-compose up -d
-
-version: '3.8'
+# =================================================================
+# 衍序 · AlgoFlow 全栈微服务与前端应用部署配置
+# 包含：Frontend (Next.js) + Gateway + 8 个业务微服务
+# 使用方式：docker compose up -d --build
+# =================================================================
 
 services:
-  # API 网关
+  # -------------------------------------------------------------
+  # 前端应用 (Next.js 15 / React 19 / GSAP / Radix UI)
+  # -------------------------------------------------------------
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: algoflow-frontend:${ALGOFLOW_VERSION:-latest}
+    container_name: algoflow-frontend
+    restart: always
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    environment:
+      - NEXT_PUBLIC_API_BASE_URL=${NEXT_PUBLIC_API_BASE_URL:-http://localhost:8080}
+    networks:
+      - algorithm-network
+
+  # -------------------------------------------------------------
+  # API 网关服务 (Spring Cloud Gateway)
+  # -------------------------------------------------------------
   algorithm-gateway:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-gateway/Dockerfile
-    image: algorithm-gateway:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-gateway:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-gateway
     restart: always
     ports:
-      - "${GATEWAY_PORT_EXTERNAL}:8080"
+      - "${GATEWAY_PORT_EXTERNAL:-8080}:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -30,22 +49,24 @@ services:
     networks:
       - algorithm-network
 
-  # 用户服务
+  # -------------------------------------------------------------
+  # 用户与认证服务
+  # -------------------------------------------------------------
   algorithm-user-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-user-service/Dockerfile
-    image: algorithm-user-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-user-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-user-service
     restart: always
     ports:
-      - "${USER_SERVICE_PORT_EXTERNAL}:8081"
+      - "${USER_SERVICE_PORT_EXTERNAL:-8081}:8081"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -55,22 +76,24 @@ services:
     networks:
       - algorithm-network
 
-  # 帖子服务
+  # -------------------------------------------------------------
+  # 算法笔记与讨论社区服务
+  # -------------------------------------------------------------
   algorithm-post-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-post-service/Dockerfile
-    image: algorithm-post-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-post-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-post-service
     restart: always
     ports:
-      - "${POST_SERVICE_PORT_EXTERNAL}:8082"
+      - "${POST_SERVICE_PORT_EXTERNAL:-8082}:8082"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -80,22 +103,24 @@ services:
     networks:
       - algorithm-network
 
-  # 文件服务
+  # -------------------------------------------------------------
+  # 文件与对象存储服务
+  # -------------------------------------------------------------
   algorithm-file-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-file-service/Dockerfile
-    image: algorithm-file-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-file-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-file-service
     restart: always
     ports:
-      - "${FILE_SERVICE_PORT_EXTERNAL}:8085"
+      - "${FILE_SERVICE_PORT_EXTERNAL:-8085}:8085"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -105,22 +130,24 @@ services:
     networks:
       - algorithm-network
 
-  # 邮件服务
+  # -------------------------------------------------------------
+  # 邮件通知服务
+  # -------------------------------------------------------------
   algorithm-mail-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-mail-service/Dockerfile
-    image: algorithm-mail-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-mail-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-mail-service
     restart: always
     ports:
-      - "${MAIL_SERVICE_PORT_EXTERNAL}:8087"
+      - "${MAIL_SERVICE_PORT_EXTERNAL:-8087}:8087"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -130,22 +157,24 @@ services:
     networks:
       - algorithm-network
 
-  # 通知服务
+  # -------------------------------------------------------------
+  # 站内通知与事件推送服务
+  # -------------------------------------------------------------
   algorithm-notification-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-notification-service/Dockerfile
-    image: algorithm-notification-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-notification-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-notification-service
     restart: always
     ports:
-      - "${NOTIFICATION_SERVICE_PORT_EXTERNAL}:8083"
+      - "${NOTIFICATION_SERVICE_PORT_EXTERNAL:-8083}:8083"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -155,22 +184,24 @@ services:
     networks:
       - algorithm-network
 
-  # 搜索服务
+  # -------------------------------------------------------------
+  # 搜索引擎服务 (Elasticsearch)
+  # -------------------------------------------------------------
   algorithm-search-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-search-service/Dockerfile
-    image: algorithm-search-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-search-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-search-service
     restart: always
     ports:
-      - "${SEARCH_SERVICE_PORT_EXTERNAL}:8084"
+      - "${SEARCH_SERVICE_PORT_EXTERNAL:-8084}:8084"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -180,22 +211,24 @@ services:
     networks:
       - algorithm-network
 
-  # 日志服务
+  # -------------------------------------------------------------
+  # 审计与系统日志服务
+  # -------------------------------------------------------------
   algorithm-log-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-log-service/Dockerfile
-    image: algorithm-log-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-log-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-log-service
     restart: always
     ports:
-      - "${LOG_SERVICE_PORT_EXTERNAL}:8086"
+      - "${LOG_SERVICE_PORT_EXTERNAL:-8086}:8086"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:
@@ -205,22 +238,24 @@ services:
     networks:
       - algorithm-network
 
-  # AI 服务
+  # -------------------------------------------------------------
+  # AI 智能导师与 RAG 向量检索服务
+  # -------------------------------------------------------------
   algorithm-ai-service:
     build:
-      context: .
+      context: ./backend
       dockerfile: algorithm-service/algorithm-ai-service/Dockerfile
-    image: algorithm-ai-service:${ALOGRITHM_CLOUD_VERSION:-latest}
+    image: algorithm-ai-service:${ALGOFLOW_VERSION:-latest}
     container_name: algorithm-ai-service
     restart: always
     ports:
-      - "${AI_SERVICE_PORT_EXTERNAL}:8088"
+      - "${AI_SERVICE_PORT_EXTERNAL:-8088}:8088"
     environment:
       - SPRING_PROFILES_ACTIVE=prod
-      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST}:${NACOS_PORT}
-      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME}
-      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD}
+      - SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR=${NACOS_HOST:-algorithm-nacos}:${NACOS_PORT:-8848}
+      - SPRING_CLOUD_NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - SPRING_CLOUD_NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
       - SPRING_MAIN_LAZY_INITIALIZATION=true
       - JAVA_TOOL_OPTIONS=-Xss256k -XX:MaxMetaspaceSize=128m -XX:MaxRAMPercentage=60.0 -XX:+TieredCompilation -XX:TieredStopAtLevel=1 -XX:+UseSerialGC -Dnacos.logging.default.config.enabled=false
     deploy:

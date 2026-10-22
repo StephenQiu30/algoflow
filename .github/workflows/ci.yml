@@ -1,0 +1,112 @@
+name: AlgoFlow CI Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ==========================================
+  # Frontend Pipeline: Next.js + React + Tests
+  # ==========================================
+  frontend-checks:
+    name: Frontend Verification
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: TypeScript Typecheck
+        run: npm run typecheck
+
+      - name: ESLint Code Quality
+        run: npm run lint
+
+      - name: Unit Tests
+        run: npm test
+
+      - name: Production Build
+        run: npm run build
+
+      - name: Setup Agent Browser for Smoke Tests
+        run: |
+          npm install --global agent-browser@0.33.0
+          agent-browser install --with-deps
+
+      - name: Browser Smoke Checks
+        run: |
+          npm run start -- --hostname 127.0.0.1 --port 3111 > /tmp/sorting-next.log 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --silent --fail http://127.0.0.1:3111/sorting/bubble > /dev/null; then break; fi
+            sleep 1
+          done
+          bash tests/browser-smoke.sh
+
+  # ==========================================
+  # Backend Pipeline: Spring Boot 3.5 + Maven
+  # ==========================================
+  backend-checks:
+    name: Backend Build & Maven Verification
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Maven Package Check
+        run: mvn -B package -DskipTests --file pom.xml
+
+  # ==========================================
+  # Backend AI RAG Contracts & Unit Tests
+  # ==========================================
+  backend-ai-tests:
+    name: AI Teaching & RAG Contract Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 (Temurin)
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run AI & Knowledge Chunk Tests
+        run: >
+          mvn -B -pl algorithm-service/algorithm-ai-service -am
+          -Dtest=RAGServiceImplTest,RetrievalOrchestratorTest,RagWebSearchFallbackDeciderTest,DocumentETLPipelineTest,SmartTextSplitterTest,RagConversationScopeTest,PublishedChunkFilterTest,ElasticsearchFilterExpressionConverterTest,RetiredChunkCleanupJobTest
+          -Dsurefire.failIfNoSpecifiedTests=false test

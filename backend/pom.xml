@@ -10,8 +10,8 @@
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
-    <name>algorithm-cloud</name>
-    <description>面向排序算法教学的 RAG 增强型交互式系统</description>
+    <name>algoflow-backend</name>
+    <description>衍序 (AlgoFlow) - 面向排序算法教学的 RAG 增强型交互式系统后端微服务</description>
 
     <modules>
         <module>algorithm-common</module>

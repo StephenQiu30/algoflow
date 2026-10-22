@@ -1,23 +1,24 @@
-# Alogrithm Cloud 基础设施环境部署配置
+# =================================================================
+# 衍序 · AlgoFlow 基础设施环境部署配置
 # 包含：MySQL、Redis、Nacos、RabbitMQ、Elasticsearch、Logstash、Prometheus、Grafana
-# 使用方式：docker-compose -f docker-compose-env.yml up -d
-
-version: '3.8'
+# 使用方式：docker compose -f docker-compose-env.yml up -d
+# =================================================================
 
 services:
-  # MySQL 数据库
+  # MySQL 关系型数据库
   mysql:
     image: mysql:8.0
     container_name: algorithm-mysql
     restart: always
     ports:
-      - "3306:3306"
+      - "${MYSQL_PORT:-3306}:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      TZ: ${TZ}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-algorithm}
+      TZ: ${TZ:-Asia/Shanghai}
     volumes:
       - mysql-data:/var/lib/mysql
+      - ./backend/sql/algorithm.sql:/docker-entrypoint-initdb.d/algorithm.sql:ro
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -31,20 +32,20 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis 缓存
+  # Redis 分布式缓存与锁
   redis:
     image: redis:7.0
     container_name: algorithm-redis
     restart: always
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT:-6379}:6379"
     volumes:
       - redis-data:/data
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-123456}
     networks:
       - algorithm-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping" ]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-123456}", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -56,13 +57,13 @@ services:
     restart: always
     environment:
       - MODE=standalone
-      - TIME_ZONE=${TZ}
+      - TIME_ZONE=${TZ:-Asia/Shanghai}
       - NACOS_AUTH_ENABLE=true
-      - NACOS_AUTH_TOKEN=${NACOS_AUTH_TOKEN}
-      - NACOS_AUTH_IDENTITY_KEY=${NACOS_AUTH_IDENTITY_KEY}
-      - NACOS_AUTH_IDENTITY_VALUE=${NACOS_AUTH_IDENTITY_VALUE}
-      - NACOS_AUTH_USERNAME=${NACOS_USERNAME}
-      - NACOS_AUTH_PASSWORD=${NACOS_PASSWORD}
+      - NACOS_AUTH_TOKEN=${NACOS_AUTH_TOKEN:-SecretKey012345678901234567890123456789012345678901234567890123456789}
+      - NACOS_AUTH_IDENTITY_KEY=${NACOS_AUTH_IDENTITY_KEY:-serverIdentity}
+      - NACOS_AUTH_IDENTITY_VALUE=${NACOS_AUTH_IDENTITY_VALUE:-security}
+      - NACOS_AUTH_USERNAME=${NACOS_USERNAME:-nacos}
+      - NACOS_AUTH_PASSWORD=${NACOS_PASSWORD:-nacos}
       - JVM_XMS=256m
       - JVM_XMX=256m
       - JVM_XMN=128m
@@ -86,7 +87,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # RabbitMQ 消息队列
+  # RabbitMQ 异步解耦消息队列
   rabbitmq:
     image: rabbitmq:3.12-management
     container_name: algorithm-rabbitmq
@@ -95,9 +96,9 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST}
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER:-guest}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS:-guest}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_DEFAULT_VHOST:-/}
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
@@ -108,7 +109,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # Elasticsearch 搜索引擎
+  # Elasticsearch 全文检索与向量存储
   elasticsearch:
     image: elasticsearch:8.19.10
     container_name: algorithm-elasticsearch
@@ -135,7 +136,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # ELK 日志汇聚：接收各服务 logback TCP 5000 上报，写入 ES；仅 prod 环境启用 logback 输出
+  # ELK 日志汇聚
   logstash:
     image: logstash:8.19.0
     container_name: algorithm-logstash
@@ -143,8 +144,6 @@ services:
     ports:
       - "5000:5000"
       - "9600:9600"
-    volumes:
-      - ./monitoring/logstash/pipeline:/usr/share/logstash/pipeline:ro
     environment:
       LS_JAVA_OPTS: -Xms256m -Xmx256m
     networks:
@@ -153,34 +152,30 @@ services:
       elasticsearch:
         condition: service_healthy
 
+  # Prometheus 监控指标采集
   prometheus:
     image: prom/prometheus:v2.54.1
     container_name: algorithm-prometheus
     restart: always
     ports:
       - "9090:9090"
-    volumes:
-      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     command:
-      - --config.file=/etc/prometheus/prometheus.yml
       - --storage.tsdb.path=/prometheus
       - --web.enable-lifecycle
     networks:
       - algorithm-network
 
+  # Grafana 可视化大屏监控 (默认映射 3100 端口，避开 3000 前端端口)
   grafana:
     image: grafana/grafana:11.4.0
     container_name: algorithm-grafana
     restart: always
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT:-3100}:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
       - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_SERVER_ROOT_URL=%(protocol)s://%(domain)s:%(http_port)s/
-    volumes:
-      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
     networks:
       - algorithm-network
 
