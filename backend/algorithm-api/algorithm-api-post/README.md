@@ -1,6 +1,6 @@
 # algorithm-api-post | 帖子与评论 API 契约
 
-`algorithm-api-post` 是 `algorithm-cloud` 的内容服务接口模块，定义帖子、评论、互动数据和内容元信息的跨服务访问协议。
+`algorithm-api-post` 是 `AlgoFlow` 的内容服务接口模块，定义帖子、评论、互动数据和内容元信息的跨服务访问协议。
 
 ## 提供能力
 
@@ -24,7 +24,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [帖子服务](../../algorithm-service/algorithm-post-service/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

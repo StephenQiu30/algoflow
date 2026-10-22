@@ -1,6 +1,6 @@
 # algorithm-common-cache | Redis、Redisson 与本地缓存组件
 
-`algorithm-common-cache` 为 `algorithm-cloud` 微服务提供统一的缓存、分布式锁和限流能力，组合 Redis/Redisson 与 Caffeine，减少业务模块重复配置。
+`algorithm-common-cache` 为 `AlgoFlow` 后端微服务集群提供统一的缓存、分布式锁和限流能力，组合 Redis/Redisson 与 Caffeine，减少业务模块重复配置。
 
 ## 核心能力
 
@@ -28,7 +28,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [RabbitMQ 公共组件](../algorithm-common-rabbitmq/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

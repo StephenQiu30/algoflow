@@ -1,6 +1,6 @@
 # algorithm-user-service | 用户认证与 RBAC 权限服务
 
-`algorithm-user-service` 负责 `algorithm-cloud` 的用户账号、邮箱/GitHub 登录、Token 会话、多端登录控制和 RBAC 权限校验。
+`algorithm-user-service` 负责 `AlgoFlow` 的用户账号、邮箱/GitHub 登录、Token 会话、多端登录控制和 RBAC 权限校验。
 
 ## 核心能力
 
@@ -36,7 +36,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [用户 API 契约](../../algorithm-api/algorithm-api-user/README.md)
 - [Nacos 配置说明](../../nacos-config/README.md)
 

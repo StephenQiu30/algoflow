@@ -1,6 +1,6 @@
 # algorithm-api-user | 用户与认证 API 契约
 
-`algorithm-api-user` 是 `algorithm-cloud` 的用户服务接口模块，定义用户资料、登录态、角色权限和服务间用户信息查询的 Feign 客户端与 DTO/VO。
+`algorithm-api-user` 是 `AlgoFlow` 的用户服务接口模块，定义用户资料、登录态、角色权限和服务间用户信息查询的 Feign 客户端与 DTO/VO。
 
 ## 提供能力
 
@@ -28,7 +28,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [用户服务](../../algorithm-service/algorithm-user-service/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

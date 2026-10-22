@@ -1,6 +1,6 @@
 # algorithm-api-ai | RAG 与 AI 服务 API 契约
 
-`algorithm-api-ai` 是 `algorithm-cloud` 的 AI 微服务接口模块，使用 Spring Cloud OpenFeign、DTO 和 VO 定义知识库、文档处理、RAG 流式问答与召回分析所需的跨服务通信契约。
+`algorithm-api-ai` 是 `AlgoFlow` 的 AI 微服务接口模块，使用 Spring Cloud OpenFeign、DTO 和 VO 定义知识库、文档处理、RAG 流式问答与召回分析所需的跨服务通信契约。
 
 ## 提供能力
 
@@ -24,7 +24,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [AI 服务](../../algorithm-service/algorithm-ai-service/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

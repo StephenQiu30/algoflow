@@ -1,6 +1,6 @@
 # algorithm-notification-service | 站内通知与实时消息服务
 
-`algorithm-notification-service` 负责 `algorithm-cloud` 的站内通知、互动提醒、未读计数和消息状态管理，并可通过 RabbitMQ 消费业务事件、通过 WebSocket 向前端推送实时消息。
+`algorithm-notification-service` 负责 `AlgoFlow` 的站内通知、互动提醒、未读计数和消息状态管理，并可通过 RabbitMQ 消费业务事件、通过 WebSocket 向前端推送实时消息。
 
 ## 核心能力
 
@@ -30,7 +30,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [通知 API 契约](../../algorithm-api/algorithm-api-notification/README.md)
 - [WebSocket 公共组件](../../algorithm-common/algorithm-common-websocket/README.md)
 

@@ -1,6 +1,6 @@
 # algorithm-search-service | Elasticsearch 全文与聚合搜索服务
 
-`algorithm-search-service` 基于 Elasticsearch 为 `algorithm-cloud` 提供帖子、用户和多数据源聚合搜索，并负责搜索索引的初始化与增量同步。
+`algorithm-search-service` 基于 Elasticsearch 为 `AlgoFlow` 提供帖子、用户和多数据源聚合搜索，并负责搜索索引的初始化与增量同步。
 
 ## 核心能力
 
@@ -35,7 +35,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [搜索 API 契约](../../algorithm-api/algorithm-api-search/README.md)
 - [AI RAG 服务](../algorithm-ai-service/README.md)
 

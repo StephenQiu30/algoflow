@@ -1,6 +1,6 @@
 # algorithm-common-web | Spring Boot Web 与 OpenAPI 公共组件
 
-`algorithm-common-web` 统一 `algorithm-cloud` 各微服务的 Web 层行为，提供 Jackson 序列化、日期格式、CORS 和 Knife4j/OpenAPI 文档配置。
+`algorithm-common-web` 统一 `AlgoFlow` 后端各微服务的 Web 层行为，提供 Jackson 序列化、日期格式、CORS 和 Knife4j/OpenAPI 文档配置。
 
 ## 核心能力
 
@@ -24,7 +24,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [核心公共组件](../algorithm-common-core/README.md)
 - [API 网关](../../algorithm-gateway/README.md)
 

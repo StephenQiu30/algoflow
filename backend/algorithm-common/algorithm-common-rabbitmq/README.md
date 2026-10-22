@@ -48,7 +48,7 @@ public class UserRegisterHandler implements RabbitMqHandler<UserDTO> {
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [Nacos 配置](../../nacos-config/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

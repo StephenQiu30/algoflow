@@ -39,8 +39,8 @@ else
     echo "Creating namespace '${NAMESPACE}'..."
     curl -s -X POST "${NACOS_ADDR}/nacos/v1/console/namespaces" \
         -d "customNamespaceId=${NAMESPACE}" \
-        -d "namespaceName=Alogrithm Cloud" \
-        -d "namespaceDesc=Alogrithm Cloud Configuration Namespace" \
+        -d "namespaceName=AlgoFlow Cloud" \
+        -d "namespaceDesc=AlgoFlow Configuration Namespace" \
         -d "accessToken=${ACCESS_TOKEN}" > /dev/null
     echo "Namespace created"
 fi

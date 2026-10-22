@@ -1,6 +1,6 @@
-# MySQL 数据库初始化 | algorithm-cloud SQL
+# MySQL 数据库初始化 | AlgoFlow Backend SQL
 
-本目录提供 `algorithm-cloud` 的单库 MySQL 初始化脚本，覆盖用户、登录、帖子、评论、点赞、收藏、RAG 知识库、文档、聊天记忆、通知、文件、邮件和审计日志等业务表。
+本目录提供 **衍序 · AlgoFlow** 微服务后端的单库 MySQL 初始化脚本，覆盖用户、登录、帖子、评论、点赞、收藏、RAG 知识库、文档、聊天记忆、通知、文件、邮件和审计日志等业务表。
 
 ## 初始化方式
 
@@ -13,7 +13,7 @@ mysql -u root -p < algorithm.sql
 也可以在 MySQL 客户端中执行：
 
 ```sql
-SOURCE /absolute/path/to/algorithm-cloud/sql/algorithm.sql;
+SOURCE /absolute/path/to/algoflow/backend/sql/algorithm.sql;
 ```
 
 ## 数据表范围
@@ -38,7 +38,7 @@ SOURCE /absolute/path/to/algorithm-cloud/sql/algorithm.sql;
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../README.md)
+- [AlgoFlow 后端总览](../README.md)
 - [Nacos 配置说明](../nacos-config/README.md)
 - [SQL 脚本](algorithm.sql)
 

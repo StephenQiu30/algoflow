@@ -108,7 +108,6 @@
   npm run typecheck    # 严格 TypeScript 类型检查
   npm run lint         # ESLint 代码风格检查
   npm test             # 核心单元测试
-  npm run course:check # 课程文档一致性校验
   npm run build        # 生产构建验证
   ```
 - **后端提交前验证**：

@@ -1,6 +1,6 @@
 # Nacos 配置中心 | 微服务环境配置导入
 
-`nacos-config` 保存 `algorithm-cloud` 的 Nacos 配置模板，为 Spring Cloud Alibaba 微服务提供服务发现、数据库、Redis、RabbitMQ、Elasticsearch、对象存储、邮件和 AI 模型配置。
+`nacos-config` 保存 **衍序 · AlgoFlow** 的 Nacos 配置模板，为 Spring Cloud Alibaba 微服务提供服务发现、数据库、Redis、RabbitMQ、Elasticsearch、对象存储、邮件和 AI 模型配置。
 
 ## 配置文件分类
 
@@ -49,7 +49,7 @@ chmod +x import-config.sh
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../README.md)
+- [AlgoFlow 后端总览](../README.md)
 - [Docker 基础设施](../docker-compose-env.yml)
 - [SQL 初始化](../sql/README.md)
 

@@ -12,9 +12,7 @@
     "format:check": "prettier --check .",
     "openapi2ts": "openapi2ts",
     "test": "node --test tests/*.test.cjs",
-    "typecheck": "tsc --noEmit --incremental false",
-    "course:check": "node scripts/course-release.cjs --check",
-    "course:build": "node scripts/course-release.cjs"
+    "typecheck": "tsc --noEmit --incremental false"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

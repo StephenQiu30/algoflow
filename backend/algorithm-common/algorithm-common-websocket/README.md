@@ -1,6 +1,6 @@
 # algorithm-common-websocket | Netty WebSocket 实时通信组件
 
-`algorithm-common-websocket` 基于 Netty 为 `algorithm-cloud` 提供 WebSocket 长连接、用户会话管理、心跳检测和多端消息推送能力。
+`algorithm-common-websocket` 基于 Netty 为 `AlgoFlow` 提供 WebSocket 长连接、用户会话管理、心跳检测和多端消息推送能力。
 
 ## 核心能力
 
@@ -27,7 +27,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [通知 API 契约](../../algorithm-api/algorithm-api-notification/README.md)
 - [通知服务](../../algorithm-service/algorithm-notification-service/README.md)
 

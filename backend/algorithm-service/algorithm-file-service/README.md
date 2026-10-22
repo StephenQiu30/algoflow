@@ -1,6 +1,6 @@
 # algorithm-file-service | COS 与 MinIO 文件服务
 
-`algorithm-file-service` 是 `algorithm-cloud` 的统一对象存储入口，为头像、帖子图片、教学文档等业务提供文件上传、格式校验、大小校验和存储地址返回。
+`algorithm-file-service` 是 `AlgoFlow` 的统一对象存储入口，为头像、帖子图片、教学文档等业务提供文件上传、格式校验、大小校验和存储地址返回。
 
 ## 核心能力
 
@@ -33,7 +33,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [文件 API 契约](../../algorithm-api/algorithm-api-file/README.md)
 - [Nacos 配置说明](../../nacos-config/README.md)
 

@@ -1,6 +1,6 @@
 # algorithm-api-search | 搜索服务 API 契约
 
-`algorithm-api-search` 是 `algorithm-cloud` 的搜索服务接口模块，使用 Feign 和统一请求模型提供帖子、用户和聚合搜索的跨服务调用能力。
+`algorithm-api-search` 是 `AlgoFlow` 的搜索服务接口模块，使用 Feign 和统一请求模型提供帖子、用户和聚合搜索的跨服务调用能力。
 
 ## 提供能力
 
@@ -29,7 +29,7 @@ Page<PostVO> page = searchFeignClient.searchPostVo(request).getData();
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [搜索服务](../../algorithm-service/algorithm-search-service/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>algorithm-ai-service</artifactId>
-    <description>Algorithm RAG-Enhanced Interactive Teaching System</description>
+    <description>衍序 (AlgoFlow) - 面向排序算法教学的 RAG 增强型交互式系统</description>
 
     <dependencies>
         <!-- algorithm-api-ai -->

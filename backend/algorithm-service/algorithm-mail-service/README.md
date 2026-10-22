@@ -1,6 +1,6 @@
 # algorithm-mail-service | 验证码与异步邮件服务
 
-`algorithm-mail-service` 为 `algorithm-cloud` 提供验证码、账号安全、系统告警和业务通知邮件能力，支持同步发送、RabbitMQ 异步投递和模板渲染。
+`algorithm-mail-service` 为 `AlgoFlow` 提供验证码、账号安全、系统告警和业务通知邮件能力，支持同步发送、RabbitMQ 异步投递和模板渲染。
 
 ## 核心能力
 
@@ -35,7 +35,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [邮件 API 契约](../../algorithm-api/algorithm-api-mail/README.md)
 - [Nacos 配置说明](../../nacos-config/README.md)
 

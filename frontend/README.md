@@ -1,48 +1,47 @@
-# Algorithm Next · Interactive Sorting Visualizer + RAG Q&A
+# 衍序 · AlgoFlow 前端交互系统 (AlgoFlow Frontend)
 
 <p align="center">
-  <strong>排序算法可视化课堂 · Next.js + React + RAG 智能问答</strong>
+  <strong>推衍秩序 · 步进数据心流 | 面向排序算法教学的 RAG 增强型交互式系统</strong>
 </p>
 
 <p align="center">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
-  <a href="https://github.com/StephenQiu30/algorithm-next/stargazers"><img src="https://img.shields.io/github/stars/StephenQiu30/algorithm-next?style=social" alt="Stars"></a>
-  <img src="https://img.shields.io/badge/Next.js-16-black.svg" alt="Next.js 16">
+  <a href="../LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
+  <a href="https://github.com/StephenQiu30/algoflow/stargazers"><img src="https://img.shields.io/github/stars/StephenQiu30/algoflow?style=social" alt="Stars"></a>
+  <img src="https://img.shields.io/badge/Next.js-15+-black.svg" alt="Next.js 15+">
   <img src="https://img.shields.io/badge/React-19-61DAFB.svg" alt="React 19">
   <img src="https://img.shields.io/badge/TypeScript-strict-blue.svg" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC.svg" alt="Tailwind CSS">
 </p>
 
 > **English**: Interactive sorting-algorithm classroom with step-by-step animation, complexity cards, and RAG-powered Q&A.
 >
-> **中文**：把排序动画、执行步骤、复杂度分析、代码高亮和 RAG 问答放进同一条学习路径。适合算法入门、课堂演示与面试复习。
+> **中文**：将排序动画、执行步骤、复杂度分析、代码高亮和 RAG 智能问答融汇于一体。适合算法教学、课堂演示、深度演算与面试复习。
 
 ---
 
-## Demo
+## 体验与入口
 
 | 入口 | 说明 |
 | --- | --- |
-| 本地体验 | `pnpm install && pnpm run dev` → <http://localhost:3000> |
-| 在线 Demo | 部署到 Vercel 后替换此链接（见 `GITHUB_SEO_CHECKLIST.md`） |
-| 排序工作台 | `/sorting`　算法详情：`/sorting/[slug]` |
-| 社区博客 | `/blog` |
-
-> 建议：Fork 后部署到 Vercel，30 秒即可拥有可分享的 Demo 链接——这对转化 Star 非常关键。
+| 本地开发 | `pnpm install && pnpm run dev` → <http://localhost:3000> |
+| 排序工作台 | `/sorting` 算法演练与详情：`/sorting/[slug]` |
+| 社区博客 | `/blog` 题解讨论与学习记录 |
+| 运营后台 | `/admin` 统一管理后台 (用户、内容、知识库与日志) |
 
 ---
 
-## Why this project
+## 核心亮点
 
-- **可视化优先**：逐步展示比较、交换、分区、合并，而不是只丢一段伪代码
-- **知识卡片**：原理、时间/空间复杂度、稳定性、适用场景
-- **RAG 问答**：围绕当前算法从知识库召回解释，支持流式对话
-- **现代前端栈**：Next.js 16、React 19、Tailwind、Radix UI、GSAP、Framer Motion
+- **可视化优先**：高帧率步进演算比较、交换、分区、合并指针状态，而非抽象伪代码；
+- **知识卡片**：19篇算法深度解析、时间/空间复杂度、稳定性、适用场景对比；
+- **RAG 智能导师**：基于领域知识库召回解释，支持流式 SSE 对话；
+- **现代前端全栈**：Next.js 15 App Router、React 19、Tailwind CSS、Radix UI、GSAP、Framer Motion、Zustand、Axios。
 
 ---
 
-## Supported Algorithms
+## 核心算法支持矩阵
 
-| 算法 | 平均时间 | 最坏时间 | 空间 | 稳定 |
+| 算法 | 平均时间 | 最坏时间 | 空间 | 稳定性 |
 | --- | --- | --- | --- | --- |
 | 冒泡排序 Bubble | O(n²) | O(n²) | O(1) | 是 |
 | 选择排序 Selection | O(n²) | O(n²) | O(1) | 否 |
@@ -53,95 +52,53 @@
 | 堆排序 Heap | O(n log n) | O(n log n) | O(1) | 否 |
 | 基数排序 Radix | O(nk) | O(nk) | O(n+k) | 是 |
 
-实现位于 [`src/lib/sortingAlgorithms.ts`](src/lib/sortingAlgorithms.ts)，可视化组件见 [`src/components/sorting/`](src/components/sorting/)。
+算法纯逻辑实现位于 [`src/lib/sortingAlgorithms.ts`](src/lib/sortingAlgorithms.ts)，可视化交互组件位于 [`src/components/sorting/`](src/components/sorting/)。
 
 ---
 
-## Features
-
-- 排序过程逐步播放 / 暂停 / 调速
-- 算法知识卡片与复杂度对比
-- 代码高亮 + Markdown / GFM / KaTeX
-- RAG 对话面板（对接 `algorithm-cloud` AI 服务）
-- 响应式布局、暗色主题、动效
-- 用户登录、博客、通知、搜索（依赖后端）
-
----
-
-## Quick Start
+## 快速上手
 
 ```bash
-git clone https://github.com/StephenQiu30/algorithm-next.git
-cd algorithm-next
+cd frontend
 
-# 推荐 pnpm
+# 推荐使用 pnpm
 pnpm install
 pnpm run dev
 ```
 
-打开 <http://localhost:3000>。
+打开浏览器访问 <http://localhost:3000>。
+
+### 脚本说明
 
 | 命令 | 说明 |
 | --- | --- |
-| `pnpm run dev` | 开发服务器 |
-| `pnpm run build` | 生产构建 |
-| `pnpm run start` | 生产启动 |
-| `pnpm run lint` | ESLint |
-| `pnpm run format` | Prettier 格式化 |
-| `pnpm run openapi2ts` | 按 OpenAPI 生成类型 |
-
-RAG / 登录等能力需要启动 [algorithm-cloud](https://github.com/StephenQiu30/algorithm-cloud) 后端，并检查 `src/api/` 与 `src/lib/` 中的 API 地址。
+| `pnpm run dev` | 本地热重载开发服务器 |
+| `pnpm run build` | 生产包打包构建 |
+| `pnpm run start` | 生产环境预览启动 |
+| `pnpm run lint` | ESLint 代码规范扫描 |
+| `pnpm run format` | Prettier 代码自动格式化 |
+| `pnpm run typecheck` | TypeScript 严格类型检查 |
 
 ---
 
-## Project Layout
+## 目录结构
 
 ```text
 src/
-├── app/                  # 路由页面（sorting / blog / user ...）
-├── components/sorting/   # 可视化、控制条、RAG 面板
-├── lib/sortingAlgorithms.ts # 唯一的算法实现、教学步骤与代码行映射
-├── api/                  # OpenAPI 生成的请求层
-└── store/                # Redux Toolkit
+├── api/                  # 基于 Axios 封装的统一业务 API 请求
+├── app/                  # Next.js App Router 页面 (sorting, blog, user, admin)
+├── components/           # UI 组件库 (sorting, auth, blog, common, design, ui)
+├── enums/                # 前端枚举定义
+├── hooks/                # 自定义 React Hooks
+├── lib/                  # 工具库与 19 种排序算法核心演算步进器
+├── store/                # Zustand 全局状态管理
+└── types/                # TypeScript 统一类型声明
 ```
 
 ---
 
-## Related Repositories
+## 项目体系联动
 
-| 仓库 | 角色 |
-| --- | --- |
-| [algorithm-cloud](https://github.com/StephenQiu30/algorithm-cloud) | 微服务后端 + RAG 核心（**主仓库**） |
-| [algorithm-admin](https://github.com/StephenQiu30/algorithm-admin) | 管理后台 |
-| **algorithm-next（本仓库）** | 用户端可视化课堂 |
-
----
-
-## Contributing
-
-欢迎补充新的排序算法、可视化步骤与教学案例。提交前请运行：
-
-```bash
-pnpm run lint
-pnpm run format:check
-```
-
-详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
-
----
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=StephenQiu30/algorithm-next&type=Date)](https://star-history.com/#StephenQiu30/algorithm-next&Date)
-
-觉得有用就点个 **Star** 吧，让更多学算法的人看到这个可视化课堂。
-
----
-
-## License
-
-[Apache License 2.0](LICENSE)
-
-## Maintainer
-
-[StephenQiu30](https://github.com/StephenQiu30)
+本项目为 **衍序 · AlgoFlow** 统一代码库（Monorepo）中的前端应用：
+- 完整项目仓库：[StephenQiu30/algoflow](https://github.com/StephenQiu30/algoflow)
+- 后端微服务集群位于根目录下的 [`backend/`](../backend/)，启动网关与对应微服务后即可无缝对接。

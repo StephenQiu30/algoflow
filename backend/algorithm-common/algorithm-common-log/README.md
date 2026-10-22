@@ -1,6 +1,6 @@
 # algorithm-common-log | AOP 操作日志与审计组件
 
-`algorithm-common-log` 是 `algorithm-cloud` 的分布式操作日志组件，基于 Spring AOP 和 `@OperationLog` 注解自动采集请求路径、参数、执行时间、用户和异常信息，并上报到日志服务。
+`algorithm-common-log` 是 `AlgoFlow` 的分布式操作日志组件，基于 Spring AOP 和 `@OperationLog` 注解自动采集请求路径、参数、执行时间、用户和异常信息，并上报到日志服务。
 
 ## 核心能力
 
@@ -42,7 +42,7 @@ public BaseResponse<Boolean> review(...) {
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [日志 API 契约](../../algorithm-api/algorithm-api-log/README.md)
 - [日志服务](../../algorithm-service/algorithm-log-service/README.md)
 

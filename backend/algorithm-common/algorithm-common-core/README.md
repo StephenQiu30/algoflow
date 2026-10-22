@@ -1,6 +1,6 @@
 # algorithm-common-core | Java 微服务核心公共组件
 
-`algorithm-common-core` 是 `algorithm-cloud` 的基础公共模块，提供统一响应、异常处理、分页模型、公共枚举和通用工具，帮助各 Spring Boot 微服务保持一致的 API 行为。
+`algorithm-common-core` 是 `AlgoFlow` 的基础公共模块，提供统一响应、异常处理、分页模型、公共枚举和通用工具，帮助各 Spring Boot 微服务保持一致的 API 行为。
 
 ## 核心能力
 
@@ -24,7 +24,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [Web 公共组件](../algorithm-common-web/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

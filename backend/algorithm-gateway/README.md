@@ -1,6 +1,6 @@
 # algorithm-gateway | Spring Cloud Gateway API 网关
 
-`algorithm-gateway` 是 `algorithm-cloud` 的统一 API 入口，基于 Spring Cloud Gateway WebFlux 构建，负责微服务路由、认证、请求头净化、Redis 限流、CORS、访问日志和统一异常响应。
+`algorithm-gateway` 是 `AlgoFlow` 的统一 API 入口，基于 Spring Cloud Gateway WebFlux 构建，负责微服务路由、认证、请求头净化、Redis 限流、CORS、访问日志和统一异常响应。
 
 ## 核心能力
 
@@ -53,9 +53,9 @@ src/main/java/com/stephen/cloud/gateway/
 - Java 21 与 Maven
 - Nacos：服务发现和配置中心
 - Redis：登录态、限流和缓存
-- 下游 `algorithm-cloud` 微服务
+- 下游 `AlgoFlow` 业务微服务
 
-默认端口为 `8080`，命名空间为 `algorithm-cloud`。完整启动流程见 [algorithm-cloud/README.md](../README.md)。
+默认端口为 `8080`，命名空间为 `algorithm-cloud`。完整启动流程见 [AlgoFlow 后端总览](../README.md)。
 
 ## Maven 模块
 

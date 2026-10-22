@@ -11,7 +11,7 @@
 
     <artifactId>algorithm-api-mail</artifactId>
     <name>algorithm-api-mail</name>
-    <description>Algorithm RAG-Enhanced Interactive Teaching System</description>
+    <description>衍序 (AlgoFlow) - 面向排序算法教学的 RAG 增强型交互式系统</description>
 
     <dependencies>
         <!-- algorithm-common-core -->

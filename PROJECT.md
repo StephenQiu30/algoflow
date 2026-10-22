@@ -229,7 +229,6 @@ pnpm dev
 npm run typecheck    # TypeScript 类型检查
 npm run lint         # ESLint 代码规范扫描
 npm test             # 单元测试
-npm run course:check # 算法课程文档一致性校验
 npm run build        # 生产打包测试
 ```
 

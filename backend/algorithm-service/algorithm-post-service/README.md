@@ -1,6 +1,6 @@
 # algorithm-post-service | 帖子、评论与内容互动服务
 
-`algorithm-post-service` 是 `algorithm-cloud` 的内容服务，提供帖子发布、Markdown 内容管理、评论、点赞、收藏、审核，以及向 Elasticsearch 和 AI 服务同步内容的能力。
+`algorithm-post-service` 是 `AlgoFlow` 的内容服务，提供帖子发布、Markdown 内容管理、评论、点赞、收藏、审核，以及向 Elasticsearch 和 AI 服务同步内容的能力。
 
 ## 核心能力
 
@@ -34,7 +34,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [帖子 API 契约](../../algorithm-api/algorithm-api-post/README.md)
 - [RabbitMQ 公共组件](../../algorithm-common/algorithm-common-rabbitmq/README.md)
 

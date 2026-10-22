@@ -1,6 +1,6 @@
 # algorithm-ai-service | Spring AI RAG 智能问答服务
 
-`algorithm-ai-service` 是 `algorithm-cloud` 的 AI 核心服务，基于 Spring AI、DashScope 和 Elasticsearch Vector Store 实现排序算法知识库、文档解析、混合检索、流式问答和召回效果分析。
+`algorithm-ai-service` 是 `AlgoFlow` 的 AI 核心服务，基于 Spring AI、DashScope 和 Elasticsearch Vector Store 实现排序算法知识库、文档解析、混合检索、流式问答和召回效果分析。
 
 ## 核心能力
 
@@ -43,7 +43,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [AI API 契约](../../algorithm-api/algorithm-api-ai/README.md)
 - [排序算法学习资料](../../docs/18-排序算法学习路径与知识图谱.md)
 

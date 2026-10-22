@@ -1,6 +1,6 @@
 # algorithm-api-log | 日志与审计 API 契约
 
-`algorithm-api-log` 是 `algorithm-cloud` 的统一日志 API 模块，为用户服务、网关和其他微服务提供业务审计、登录日志、访问日志、邮件记录和文件记录的跨服务上报契约。
+`algorithm-api-log` 是 `AlgoFlow` 的统一日志 API 模块，为用户服务、网关和其他微服务提供业务审计、登录日志、访问日志、邮件记录和文件记录的跨服务上报契约。
 
 ## 提供能力
 
@@ -24,7 +24,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [公共日志组件](../../algorithm-common/algorithm-common-log/README.md)
 - [日志服务](../../algorithm-service/algorithm-log-service/README.md)
 

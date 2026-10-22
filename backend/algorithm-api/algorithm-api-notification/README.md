@@ -1,6 +1,6 @@
 # algorithm-api-notification | 通知服务 API 契约
 
-`algorithm-api-notification` 是 `algorithm-cloud` 的通知服务接口模块，定义系统公告、互动提醒、未读计数和消息状态管理的跨服务 RPC 协议。
+`algorithm-api-notification` 是 `AlgoFlow` 的通知服务接口模块，定义系统公告、互动提醒、未读计数和消息状态管理的跨服务 RPC 协议。
 
 ## 提供能力
 
@@ -20,7 +20,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [通知服务](../../algorithm-service/algorithm-notification-service/README.md)
 - [WebSocket 公共组件](../../algorithm-common/algorithm-common-websocket/README.md)
 

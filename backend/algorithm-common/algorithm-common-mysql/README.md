@@ -24,7 +24,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [SQL 初始化说明](../../sql/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。

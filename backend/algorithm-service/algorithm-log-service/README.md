@@ -1,6 +1,6 @@
 # algorithm-log-service | MySQL 业务审计日志服务
 
-`algorithm-log-service` 负责 `algorithm-cloud` 的业务审计日志采集与存储，包括操作日志、登录日志、API 访问日志、邮件记录和文件上传记录。它使用 MySQL 保存结构化业务记录，与可选的 Logstash/Elasticsearch 运行时技术日志链路相互补充。
+`algorithm-log-service` 负责 `AlgoFlow` 的业务审计日志采集与存储，包括操作日志、登录日志、API 访问日志、邮件记录和文件上传记录。它使用 MySQL 保存结构化业务记录，与可选的 Logstash/Elasticsearch 运行时技术日志链路相互补充。
 
 ## 核心能力
 
@@ -32,7 +32,7 @@
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [日志 API 契约](../../algorithm-api/algorithm-api-log/README.md)
 - [AOP 日志组件](../../algorithm-common/algorithm-common-log/README.md)
 

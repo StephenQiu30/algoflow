@@ -1,6 +1,6 @@
 # algorithm-api-file | 文件服务 API 契约
 
-`algorithm-api-file` 是 `algorithm-cloud` 的文件服务 API 模块，使用 Spring Cloud OpenFeign 定义跨服务文件上传、业务类型校验和存储结果返回协议。
+`algorithm-api-file` 是 `AlgoFlow` 的文件服务 API 模块，使用 Spring Cloud OpenFeign 定义跨服务文件上传、业务类型校验和存储结果返回协议。
 
 ## 提供能力
 
@@ -35,7 +35,7 @@ public String uploadAvatar(MultipartFile file) {
 
 ## 相关文档
 
-- [algorithm-cloud 后端总览](../../README.md)
+- [AlgoFlow 后端总览](../../README.md)
 - [文件服务](../../algorithm-service/algorithm-file-service/README.md)
 
 本模块基于 [Apache License 2.0](../../LICENSE) 开源。
