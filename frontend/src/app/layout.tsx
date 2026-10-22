@@ -1,5 +1,4 @@
-import { Footer } from '@/components/footer/footer'
-import { SiteHeader } from '@/components/header/site-header'
+import { SiteLayout } from '@/components/layout/site-layout'
 import { RootProviders } from '@/components/providers/root-providers'
 import type { Metadata } from 'next'
 import React from 'react'
@@ -19,16 +18,7 @@ export default function RootLayout({
     <html lang="zh-CN" suppressHydrationWarning>
       <body className="bg-background text-foreground min-h-screen font-sans antialiased">
         <RootProviders>
-          <div className="flex min-h-screen flex-col">
-            <a href="#main-content" className="skip-link">
-              跳转到主要内容
-            </a>
-            <SiteHeader />
-            <main id="main-content" className="flex-1" tabIndex={-1}>
-              {children}
-            </main>
-            <Footer />
-          </div>
+          <SiteLayout>{children}</SiteLayout>
         </RootProviders>
       </body>
     </html>

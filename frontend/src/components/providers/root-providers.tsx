@@ -165,11 +165,12 @@ export function RootProviders({ children }: { children: React.ReactNode }) {
       <AuthLoader>
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="system"
+          enableSystem
           disableTransitionOnChange
         >
           {children}
-          <Toaster position="top-center" richColors />
+          <Toaster position="top-center" />
         </ThemeProvider>
       </AuthLoader>
     </Provider>

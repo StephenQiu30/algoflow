@@ -7,36 +7,36 @@
 @layer base {
   :root {
     --font-inter: 'Inter';
-    --background: 0.000 0.000% 100.000%;
-    --foreground: 240.000 3.333% 11.765%;
-    --card: 0.000 0.000% 100.000%;
-    --card-foreground: 240.000 3.333% 11.765%;
-    --popover: 0.000 0.000% 100.000%;
-    --popover-foreground: 240.000 3.333% 11.765%;
-    --primary: 210.000 100.000% 40.000%;
-    --primary-foreground: 0.000 0.000% 100.000%;
-    --secondary: 240.000 11.111% 96.471%;
-    --secondary-foreground: 240.000 3.333% 11.765%;
-    --muted: 240.000 11.111% 96.471%;
-    --muted-foreground: 240.000 3.810% 41.176%;
-    --accent: 240.000 11.111% 96.471%;
-    --accent-foreground: 240.000 3.333% 11.765%;
-    --cta: 210.000 100.000% 40.000%;
-    --cta-foreground: 0.000 0.000% 100.000%;
-    --destructive: 4.231 76.471% 40.000%;
-    --destructive-foreground: 0.000 0.000% 100.000%;
-    --border: 240.000 8.197% 88.039%;
-    --input: 240.000 3.448% 54.510%;
-    --ring: 210.000 100.000% 40.000%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 9.02%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 9.02%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 9.02%;
+    --primary: 0 0% 9.02%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 96.078%;
+    --secondary-foreground: 0 0% 9.02%;
+    --muted: 0 0% 96.078%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 0 0% 96.078%;
+    --accent-foreground: 0 0% 9.02%;
+    --cta: 0 0% 9.02%;
+    --cta-foreground: 0 0% 100%;
+    --destructive: 0 0% 9.02%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 89.804%;
+    --input: 0 0% 53.333%;
+    --ring: 0 0% 9.02%;
     --radius: 0.875rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --state-comparing: 36.069 100.000% 33.922%;
-    --state-sorted: 144.130 67.647% 26.667%;
-    --state-pivot: 271.304 36.508% 49.412%;
+    --chart-1: 0 0% 9.02%;
+    --chart-2: 0 0% 30%;
+    --chart-3: 0 0% 45%;
+    --chart-4: 0 0% 60%;
+    --chart-5: 0 0% 75%;
+    --state-comparing: 0 0% 40%;
+    --state-sorted: 0 0% 60%;
+    --state-pivot: 0 0% 20%;
     --space-0: 0px;
     --space-1: 4px;
     --space-2: 8px;
@@ -48,35 +48,35 @@
   }
 
   .dark {
-    --background: 240.000 5.556% 7.059%;
-    --foreground: 240.000 11.111% 96.471%;
-    --card: 240.000 5.556% 7.059%;
-    --card-foreground: 240.000 11.111% 96.471%;
-    --popover: 240.000 5.882% 13.333%;
-    --popover-foreground: 240.000 11.111% 96.471%;
-    --primary: 209.159 100.000% 58.039%;
-    --primary-foreground: 240.000 5.556% 7.059%;
-    --secondary: 240.000 5.882% 13.333%; 
-    --secondary-foreground: 240.000 11.111% 96.471%;
-    --muted: 240.000 5.882% 13.333%;
-    --muted-foreground: 240.000 6.383% 72.353%;
-    --accent: 240.000 5.882% 13.333%;
-    --accent-foreground: 240.000 11.111% 96.471%;
-    --cta: 209.159 100.000% 58.039%; 
-    --cta-foreground: 240.000 5.556% 7.059%;
-    --destructive: 4.724 100.000% 75.098%;
-    --destructive-foreground: 240.000 5.556% 7.059%;
-    --border: 240.000 4.274% 22.941%;
-    --input: 240.000 3.644% 48.431%;
-    --ring: 209.159 100.000% 58.039%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --state-comparing: 38.039 100.000% 70.000%;
-    --state-sorted: 140.000 63.333% 64.706%;
-    --state-pivot: 272.842 90.476% 79.412%;
+    --background: 0 0% 3.922%;
+    --foreground: 0 0% 92.941%;
+    --card: 0 0% 3.922%;
+    --card-foreground: 0 0% 92.941%;
+    --popover: 0 0% 9.02%;
+    --popover-foreground: 0 0% 92.941%;
+    --primary: 0 0% 92.941%;
+    --primary-foreground: 0 0% 3.922%;
+    --secondary: 0 0% 9.02%;
+    --secondary-foreground: 0 0% 92.941%;
+    --muted: 0 0% 9.02%;
+    --muted-foreground: 0 0% 63.137%;
+    --accent: 0 0% 9.02%;
+    --accent-foreground: 0 0% 92.941%;
+    --cta: 0 0% 92.941%;
+    --cta-foreground: 0 0% 3.922%;
+    --destructive: 0 0% 92.941%;
+    --destructive-foreground: 0 0% 3.922%;
+    --border: 0 0% 20%;
+    --input: 0 0% 46.667%;
+    --ring: 0 0% 92.941%;
+    --chart-1: 0 0% 92.941%;
+    --chart-2: 0 0% 75%;
+    --chart-3: 0 0% 60%;
+    --chart-4: 0 0% 45%;
+    --chart-5: 0 0% 30%;
+    --state-comparing: 0 0% 63.137%;
+    --state-sorted: 0 0% 40%;
+    --state-pivot: 0 0% 83.137%;
   }
 }
 
@@ -139,21 +139,23 @@
   --radius-lg: calc(var(--radius) - 2px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-sm: calc(var(--radius) - 6px);
-  --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Noto Sans SC', sans-serif;
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Noto Sans SC',
+    sans-serif;
   --font-mono: var(--font-jetbrains), SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @layer utilities {
   .glass {
-    @apply bg-background/80 border border-zinc-200/50 dark:border-zinc-800/50 backdrop-blur-[20px] shadow-sm;
+    @apply bg-background/80 border border-zinc-200/50 shadow-sm backdrop-blur-[20px] dark:border-zinc-800/50;
   }
 
   .glass-card {
-    @apply bg-white dark:bg-zinc-950 border border-zinc-200/50 dark:border-zinc-800/50 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] transition-all duration-300;
+    @apply border border-zinc-200/50 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 dark:border-zinc-800/50 dark:bg-zinc-950 dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
   }
-  
+
   .glass-card:hover {
-    @apply shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.3)] -translate-y-1 border-primary/20;
+    @apply border-primary/20 -translate-y-1 shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.3)];
   }
 
   .text-balance-header {
@@ -189,5 +191,16 @@
 }
 
 /* Keyboard access remains available after the visual rollback. */
-.skip-link { position: fixed; left: 16px; top: 16px; z-index: 100; transform: translateY(-200%); padding: 12px 16px; background: hsl(var(--background)); color: hsl(var(--foreground)); }
-.skip-link:focus { transform: none; }
+.skip-link {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  z-index: 100;
+  transform: translateY(-200%);
+  padding: 12px 16px;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+.skip-link:focus {
+  transform: none;
+}

@@ -1,58 +1,55 @@
 'use client'
 
-import * as React from 'react'
-import { Moon, Sun } from 'lucide-react'
+import { useSyncExternalStore } from 'react'
+import { Monitor, Moon, Sun } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+
+const subscribe = () => () => {}
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = React.useState(false)
-
-  React.useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <button className="text-muted-foreground hover:text-foreground relative inline-flex h-9 w-9 items-center justify-center rounded-full transition-colors hover:bg-transparent">
-        <Sun className="h-4 w-4" />
-        <span className="sr-only">Toggle theme</span>
-      </button>
-    )
-  }
-
-  const isDark = theme === 'dark'
-
-  const toggleTheme = () => {
-    setTheme(isDark ? 'light' : 'dark')
-  }
+  const { theme, resolvedTheme, setTheme } = useTheme()
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true,
+    () => false
+  )
+  const Icon = !mounted || theme === 'system' ? Monitor : resolvedTheme === 'dark' ? Moon : Sun
 
   return (
-    <button
-      onClick={toggleTheme}
-      className={cn(
-        'text-muted-foreground hover:text-foreground relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full transition-colors hover:bg-transparent'
-      )}
-      aria-label="Toggle theme"
-    >
-      <Sun
-        className={cn(
-          'absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 transition-all duration-300',
-          isDark
-            ? 'translate-y-10 scale-0 rotate-90 opacity-0'
-            : '-translate-y-1/2 scale-100 rotate-0 opacity-100'
-        )}
-      />
-      <Moon
-        className={cn(
-          'absolute top-1/2 left-1/2 h-4 w-4 -translate-x-1/2 transition-all duration-300',
-          !isDark
-            ? '-translate-y-10 scale-0 rotate-90 opacity-0'
-            : '-translate-y-1/2 scale-100 rotate-0 opacity-100'
-        )}
-      />
-      <span className="sr-only">Toggle theme</span>
-    </button>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="size-11" aria-label="切换主题">
+          <Icon data-icon="inline-start" aria-hidden="true" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuLabel>外观</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuRadioGroup value={mounted ? theme : 'system'} onValueChange={setTheme}>
+          <DropdownMenuRadioItem value="light">
+            <Sun aria-hidden="true" />
+            浅色
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="dark">
+            <Moon aria-hidden="true" />
+            深色
+          </DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value="system">
+            <Monitor aria-hidden="true" />
+            跟随系统
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }

@@ -12,7 +12,7 @@
 | :--- | :---: | :--- |
 | **Git 分支与状态** | `main` 分支 / 工作区整洁 | `git status` 干净，代码已与规范全面对齐 |
 | **后端工程 (Java 21)** | 🟢 全部编译通过 | 30 个子模块 `mvn test-compile -DskipTests` 全量 SUCCESS (耗时 ~2.0s) |
-| **前端工程 (Next.js 15)**| 🟢 编译与测试全绿 | `npm run typecheck` 0 错误；`npm test` 17 项核心算法与 SSE 单测 100% 通过 |
+| **前端工程 (Next.js 15)**| 🟢 编译与测试全绿 | `pnpm typecheck` 0 错误；`pnpm test` 17 项核心算法与 SSE 单测 100% 通过；生产构建与冒烟测试全绿 |
 | **文档中心体系 (docs/)** | 🟢 全链路闭环 | 已重构 `requirement` → `design` → `prd` → `plan` → `algorithms` 体系 |
 | **核心中间件依赖** | 准备就绪 | `docker-compose-env.yml` 支持一键拉起 MySQL 8.0, Redis 7.0, Nacos, ES 9.3, RabbitMQ |
 
