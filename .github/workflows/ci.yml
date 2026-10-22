@@ -58,13 +58,18 @@ jobs:
 
       - name: Browser Smoke Checks
         run: |
-          pnpm run start -- --hostname 127.0.0.1 --port 3111 > /tmp/sorting-next.log 2>&1 &
+          pnpm start --hostname 127.0.0.1 --port 3111 > /tmp/sorting-next.log 2>&1 &
           app_pid=$!
           trap 'kill "$app_pid"' EXIT
           for attempt in $(seq 1 30); do
             if curl --silent --fail http://127.0.0.1:3111/sorting/bubble > /dev/null; then break; fi
             sleep 1
           done
+          if ! curl --silent --fail http://127.0.0.1:3111/sorting/bubble > /dev/null; then
+            echo "Server failed to start, dumping /tmp/sorting-next.log:"
+            cat /tmp/sorting-next.log || true
+            exit 1
+          fi
           bash tests/browser-smoke.sh
 
   # ==========================================
