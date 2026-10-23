@@ -692,6 +692,7 @@ export function RAGChatPanel({
             persistMode: 'immediate',
             setActive: true,
           })
+          controller.abort()
           break
         }
 
@@ -723,6 +724,7 @@ export function RAGChatPanel({
             persistMode: 'immediate',
             setActive: true,
           })
+          controller.abort()
           break
         }
       }
@@ -762,6 +764,8 @@ export function RAGChatPanel({
       })
     } finally {
       clearTimeout(timeout)
+      // Cancelling Axios's response stream may not close the underlying fetch transport.
+      controller.abort()
       if (streamControllerRef.current === controller) streamControllerRef.current = null
       setIsLoading(false)
       setStatusText('')

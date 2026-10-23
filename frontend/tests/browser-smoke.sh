@@ -34,7 +34,7 @@ browser network route '**/ai/kb/list/page/vo' --body '{"code":0,"data":{"records
 browser find role button click --name '重新加载' --exact
 browser wait --fn "document.body.innerText.includes('受控课程知识库')"
 browser eval --stdin <<'JS'
-window.__ragMode='done';window.__ragRequests=[];
+window.__ragMode='done';window.__ragRequests=[];window.__ragAborted=false;
 const realFetch=window.fetch.bind(window);
 window.fetch=async(input,init)=>{
   const request=new Request(input,init);
@@ -44,7 +44,7 @@ window.fetch=async(input,init)=>{
     start(controller){
       controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify({type:'answer',content:window.__ragMode==='done'?'已完成的受控回答':'已经收到的部分回答'})+'\r\n\r\n'));
       if(window.__ragMode==='done')controller.enqueue(new TextEncoder().encode('data: '+JSON.stringify({type:'done',sources:[{documentName:'sorting-merge.md',chunkId:'controlled-sample',version:body.teachingContext.courseVersion,content:'受控引用片段'}]})+'\r\n\r\n'));
-      request.signal.addEventListener('abort',()=>controller.error(new DOMException('Aborted','AbortError')));
+      request.signal.addEventListener('abort',()=>{window.__ragAborted=true;controller.error(new DOMException('Aborted','AbortError'))});
     },cancel(){window.__ragCancelled=true}
   }),{headers:{'Content-Type':'text/event-stream'}});
 };'controlled stream installed'
@@ -52,7 +52,8 @@ JS
 browser find role textbox fill --name '向 AI 提问' '解释当前步骤'
 browser find role button click --name '发送问题' --exact
 browser wait --fn "document.body.innerText.includes('sorting-merge.md')"
-browser eval "if(!window.__ragCancelled || !window.__ragRequests[0].teachingContext.codeSnippet || !window.__ragRequests[0].teachingContext.courseVersion)throw Error('context or stream completion missing');'context and references verified'"
+browser wait --fn "window.__ragCancelled || window.__ragAborted"
+browser eval "if(!window.__ragRequests[0].teachingContext.codeSnippet || !window.__ragRequests[0].teachingContext.courseVersion)throw Error('teaching context missing');'context, references and transport cleanup verified'"
 browser eval "window.__ragMode='partial';'hold next stream open'"
 browser find role textbox fill --name '向 AI 提问' '测试中断'
 browser find role button click --name '发送问题' --exact
