@@ -1,6 +1,6 @@
 'use client'
-
-import * as React from 'react'
+import { useEffect, useState } from 'react'
+import { Github, Mail } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -8,223 +8,152 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Spinner } from '@/components/ui/spinner'
+import { useAppDispatch } from '@/store/hooks'
 import { setLoginUser } from '@/store/modules'
 import {
   getGitHubAuthorizeUrl,
   sendEmailLoginCode,
   userLoginByEmail,
 } from '@/api/user/userController'
-import { User as UserIcon, X } from 'lucide-react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { MethodSelector } from './method-selector'
-import { EmailLogin } from './email-login'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-
-interface AuthModalProps {
+export function AuthModal({
+  open,
+  onOpenChange,
+}: {
   open: boolean
   onOpenChange: (open: boolean) => void
-}
-
-type ViewType = 'choice' | 'email'
-
-export function AuthModal({ open, onOpenChange }: AuthModalProps) {
-  const dispatch = useAppDispatch()
-  const { user } = useAppSelector(state => state.user)
-  const [loading, setLoading] = React.useState(false)
-  const [error, setError] = React.useState('')
-  const [success, setSuccess] = React.useState('')
-  const [view, setView] = React.useState<ViewType>('choice')
-  const [emailForm, setEmailForm] = React.useState({
-    email: '',
-    code: '',
-  })
-  const [countdown, setCountdown] = React.useState(0)
-  const containerRef = React.useRef<HTMLDivElement>(null)
-
-  // Reset view when modal opens
-  React.useEffect(() => {
-    if (open) {
-      setView('choice')
-      setError('')
-      setSuccess('')
-    }
-  }, [open])
-
-  // Countdown timer
-  React.useEffect(() => {
-    let timer: NodeJS.Timeout
-    if (countdown > 0) {
-      timer = setInterval(() => {
-        setCountdown(prev => prev - 1)
-      }, 1000)
-    }
-    return () => clearInterval(timer)
+}) {
+  const dispatch = useAppDispatch(),
+    [email, setEmail] = useState(''),
+    [code, setCode] = useState(''),
+    [sent, setSent] = useState(false),
+    [countdown, setCountdown] = useState(0),
+    [pending, setPending] = useState(false),
+    [error, setError] = useState('')
+  useEffect(() => {
+    if (!countdown) return
+    const timer = setTimeout(() => setCountdown(n => n - 1), 1000)
+    return () => clearTimeout(timer)
   }, [countdown])
-
-  const handleSendCode = async () => {
-    if (!emailForm.email) {
-      setError('请输入邮箱地址')
+  async function send() {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('请输入有效邮箱')
       return
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailForm.email)) {
-      setError('请输入有效的邮箱地址')
-      return
-    }
-    setLoading(true)
+    setPending(true)
     setError('')
     try {
-      const res = (await sendEmailLoginCode({
-        email: emailForm.email,
-      })) as unknown as UserAPI.BaseResponseInteger
-      if (res.code === 0) {
-        setSuccess('验证码已发送')
-        setCountdown(60)
-      } else {
-        setError(res.message || '发送失败')
-      }
-    } catch (err: unknown) {
-      setError((err instanceof Error ? err.message : '') || '发送失败，请重试')
+      const r = await sendEmailLoginCode({ email })
+      if (r.code !== 0) throw Error(r.message || '发送失败')
+      setSent(true)
+      setCountdown(60)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '发送失败，请重试')
     } finally {
-      setLoading(false)
+      setPending(false)
     }
   }
-
-  const handleEmailLogin = async (e: React.FormEvent) => {
+  async function login(e: React.FormEvent) {
     e.preventDefault()
-    setError('')
-    setSuccess('')
-    setLoading(true)
-    if (!emailForm.email || !emailForm.code) {
-      setError('请输入邮箱和验证码')
-      setLoading(false)
+    if (!/^\d{6}$/.test(code)) {
+      setError('请输入 6 位验证码')
       return
     }
+    setPending(true)
+    setError('')
     try {
-      const res = (await userLoginByEmail(emailForm)) as unknown as UserAPI.BaseResponseLoginUserVO
-      if (res.code === 0 && res.data) {
-        if (res.data.token && typeof window !== 'undefined') {
-          localStorage.setItem('token', res.data.token)
-        }
-        dispatch(setLoginUser(res.data))
-        onOpenChange(false)
-        setSuccess('登录成功')
-      } else {
-        setError(res.message || '登录失败')
-      }
-    } catch (err: unknown) {
-      setError((err instanceof Error ? err.message : '') || '登录失败，请重试')
+      const r = await userLoginByEmail({ email, code })
+      if (r.code !== 0 || !r.data) throw Error(r.message || '登录失败')
+      if (r.data.token) localStorage.setItem('token', r.data.token)
+      dispatch(setLoginUser(r.data))
+      onOpenChange(false)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '登录失败，请重试')
     } finally {
-      setLoading(false)
+      setPending(false)
     }
   }
-
-  const handleGitHubLogin = async () => {
+  async function github() {
+    setPending(true)
+    setError('')
     try {
-      const res = (await getGitHubAuthorizeUrl()) as unknown as UserAPI.BaseResponseString
-      if (res.code === 0 && res.data) {
-        window.location.href = res.data
-      } else {
-        setError(res.message || '获取 GitHub 授权链接失败')
-      }
-    } catch (err: unknown) {
-      setError((err instanceof Error ? err.message : '') || '操作失败，请重试')
+      const r = await getGitHubAuthorizeUrl()
+      if (r.code !== 0 || !r.data) throw Error(r.message || '无法获取授权链接')
+      window.location.assign(r.data)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '请求失败')
+    } finally {
+      setPending(false)
     }
   }
-
-  useGSAP(
-    () => {
-      if (open) {
-        gsap.from('.auth-modal-content', {
-          y: 40,
-          opacity: 0,
-          duration: 1,
-          ease: 'power4.out',
-        })
-      }
-    },
-    { scope: containerRef, dependencies: [open, view] }
-  )
-
-  const getTitle = () => {
-    switch (view) {
-      case 'email':
-        return '邮箱登录'
-      default:
-        return '欢迎回来'
-    }
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-background/50 selection:bg-primary/20 overflow-hidden rounded-[2.5rem] border-none p-0 shadow-2xl backdrop-blur-3xl sm:max-w-[440px]">
-        <div ref={containerRef} className="auth-modal-content relative flex flex-col">
-          <DialogHeader className="space-y-6 px-10 pt-16">
-            <div className="flex flex-col items-center justify-center gap-6">
-              <div className="group relative">
-                <div className="bg-primary/5 absolute -inset-4 rounded-full opacity-0 blur-2xl transition-opacity duration-1000 group-hover:opacity-100" />
-                <Avatar className="border-background relative h-24 w-24 border-[6px] shadow-2xl transition-transform duration-700 group-hover:scale-110">
-                  <AvatarImage src={user?.userAvatar} alt={user?.userName || '用户头像'} />
-                  <AvatarFallback className="bg-muted backdrop-blur-2xl">
-                    <UserIcon className="text-foreground/20 h-10 w-10" />
-                  </AvatarFallback>
-                </Avatar>
-              </div>
-              <div className="space-y-2 text-center">
-                <DialogTitle className="text-foreground text-3xl font-black tracking-tight">
-                  {getTitle()}
-                </DialogTitle>
-                <DialogDescription className="text-foreground/40 px-4 text-sm font-bold tracking-tight">
-                  {view === 'choice' ? '选择您偏好的方式登录账户' : '请根据指示完成身份验证'}
-                </DialogDescription>
-              </div>
-            </div>
-          </DialogHeader>
-
-          <div className="px-10 pt-10 pb-12">
-            <div className="min-h-[160px]">
-              {view === 'choice' && (
-                <MethodSelector
-                  onGitHubLogin={handleGitHubLogin}
-                  onEmailClick={() => setView('email')}
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>登录 AlgoFlow</DialogTitle>
+          <DialogDescription>使用邮箱验证码或 GitHub 继续。</DialogDescription>
+        </DialogHeader>
+        <form className="flex flex-col gap-6" onSubmit={e => void login(e)}>
+          <FieldGroup>
+            <Field>
+              <FieldLabel htmlFor="login-email">邮箱</FieldLabel>
+              <Input
+                id="login-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={e => {
+                  setEmail(e.target.value)
+                  setSent(false)
+                }}
+                required
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="login-code">验证码</FieldLabel>
+              <div className="flex gap-2">
+                <Input
+                  id="login-code"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  maxLength={6}
+                  value={code}
+                  onChange={e => setCode(e.target.value)}
+                  required
                 />
-              )}
-              {view === 'email' && (
-                <EmailLogin
-                  emailForm={emailForm}
-                  setEmailForm={setEmailForm}
-                  onSendCode={handleSendCode}
-                  onSubmit={handleEmailLogin}
-                  onBack={() => setView('choice')}
-                  loading={loading}
-                  countdown={countdown}
-                  error={error}
-                  success={success}
-                />
-              )}
-            </div>
-          </div>
-
-          <div className="bg-muted/20 border-border/5 border-t px-10 py-6 text-center">
-            <p className="text-foreground/20 text-[10px] leading-relaxed font-black tracking-[0.2em] uppercase italic">
-              登录即代表您同意
-              <a
-                href="#"
-                className="text-foreground/40 hover:text-primary decoration-border/10 mx-1 underline underline-offset-4 transition-colors"
-              >
-                服务条款
-              </a>
-              与
-              <a
-                href="#"
-                className="text-foreground/40 hover:text-primary decoration-border/10 mx-1 underline underline-offset-4 transition-colors"
-              >
-                隐私政策
-              </a>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  disabled={pending || countdown > 0}
+                  onClick={() => void send()}
+                >
+                  {countdown ? `${countdown}s` : '获取验证码'}
+                </Button>
+              </div>
+            </Field>
+          </FieldGroup>
+          {sent && (
+            <p role="status" className="text-muted-foreground text-sm">
+              验证码已发送，请查收邮件。
             </p>
-          </div>
-        </div>
+          )}
+          {error && (
+            <Alert>
+              <AlertDescription role="alert">{error}</AlertDescription>
+            </Alert>
+          )}
+          <Button disabled={pending}>
+            {pending ? <Spinner /> : <Mail data-icon="inline-start" />}登录并继续
+          </Button>
+        </form>
+        <Button variant="secondary" disabled={pending} onClick={() => void github()}>
+          <Github data-icon="inline-start" />
+          使用 GitHub 登录
+        </Button>
       </DialogContent>
     </Dialog>
   )

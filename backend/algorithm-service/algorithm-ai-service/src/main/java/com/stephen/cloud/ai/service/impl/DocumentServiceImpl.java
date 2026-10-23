@@ -102,6 +102,7 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document> i
         document.setFileExtension(extension);
         document.setStatus(DocumentParseStatusEnum.PENDING.getValue());
         document.setChunkCount(0);
+        document.setRevision(0L);
         document.setUserId(userId);
         document.setUploadTime(new Date());
         boolean result = this.save(document);
@@ -140,11 +141,15 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document> i
                 .like(StringUtils.isNotBlank(queryRequest.getName()), Document::getName, queryRequest.getName());
         String sortField = queryRequest.getSortField();
         String sortOrder = queryRequest.getSortOrder();
-        if (StringUtils.isNotBlank(sortField) && "createTime".equals(sortField)) {
-            queryWrapper.orderBy(true, CommonConstant.SORT_ORDER_ASC.equalsIgnoreCase(sortOrder), Document::getCreateTime);
+        boolean ascending = CommonConstant.SORT_ORDER_ASC.equalsIgnoreCase(sortOrder);
+        if ("updateTime".equals(sortField)) {
+            queryWrapper.orderBy(true, ascending, Document::getUpdateTime);
+        } else if ("name".equals(sortField)) {
+            queryWrapper.orderBy(true, ascending, Document::getName);
         } else {
-            queryWrapper.orderByDesc(Document::getCreateTime);
+            queryWrapper.orderBy(true, ascending, Document::getCreateTime);
         }
+        queryWrapper.orderByDesc(Document::getId);
         return queryWrapper;
     }
 
@@ -198,6 +203,7 @@ public class DocumentServiceImpl extends ServiceImpl<DocumentMapper, Document> i
         }
         DocumentProcessMessage message = new DocumentProcessMessage();
         message.setDocumentId(document.getId());
+        message.setRevision(document.getRevision());
         message.setKnowledgeBaseId(document.getKnowledgeBaseId());
         message.setFilePath(document.getFilePath());
         message.setFileExtension(document.getFileExtension());

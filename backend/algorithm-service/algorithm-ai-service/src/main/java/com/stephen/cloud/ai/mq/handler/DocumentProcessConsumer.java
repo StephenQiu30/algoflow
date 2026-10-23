@@ -6,6 +6,7 @@ import com.stephen.cloud.ai.knowledge.etl.DocumentETLPipeline;
 import com.stephen.cloud.ai.model.entity.Document;
 import com.stephen.cloud.ai.mq.model.DocumentProcessMessage;
 import com.stephen.cloud.ai.service.DocumentService;
+import com.stephen.cloud.ai.mapper.DocumentMapper;
 import com.stephen.cloud.api.ai.model.enums.DocumentParseStatusEnum;
 import com.stephen.cloud.common.rabbitmq.consumer.RabbitMqDedupeLock;
 import com.stephen.cloud.common.rabbitmq.consumer.RabbitMqHandler;
@@ -27,6 +28,7 @@ public class DocumentProcessConsumer implements RabbitMqHandler<DocumentProcessM
 
     @Resource
     private DocumentService documentService;
+    @Resource private DocumentMapper documentMapper;
 
     @Resource
     private DocumentETLPipeline documentETLPipeline;
@@ -46,21 +48,24 @@ public class DocumentProcessConsumer implements RabbitMqHandler<DocumentProcessM
             log.warn("[DocumentProcessConsumer] 文档不存在，忽略处理, msgId={}, documentId={}", msgId, documentId);
             return;
         }
-        Date now = new Date();
-        document.setStatus(DocumentParseStatusEnum.PROCESSING.getValue());
-        document.setProcessStartTime(now);
-        documentService.updateById(document);
+        Long revision = message.getRevision() == null ? 0L : message.getRevision();
+        if (documentMapper.claimIndex(documentId, revision) != 1) {
+            log.info("忽略重复或过期的索引任务，documentId={}, revision={}", documentId, revision);
+            return;
+        }
         long start = System.currentTimeMillis();
         try {
             Map<String, Object> metadata = new HashMap<>();
-            putIfNotNull(metadata, "knowledgeBaseId", message.getKnowledgeBaseId());
-            putIfNotNull(metadata, "documentId", message.getDocumentId());
+            putIfNotNull(metadata, "knowledgeBaseId", document.getKnowledgeBaseId());
+            putIfNotNull(metadata, "documentId", document.getId());
+            metadata.put("documentRevision", revision);
+            metadata.put("useStoredChunks", document.getChunkCount() != null && document.getChunkCount() > 0);
             putIfNotNull(metadata, "documentName", document.getName());
             putIfNotNull(metadata, "sourceType", document.getSourceType());
             putIfNotNull(metadata, "bizTag", document.getBizTag());
             putIfNotNull(metadata, "version", document.getVersion());
             enrichMetadataFromExtraMeta(document.getExtraMeta(), metadata);
-            int chunkCount = documentETLPipeline.process(message.getFilePath(), message.getFileExtension(), metadata);
+            int chunkCount = documentETLPipeline.process(document.getFilePath(), document.getFileExtension(), metadata);
             document.setStatus(DocumentParseStatusEnum.COMPLETED.getValue());
             document.setChunkCount(chunkCount);
             document.setErrorMessage(null);
@@ -69,12 +74,10 @@ public class DocumentProcessConsumer implements RabbitMqHandler<DocumentProcessM
             log.info("[DocumentProcessConsumer] 文档处理成功, msgId={}, documentId={}, cost={}ms",
                     msgId, documentId, System.currentTimeMillis() - start);
         } catch (Exception e) {
-            document.setStatus(DocumentParseStatusEnum.FAILED.getValue());
-            document.setErrorMessage(e.getMessage());
-            document.setProcessEndTime(new Date());
-            documentService.updateById(document);
+            documentMapper.failIndex(documentId, revision, StringUtils.abbreviate(
+                    StringUtils.defaultIfBlank(e.getMessage(), "索引处理失败，请检查服务后重试"), 2000));
             log.error("[DocumentProcessConsumer] 文档处理失败, msgId={}, documentId={}", msgId, documentId, e);
-            throw e;
+            // This is a persisted business failure, retried explicitly with a new revision.
         }
     }
 

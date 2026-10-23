@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** RAG流式问答 基于知识库进行问答，支持流式输出答案 POST /ai/rag/ask/stream */

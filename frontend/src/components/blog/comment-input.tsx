@@ -1,117 +1,79 @@
 'use client'
-
-import * as React from 'react'
+import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { Loader2, Send } from 'lucide-react'
-import { useAppSelector } from '@/store/hooks'
-import { RootState } from '@/store'
-import { toast } from 'sonner'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Spinner } from '@/components/ui/spinner'
 import { addPostComment } from '@/api/post/postCommentController'
-
-import { UserAvatar } from '@/components/header/user-avatar'
-
-interface CommentInputProps {
-  postId: string
-  parentId?: number
-  onSuccess?: () => void
-  onCancel?: () => void
-  autoFocus?: boolean
-  placeholder?: string
-}
-
+import { useAppSelector } from '@/store/hooks'
+import { AuthModal } from '@/components/auth/auth-modal'
+import { toast } from 'sonner'
 export function CommentInput({
   postId,
   parentId = 0,
   onSuccess,
   onCancel,
   autoFocus = false,
-  placeholder = '写下你的评论见解...',
-}: CommentInputProps) {
-  const { user } = useAppSelector((state: RootState) => state.user)
-  const [content, setContent] = React.useState('')
-  const [submitting, setSubmitting] = React.useState(false)
-
-  const handleSubmit = async () => {
-    if (!content.trim()) return
+  placeholder = '写下你的思考…',
+}: {
+  postId: string
+  parentId?: number
+  onSuccess?: () => void
+  onCancel?: () => void
+  autoFocus?: boolean
+  placeholder?: string
+}) {
+  const { user } = useAppSelector(s => s.user),
+    [content, setContent] = useState(''),
+    [pending, setPending] = useState(false),
+    [login, setLogin] = useState(false)
+  async function submit(e: React.FormEvent) {
+    e.preventDefault()
     if (!user) {
-      toast.error('请先登录')
+      setLogin(true)
       return
     }
-
-    setSubmitting(true)
+    if (!content.trim()) return
+    setPending(true)
     try {
-      const res = (await addPostComment({
+      const r = await addPostComment({
         postId: postId as unknown as number,
-        content,
         parentId,
-      })) as unknown as PostAPI.BaseResponseLong
-      if (res.code === 0) {
-        toast.success('分享评论见解')
-        setContent('')
-        onSuccess?.()
-      } else {
-        toast.error(res.message || '分享失败')
-      }
-    } catch (error) {
-      console.error('Failed to submit comment:', error)
-      toast.error('评论发表失败')
+        content: content.trim(),
+      })
+      if (r.code !== 0) throw Error(r.message || '回复失败')
+      setContent('')
+      onSuccess?.()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '回复失败')
     } finally {
-      setSubmitting(false)
+      setPending(false)
     }
   }
-
   return (
-    <div className="space-y-6">
-      <div className="flex gap-6">
-        <UserAvatar
-          user={user}
-          size="md"
-          className="border-border/10 h-12 w-12 shrink-0 border-2 shadow-sm"
-        />
-        <div className="flex-1 space-y-4">
-          <div className="group relative">
-            <Textarea
-              value={content}
-              onChange={e => setContent(e.target.value)}
-              placeholder={placeholder}
-              className="bg-card/40 border-border/10 focus:border-primary/30 focus:bg-background/90 placeholder:text-foreground/10 min-h-[160px] resize-none overflow-hidden rounded-[2rem] p-8 text-base leading-relaxed shadow-sm transition-all duration-500 placeholder:font-black focus:ring-0"
-              autoFocus={autoFocus}
-            />
-          </div>
-          <div className="flex items-center justify-end gap-4">
-            {onCancel && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onCancel}
-                disabled={submitting}
-                className="text-foreground/40 hover:text-foreground hover:bg-muted/50 h-10 rounded-full px-6 font-bold transition-all"
-              >
-                取消
-              </Button>
-            )}
-            <Button
-              size="lg"
-              onClick={handleSubmit}
-              disabled={!content.trim() || submitting}
-              className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-primary/20 hover:shadow-primary/40 h-14 rounded-full px-10 font-black tracking-tight shadow-2xl transition-all"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-3 h-5 w-5 animate-spin" />
-                  见解同步中
-                </>
-              ) : (
-                <>
-                  发布见解
-                  <Send className="ml-3 h-4 w-4 transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1" />
-                </>
-              )}
+    <>
+      <form onSubmit={e => void submit(e)} className="flex flex-col gap-3">
+        <Field>
+          <FieldLabel className="sr-only">回复内容</FieldLabel>
+          <Textarea
+            aria-label={parentId ? '回复评论' : '回复讨论'}
+            value={content}
+            onChange={e => setContent(e.target.value)}
+            autoFocus={autoFocus}
+            placeholder={placeholder}
+            required
+          />
+        </Field>
+        <div className="flex justify-end gap-2">
+          {onCancel && (
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              取消
             </Button>
-          </div>
+          )}
+          <Button disabled={pending || !content.trim()}>{pending && <Spinner />}回复</Button>
         </div>
-      </div>
-    </div>
+      </form>
+      <AuthModal open={login} onOpenChange={setLogin} />
+    </>
   )
 }

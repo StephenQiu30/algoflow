@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 创建邮件记录 记录邮件发送信息 POST /log/email/add */

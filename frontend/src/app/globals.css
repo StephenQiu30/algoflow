@@ -6,7 +6,8 @@
 
 @layer base {
   :root {
-    --font-inter: 'Inter';
+    --visualizer-accent: 221 83% 53%;
+    --visualizer-accent-muted: 214 100% 97%;
     --background: 0 0% 100%;
     --foreground: 0 0% 9.02%;
     --card: 0 0% 100%;
@@ -48,6 +49,8 @@
   }
 
   .dark {
+    --visualizer-accent: 213 94% 68%;
+    --visualizer-accent-muted: 226 57% 21%;
     --background: 0 0% 3.922%;
     --foreground: 0 0% 92.941%;
     --card: 0 0% 3.922%;
@@ -106,6 +109,8 @@
 }
 
 @theme inline {
+  --color-visualizer-accent: hsl(var(--visualizer-accent));
+  --color-visualizer-accent-muted: hsl(var(--visualizer-accent-muted));
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
   --color-card: hsl(var(--card));
@@ -139,45 +144,8 @@
   --radius-lg: calc(var(--radius) - 2px);
   --radius-md: calc(var(--radius) - 4px);
   --radius-sm: calc(var(--radius) - 6px);
-  --font-sans:
-    -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', 'PingFang SC', 'Noto Sans SC',
-    sans-serif;
-  --font-mono: var(--font-jetbrains), SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-}
-
-@layer utilities {
-  .glass {
-    @apply bg-background/80 border border-zinc-200/50 shadow-sm backdrop-blur-[20px] dark:border-zinc-800/50;
-  }
-
-  .glass-card {
-    @apply border border-zinc-200/50 bg-white shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 dark:border-zinc-800/50 dark:bg-zinc-950 dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)];
-  }
-
-  .glass-card:hover {
-    @apply border-primary/20 -translate-y-1 shadow-[0_20px_40px_rgb(0,0,0,0.08)] dark:shadow-[0_20px_40px_rgb(0,0,0,0.3)];
-  }
-
-  .text-balance-header {
-    text-wrap: balance;
-  }
-
-  .shimmer {
-    @apply relative overflow-hidden;
-  }
-
-  .shimmer::after {
-    @apply absolute inset-0 -translate-x-full;
-    content: '';
-    background: linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.05), transparent);
-    animation: shimmer 2s infinite;
-  }
-}
-
-@keyframes shimmer {
-  100% {
-    transform: translateX(100%);
-  }
+  --font-sans: var(--font-geist-sans), 'PingFang SC', 'Noto Sans SC', sans-serif;
+  --font-mono: var(--font-geist-mono), SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 @layer base {
@@ -203,4 +171,37 @@
 }
 .skip-link:focus {
   transform: none;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  padding-inline: 20px;
+}
+@media (min-width: 640px) {
+  .page-container {
+    padding-inline: 32px;
+  }
+}
+@media (min-width: 1280px) {
+  .page-container {
+    padding-inline: 80px;
+  }
+}
+.brand-mark {
+  display: block;
+  background: currentColor;
+  mask: url(/brand/algoflow.svg) center / contain no-repeat;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

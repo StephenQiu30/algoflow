@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 创建帖子评论 创建新的帖子评论 POST /post/comment/add */

@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 聚合搜索查询 POST /search/all */

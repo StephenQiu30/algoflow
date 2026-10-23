@@ -1,31 +1,28 @@
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
-
-interface SiteLogoProps {
+export function SiteLogo({
+  className,
+  showText = true,
+  onClick,
+}: {
   className?: string
   showText?: boolean
   onClick?: () => void
-}
-
-export function SiteLogo({ className, showText = true, onClick }: SiteLogoProps) {
-  const siteName = process.env.NEXT_PUBLIC_SITE_NAME || '衍序 AlgoFlow'
+}) {
   return (
     <Link
       href="/"
       onClick={onClick}
-      aria-label={`${siteName}首页`}
-      className={cn(
-        'flex min-h-11 shrink-0 items-center gap-2 font-semibold tracking-tight',
-        className
-      )}
+      aria-label="衍序 AlgoFlow，返回首页"
+      className={cn('flex min-h-11 shrink-0 items-center gap-2 font-medium', className)}
     >
-      <span
-        className="bg-primary text-primary-foreground flex size-8 items-center justify-center rounded-md"
-        aria-hidden="true"
-      >
-        衍
-      </span>
-      {showText && <span>{siteName}</span>}
+      <span aria-hidden="true" className="brand-mark size-6 lg:size-7" />
+      {showText && (
+        <>
+          <span className="text-lg max-[359px]:hidden lg:hidden">衍序</span>
+          <span className="hidden text-xl lg:inline">衍序 AlgoFlow</span>
+        </>
+      )}
     </Link>
   )
 }

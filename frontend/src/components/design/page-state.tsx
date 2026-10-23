@@ -1,6 +1,14 @@
-import { CircleAlert, Loader2 } from 'lucide-react'
 import type { ReactNode } from 'react'
-
+import { CircleAlert } from 'lucide-react'
+import {
+  Empty,
+  EmptyHeader,
+  EmptyTitle,
+  EmptyDescription,
+  EmptyContent,
+  EmptyMedia,
+} from '@/components/ui/empty'
+import { Skeleton } from '@/components/ui/skeleton'
 export function PageState({
   title,
   description,
@@ -12,16 +20,27 @@ export function PageState({
   loading?: boolean
   children?: ReactNode
 }) {
+  if (loading)
+    return (
+      <div className="page-container flex flex-col gap-4 py-12" role="status" aria-label={title}>
+        <Skeleton className="h-8 w-40" />
+        <Skeleton className="h-24 w-full" />
+        <Skeleton className="h-24 w-full" />
+        <span className="sr-only">{title}</span>
+      </div>
+    )
   return (
-    <div className="container mx-auto flex min-h-[50vh] flex-col items-center justify-center gap-6 px-6 py-16 text-center" role={loading ? 'status' : undefined} aria-live="polite">
-      {loading ? (
-        <Loader2 className="animate-spin" aria-hidden="true" />
-      ) : (
-        <CircleAlert aria-hidden="true" />
-      )}
-      <h2 className="text-2xl font-bold">{title}</h2>
-      {description && <p className="text-muted-foreground">{description}</p>}
-      {children}
-    </div>
+    <Empty className="min-h-64">
+      <EmptyHeader>
+        <EmptyMedia variant="icon">
+          <CircleAlert />
+        </EmptyMedia>
+        <EmptyTitle>
+          <h2>{title}</h2>
+        </EmptyTitle>
+        {description && <EmptyDescription>{description}</EmptyDescription>}
+      </EmptyHeader>
+      {children && <EmptyContent>{children}</EmptyContent>}
+    </Empty>
   )
 }

@@ -50,6 +50,9 @@ import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugment
 import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.stephen.cloud.common.common.ErrorCode;
+import com.stephen.cloud.common.exception.BusinessException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -123,7 +126,7 @@ public class RAGServiceImpl implements RAGService {
 
     private static final String EVENT_DONE = "done";
 
-    @Resource
+    @Autowired(required = false)
     private ChatClient chatClient;
 
     @Resource
@@ -160,6 +163,7 @@ public class RAGServiceImpl implements RAGService {
     public Flux<String> askStream(String question, Long knowledgeBaseId, Long userId, Integer topK,
             String conversationId, Boolean enableWebSearchFallback, Map<String, Object> teachingContext) {
         TeachingContextFormatter.validateRequest(question, knowledgeBaseId, topK);
+        if (chatClient == null) return Flux.error(new BusinessException(ErrorCode.AI_ERROR, "AI 模型未配置，请联系管理员完成配置后重试"));
         String pageContext = TeachingContextFormatter.format(teachingContext);
         return Flux.defer(() -> {
             long start = System.currentTimeMillis();
@@ -181,6 +185,10 @@ public class RAGServiceImpl implements RAGService {
     public Flux<ServerSentEvent<RAGStreamEventVO>> askEventStream(String question, Long knowledgeBaseId, Long userId,
             Integer topK, String conversationId, Boolean enableWebSearchFallback, Map<String, Object> teachingContext) {
         TeachingContextFormatter.validateRequest(question, knowledgeBaseId, topK);
+        if (chatClient == null) return Flux.just(buildEvent(EVENT_ERROR, event -> {
+            event.setMessage("AI 模型未配置，请联系管理员完成配置后重试");
+            event.setSuccess(Boolean.FALSE);
+        }));
         String pageContext = TeachingContextFormatter.format(teachingContext);
         long start = System.currentTimeMillis();
         boolean requestAllowsWebSearchFallback = !Boolean.FALSE.equals(enableWebSearchFallback);
@@ -368,6 +376,7 @@ public class RAGServiceImpl implements RAGService {
 
     @Override
     public RecallAnalysisVO analyzeRecall(RecallAnalysisRequest request) {
+        if (chatClient == null) throw new BusinessException(ErrorCode.AI_ERROR, "AI 模型未配置，无法完成向量召回评测");
         long start = System.currentTimeMillis();
         Map<String, String> requiredFilters = request.getMetadataFilters() == null ? Map.of() : request.getMetadataFilters();
         if (!java.util.Set.of("version", "bizTag").containsAll(requiredFilters.keySet()) || requiredFilters.values().stream().anyMatch(v -> v == null || v.length() > 128)) throw new IllegalArgumentException("召回过滤无效");

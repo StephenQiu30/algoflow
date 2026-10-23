@@ -1,104 +1,48 @@
-# 衍序 · AlgoFlow 前端交互系统 (AlgoFlow Frontend)
+# 衍序 · AlgoFlow 前端
 
-<p align="center">
-  <strong>推衍秩序 · 步进数据心流 | 面向排序算法教学的 RAG 增强型交互式系统</strong>
-</p>
+排序算法学习、可视化演练、RAG 导师与分享社区。个人中心和运营管理共用同一个顶部 Layout。
 
-<p align="center">
-  <a href="../LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
-  <a href="https://github.com/StephenQiu30/algoflow/stargazers"><img src="https://img.shields.io/github/stars/StephenQiu30/algoflow?style=social" alt="Stars"></a>
-  <img src="https://img.shields.io/badge/Next.js-15+-black.svg" alt="Next.js 15+">
-  <img src="https://img.shields.io/badge/React-19-61DAFB.svg" alt="React 19">
-  <img src="https://img.shields.io/badge/TypeScript-strict-blue.svg" alt="TypeScript">
-  <img src="https://img.shields.io/badge/Tailwind-CSS-38B2AC.svg" alt="Tailwind CSS">
-</p>
+当前环境：Next.js 16.4.2、React 19、TypeScript、Tailwind v4、shadcn/ui default + Radix、Lucide、Geist、Axios、GSAP。账户状态复用现有 Redux；本轮未引入第二套账户状态管理。
 
-> **English**: Interactive sorting-algorithm classroom with step-by-step animation, complexity cards, and RAG-powered Q&A.
->
-> **中文**：将排序动画、执行步骤、复杂度分析、代码高亮和 RAG 智能问答融汇于一体。适合算法教学、课堂演示、深度演算与面试复习。
-
----
-
-## 体验与入口
-
-| 入口 | 说明 |
-| --- | --- |
-| 本地开发 | `pnpm install && pnpm run dev` → <http://localhost:3000> |
-| 排序工作台 | `/sorting` 算法演练与详情：`/sorting/[slug]` |
-| 社区博客 | `/blog` 题解讨论与学习记录 |
-| 运营后台 | `/admin` 统一管理后台 (用户、内容、知识库与日志) |
-
----
-
-## 核心亮点
-
-- **可视化优先**：高帧率步进演算比较、交换、分区、合并指针状态，而非抽象伪代码；
-- **知识卡片**：19篇算法深度解析、时间/空间复杂度、稳定性、适用场景对比；
-- **RAG 智能导师**：基于领域知识库召回解释，支持流式 SSE 对话；
-- **现代前端全栈**：Next.js 15 App Router、React 19、Tailwind CSS、Radix UI、GSAP、Framer Motion、Zustand、Axios。
-
----
-
-## 核心算法支持矩阵
-
-| 算法 | 平均时间 | 最坏时间 | 空间 | 稳定性 |
-| --- | --- | --- | --- | --- |
-| 冒泡排序 Bubble | O(n²) | O(n²) | O(1) | 是 |
-| 选择排序 Selection | O(n²) | O(n²) | O(1) | 否 |
-| 插入排序 Insertion | O(n²) | O(n²) | O(1) | 是 |
-| 希尔排序 Shell | O(n log n)~O(n²) | O(n²) | O(1) | 否 |
-| 归并排序 Merge | O(n log n) | O(n log n) | O(n) | 是 |
-| 快速排序 Quick | O(n log n) | O(n²) | O(log n) | 否 |
-| 堆排序 Heap | O(n log n) | O(n log n) | O(1) | 否 |
-| 基数排序 Radix | O(nk) | O(nk) | O(n+k) | 是 |
-
-算法纯逻辑实现位于 [`src/lib/sortingAlgorithms.ts`](src/lib/sortingAlgorithms.ts)，可视化交互组件位于 [`src/components/sorting/`](src/components/sorting/)。
-
----
-
-## 快速上手
+## 启动
 
 ```bash
 cd frontend
-
-# 推荐使用 pnpm
-pnpm install
-pnpm run dev
+pnpm install --frozen-lockfile
+cp .env.example .env.local
+pnpm dev --port 3111
 ```
 
-打开浏览器访问 <http://localhost:3000>。
+浏览 <http://localhost:3111>。默认 /api 请求经 Next.js 转发到本机 8080 网关；网关未启动时，公开算法演练仍可运行，远程列表显示错误和重试。变更 ALGOFLOW_GATEWAY_URL 后重新构建；NEXT_PUBLIC_* 是公开构建配置，不能放密钥。
 
-### 脚本说明
+## 页面与规范
 
-| 命令 | 说明 |
-| --- | --- |
-| `pnpm run dev` | 本地热重载开发服务器 |
-| `pnpm run build` | 生产包打包构建 |
-| `pnpm run start` | 生产环境预览启动 |
-| `pnpm run lint` | ESLint 代码规范扫描 |
-| `pnpm run format` | Prettier 代码自动格式化 |
-| `pnpm run typecheck` | TypeScript 严格类型检查 |
+- 发现 /；算法目录 /sorting；知识详情 /sorting/[slug]；演练 /visualizer。
+- 社区 /blog；讨论 /blog/[id]；发布 /blog/create，编辑使用 ?edit=id。
+- 个人中心 /user/profile；内容、收藏、学习记录、通知和设置从头像菜单及个人模块进入。
+- 运营管理 /admin，六个模块均在同一工程；普通用户不展示管理入口，实际权限由网关控制。
+- 支持 8 种现有排序算法：冒泡、选择、插入、希尔、归并、快速、堆、基数。19 种是规划。
 
----
+[设计唯一来源](../docs/DESIGN.md) · [实现范围与数据边界](../docs/plan/05-全站前端页面实现计划.md) · [当前验证与待办](../HANDOVER.md)
 
-## 目录结构
+## 验证
 
-```text
-src/
-├── api/                  # 基于 Axios 封装的统一业务 API 请求
-├── app/                  # Next.js App Router 页面 (sorting, blog, user, admin)
-├── components/           # UI 组件库 (sorting, auth, blog, common, design, ui)
-├── enums/                # 前端枚举定义
-├── hooks/                # 自定义 React Hooks
-├── lib/                  # 工具库与 19 种排序算法核心演算步进器
-├── store/                # Zustand 全局状态管理
-└── types/                # TypeScript 统一类型声明
+```bash
+pnpm run typecheck
+pnpm run lint
+pnpm test
+pnpm run build
 ```
 
----
+tests/browser-smoke.sh 供已安装 agent-browser 的 CI 使用。单元测试、浏览器夹具测试和真实后端验收分别记录，不互相替代。
 
-## 项目体系联动
+隔离 UI 验证（不要作为普通开发或生产配置）：
 
-本项目为 **衍序 · AlgoFlow** 统一代码库（Monorepo）中的前端应用：
-- 完整项目仓库：[StephenQiu30/algoflow](https://github.com/StephenQiu30/algoflow)
-- 后端微服务集群位于根目录下的 [`backend/`](../backend/)，启动网关与对应微服务后即可无缝对接。
+```bash
+# 终端 1：仅绑定 loopback 的测试 API
+node tests/fixtures-api.cjs
+# 终端 2：显式连接测试 API
+NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3212 pnpm dev --port 3111
+```
+
+夹具中的用户、文档、审核与回答都是测试数据。学习记录、草稿和学习偏好目前保存在此浏览器，界面明确标注其范围。

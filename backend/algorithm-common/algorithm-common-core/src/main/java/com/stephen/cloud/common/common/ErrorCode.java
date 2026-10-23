@@ -87,6 +87,8 @@ public enum ErrorCode {
      */
     ALREADY_EXIST(40301, "已存在"),
 
+    VERSION_CONFLICT(40900, "内容已更新，请加载最新版本后比较"),
+
     /**
      * 系统内部异常
      */

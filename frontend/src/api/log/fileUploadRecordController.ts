@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 创建文件上传记录 记录文件上传信息 POST /log/file/upload/add */

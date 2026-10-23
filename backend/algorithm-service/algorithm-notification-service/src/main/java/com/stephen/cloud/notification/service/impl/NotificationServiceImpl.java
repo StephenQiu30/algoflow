@@ -127,9 +127,10 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
 
         // 排序逻辑
         queryWrapper.orderBy(SqlUtils.validSortField(sortField),
-                sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
+                CommonConstant.SORT_ORDER_ASC.equalsIgnoreCase(sortOrder),
                 Notification::getCreateTime);
 
+        queryWrapper.orderByDesc(Notification::getId);
         return queryWrapper;
     }
 

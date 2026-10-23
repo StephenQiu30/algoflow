@@ -7,6 +7,7 @@ import store from '@/store'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { clearLoginUser, setLoginUser } from '@/store/modules/user/userSlice'
 import { isAxiosError } from 'axios'
+import { notificationPreview } from '@/lib/notification'
 import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
@@ -20,6 +21,15 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
   const dispatch = useAppDispatch()
   const { user } = useAppSelector(state => state.user)
   const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    const expire = () => {
+      dispatch(clearLoginUser())
+      toast.info('登录已过期，请重新登录。')
+    }
+    window.addEventListener('algoflow:session-expired', expire)
+    return () => window.removeEventListener('algoflow:session-expired', expire)
+  }, [dispatch])
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -52,15 +62,15 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
   const heartbeatTimerRef = React.useRef<NodeJS.Timeout>(null)
 
   useEffect(() => {
+    let active = true
     const connectWebSocket = () => {
-      if (!user) return
+      if (!active || !user) return
 
-      // Determine WebSocket URL - Notifications are on port 9090 via Netty
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-      const hostname = process.env.NEXT_PUBLIC_API_BASE_URL
-        ? new URL(process.env.NEXT_PUBLIC_API_BASE_URL).hostname
-        : 'localhost'
-      const wsUrl = `${protocol}//${hostname}:9090/websocket`
+      // Use the gateway origin and path; an explicit WebSocket URL can override deployment routing.
+      const api = new URL(process.env.NEXT_PUBLIC_API_BASE_URL || '/api', window.location.origin)
+      const endpoint = new URL(api.pathname.replace(/\/$/, '') + '/websocket', api.origin)
+      endpoint.protocol = api.protocol === 'https:' ? 'wss:' : 'ws:'
+      const wsUrl = process.env.NEXT_PUBLIC_WEBSOCKET_URL || endpoint.href
 
       const ws = new WebSocket(wsUrl)
       socketRef.current = ws
@@ -97,15 +107,17 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
             type >= WebSocketMessageTypeEnum.SYSTEM_NOTICE &&
             type <= WebSocketMessageTypeEnum.FOLLOW_NOTICE
           ) {
-            const title = typeof message.title === 'string' ? message.title : '新通知'
-            const description =
-              typeof message.content === 'string'
-                ? message.content
-                : typeof message.data === 'string'
-                  ? message.data
-                  : ''
+            const { title, description } = notificationPreview(message)
 
-            if (title || description) {
+            let showNotification = true
+            try {
+              showNotification =
+                JSON.parse(localStorage.getItem(`algoflow:preferences:${user.id}`) || '{}')
+                  .notifications !== false
+            } catch {
+              /* keep default */
+            }
+            if (showNotification && (title || description)) {
               toast.info(title, {
                 description: description,
               })
@@ -126,7 +138,7 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
           heartbeatTimerRef.current = null
         }
         // Reconnect after 5 seconds
-        if (user) {
+        if (active && user) {
           reconnectTimerRef.current = setTimeout(connectWebSocket, 5000)
         }
       }
@@ -141,6 +153,7 @@ function AuthLoader({ children }: { children: React.ReactNode }) {
     }
 
     return () => {
+      active = false
       if (socketRef.current) {
         socketRef.current.close()
         socketRef.current = null
@@ -170,7 +183,12 @@ export function RootProviders({ children }: { children: React.ReactNode }) {
           disableTransitionOnChange
         >
           {children}
-          <Toaster position="top-center" />
+          <Toaster
+            position="bottom-right"
+            visibleToasts={1}
+            closeButton
+            toastOptions={{ closeButtonAriaLabel: '关闭提示' }}
+          />
         </ThemeProvider>
       </AuthLoader>
     </Provider>

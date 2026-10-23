@@ -6,6 +6,7 @@ import { useAppDispatch } from '@/store/hooks'
 import { setLoginUser } from '@/store/modules'
 import { gitHubLoginCallback } from '@/api/user/userController'
 import { GitHubAuthStatus } from '@/components/auth/github-auth-status'
+import { PageState } from '@/components/design/page-state'
 import { toast } from 'sonner'
 
 function GitHubCallbackContent() {
@@ -15,22 +16,7 @@ function GitHubCallbackContent() {
 
   const [status, setStatus] = React.useState<'loading' | 'success' | 'error'>('loading')
   const [message, setMessage] = React.useState('正在连接 GitHub...')
-  const [progress, setProgress] = React.useState(0)
-
-  // 模拟进度条
-  React.useEffect(() => {
-    if (status === 'loading') {
-      const timer = setInterval(() => {
-        setProgress(prev => {
-          if (prev >= 90) return 90
-          return prev + Math.random() * 20
-        })
-      }, 800)
-      return () => clearInterval(timer)
-    } else if (status === 'success') {
-      setProgress(100)
-    }
-  }, [status])
+  const progress = status === 'success' ? 100 : 0
 
   const handleLogin = React.useCallback(async () => {
     const code = searchParams.get('code')
@@ -93,11 +79,7 @@ function GitHubCallbackContent() {
 export default function GitHubCallbackPage() {
   return (
     <React.Suspense
-      fallback={
-        <div className="flex h-screen w-screen items-center justify-center bg-[#F5F5F7] dark:bg-black">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#0071E3] border-t-transparent" />
-        </div>
-      }
+      fallback={<PageState loading title="正在验证 GitHub 登录" />}
     >
       <GitHubCallbackContent />
     </React.Suspense>

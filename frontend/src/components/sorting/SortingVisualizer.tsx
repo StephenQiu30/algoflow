@@ -1,462 +1,363 @@
 'use client'
-
-import React from 'react'
-import { useRouter } from 'next/navigation'
-import { type SortingVisualizerState } from '@/hooks/useSortingVisualizer'
-import { SORTING_ALGORITHMS } from '@/lib/sortingAlgorithms'
-import { Bar, BarState } from './Bar'
-import { CodeHighlighter } from './CodeHighlighter'
-import { cn } from '@/lib/utils'
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
+import { useState, useRef } from 'react'
+import {
+  ArrowUpDown,
+  Code2,
+  Play,
+  Pause,
+  SkipBack,
+  SkipForward,
+  RotateCcw,
+  Settings2,
+} from 'lucide-react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
-import { Settings2, Play, Pause, StepForward, StepBack, Shuffle, RotateCcw } from 'lucide-react'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import type { SortingVisualizerState } from '@/hooks/useSortingVisualizer'
+import { SORTING_ALGORITHMS, SORTING_CODE } from '@/lib/sortingAlgorithms'
+import { Button } from '@/components/ui/button'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from '@/components/ui/card'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog'
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectValue,
+} from '@/components/ui/select'
 import { Slider } from '@/components/ui/slider'
-
-export function SortingVisualizer({ visualizer }: { visualizer: SortingVisualizerState }) {
-  const scopeRef = React.useRef<HTMLDivElement>(null)
-  const {
-    array,
-    size,
-    setSize,
-    algorithmId,
-    speed,
-    setSpeed,
-    isPlaying,
-    handlePlayPause,
-    reset,
-    activeIndices,
-    sortedIndices,
-    currentStep,
-    totalSteps,
-    stepForward,
-    stepBack,
-    metrics,
-    currentStepInfo,
-    setArrayFromInput,
-    generateArray,
-    isSorted,
-    elementIds,
-  } = visualizer
-  const router = useRouter()
-
-  const maxValue = Math.max(...array, 1)
-  const activeSet = React.useMemo(() => new Set(activeIndices), [activeIndices])
-  const sortedSet = React.useMemo(() => new Set(sortedIndices), [sortedIndices])
-
-  const actionTone = React.useMemo(() => {
-    switch (currentStepInfo?.action) {
-      case 'compare':
-        return {
-          tag: 'bg-muted text-foreground border-border',
-          rail: 'bg-foreground',
-        }
-      case 'swap':
-        return {
-          tag: 'bg-muted text-foreground border-border',
-          rail: 'bg-foreground',
-        }
-      case 'pivot':
-        return {
-          tag: 'bg-muted text-foreground border-border',
-          rail: 'bg-foreground',
-        }
-      case 'done':
-        return {
-          tag: 'bg-muted text-foreground border-border',
-          rail: 'bg-foreground',
-        }
-      default:
-        return {
-          tag: 'bg-muted text-foreground border-border',
-          rail: 'bg-foreground',
-        }
-    }
-  }, [currentStepInfo?.action])
-
-  const progressPercent = Math.round((currentStep / Math.max(1, totalSteps)) * 100)
-
-  const [arrayText, setArrayText] = React.useState('')
-  const parsedArray = React.useMemo(() => {
-    const raw = arrayText.trim()
-    if (!raw) return null
-    const nums = raw
+import { Field, FieldGroup, FieldLabel, FieldDescription } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
+import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from '@/components/ui/tooltip'
+import { CodeHighlighter } from './CodeHighlighter'
+import { RAGChatPanel } from './RAGChatPanel'
+import { COURSE_VERSION } from '@/lib/courseVersion'
+import { cn } from '@/lib/utils'
+export function SortingVisualizer({ visualizer: v }: { visualizer: SortingVisualizerState }) {
+  const [open, setOpen] = useState(false),
+    [text, setText] = useState(''),
+    [error, setError] = useState('')
+  const scope = useRef<HTMLDivElement>(null)
+  const algorithm = SORTING_ALGORITHMS.find(a => a.id === v.algorithmId)!
+  const max = Math.max(...v.array, 1),
+    step = v.currentStepInfo
+  useGSAP(
+    () => {
+      if (
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches &&
+        document.documentElement.dataset.reducedMotion !== 'true'
+      )
+        gsap.fromTo(
+          '.algorithm-bar',
+          { scaleY: 0.92 },
+          { scaleY: 1, duration: 0.15, stagger: 0, ease: 'power1.out' }
+        )
+    },
+    { scope, dependencies: [v.currentStep] }
+  )
+  function apply() {
+    const values = text
+      .trim()
       .split(/[\s,，]+/)
       .filter(Boolean)
       .map(Number)
-    return nums.length >= 2 &&
-      nums.length <= 50 &&
-      nums.every(n => Number.isInteger(n) && n >= 1 && n <= 999)
-      ? nums
-      : null
-  }, [arrayText])
-
-  // Layout Animation
-  useGSAP(
-    () => {
-      gsap.fromTo(
-        ['.sv-board', '.sv-side-panel'],
-        { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: 'power4.out', stagger: 0.1, clearProps: 'all' }
-      )
-    },
-    { scope: scopeRef }
-  )
-
+    if (
+      values.length < 2 ||
+      values.length > 50 ||
+      values.some(n => !Number.isInteger(n) || n < 1 || n > 999)
+    ) {
+      setError('请输入 2–50 个 1–999 的整数，用逗号分隔。')
+      return
+    }
+    v.setArrayFromInput(values)
+    setOpen(false)
+    setError('')
+  }
   return (
-    <div
-      ref={scopeRef}
-      data-sorting-step={currentStep}
-      className="flex flex-col gap-6 lg:h-[calc(100vh-160px)]"
-    >
-      <div className="grid h-full grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
-        {/* Left Section (8/12): Board + Immersive Controls */}
-        <div className="relative flex h-full flex-col gap-0 lg:col-span-8">
-          {/* Top Bar: Algorithm Selector - Apple Style */}
-          <div className="bg-card/80 absolute inset-x-6 top-6 z-40 mx-auto flex items-center justify-between rounded-full p-1.5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] ring-1 ring-black/5 backdrop-blur-xl lg:max-w-max dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] dark:ring-white/10">
-            <ScrollArea className="max-w-[calc(100%-48px)]">
-              <div className="flex items-center gap-1">
-                {SORTING_ALGORITHMS.map(algo => (
-                  <button
-                    key={algo.id}
-                    onClick={() => router.push(`/sorting/${algo.id}`, { scroll: false })}
-                    disabled={isPlaying}
-                    className={cn(
-                      'rounded-xl px-3 py-1.5 text-[11px] font-bold whitespace-nowrap transition-all',
-                      algorithmId === algo.id
-                        ? 'bg-primary text-primary-foreground shadow-sm'
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
+    <TooltipProvider>
+      <div
+        ref={scope}
+        data-sorting-step={v.currentStep}
+        className="grid min-w-0 items-stretch gap-6 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]"
+      >
+        <Card className="flex min-w-0 flex-col lg:min-h-[640px]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ArrowUpDown className="text-visualizer-accent size-5" />
+              执行过程
+            </CardTitle>
+            <CardDescription>
+              {algorithm.name} · {v.array.length} 个元素
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-1 flex-col gap-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Badge variant="secondary">
+                {v.isSorted
+                  ? '排序完成'
+                  : step?.action === 'compare'
+                    ? '比较中'
+                    : step?.action === 'overwrite'
+                      ? '移动元素'
+                      : `步骤 ${v.currentStep}`}
+              </Badge>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setText(v.inputArray.join(', '))
+                  setError('')
+                  setOpen(true)
+                }}
+              >
+                <Settings2 data-icon="inline-start" />
+                数据设置
+              </Button>
+            </div>
+            <div
+              className="min-w-0 overflow-x-auto pb-2"
+              role="region"
+              tabIndex={0}
+              aria-label="数组可视化"
+            >
+              <div
+                className="flex h-64 items-end gap-2"
+                style={{ minWidth: v.array.length > 15 ? v.array.length * 30 : undefined }}
+                role="img"
+                aria-label={`当前数组：${v.array.join('、')}。活动索引：${v.activeIndices.join('、') || '无'}`}
+              >
+                {v.array.map((value, index) => (
+                  <div
+                    className="flex h-full min-w-0 flex-1 flex-col justify-end gap-2"
+                    key={`${index}:${v.elementIds[index]}`}
                   >
-                    {algo.shortName || algo.name.replace('排序', '')}
-                  </button>
+                    <div
+                      className={cn(
+                        'algorithm-bar min-h-1 origin-bottom rounded-t-sm',
+                        v.activeIndices.includes(index)
+                          ? 'bg-visualizer-accent'
+                          : v.sortedIndices.includes(index)
+                            ? 'bg-state-sorted'
+                            : 'bg-state-comparing'
+                      )}
+                      style={{ height: `${(value / max) * 78}%` }}
+                    />
+                    <span
+                      className={cn(
+                        'text-center font-mono text-xs',
+                        v.activeIndices.includes(index) && 'text-visualizer-accent'
+                      )}
+                    >
+                      {value}
+                    </span>
+                    <span className="text-muted-foreground text-center font-mono text-xs">
+                      {index}
+                    </span>
+                  </div>
                 ))}
               </div>
-              <ScrollBar orientation="horizontal" className="hidden" />
-            </ScrollArea>
-            <div className="bg-border mx-2 h-4 w-[1px]" />
-            <Popover>
-              <PopoverTrigger asChild>
-                <button
-                  aria-label="数组与播放设置"
-                  className="text-muted-foreground hover:text-foreground rounded-xl p-2 transition-colors"
-                >
-                  <Settings2 size={16} />
-                </button>
-              </PopoverTrigger>
-              <PopoverContent
-                className="border-border bg-card w-80 rounded-2xl p-6 shadow-xl"
-                side="bottom"
-                align="end"
-              >
-                <div className="space-y-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-primary text-[10px] font-bold tracking-widest uppercase">
-                        速度 {speed}%
-                      </span>
-                    </div>
-                    <Slider
-                      value={[speed]}
-                      onValueChange={([v]) => setSpeed(v)}
-                      max={100}
-                      min={1}
-                      step={1}
-                    />
-                  </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-muted-foreground text-[10px] font-bold tracking-widest uppercase">
-                        大小 {size}
-                      </span>
-                    </div>
-                    <Slider
-                      value={[size]}
-                      onValueChange={([v]) => setSize(v)}
-                      max={50}
-                      min={2}
-                      step={1}
-                      disabled={isPlaying}
-                    />
-                  </div>
-                  <div className="border-border space-y-3 border-t pt-4">
-                    <span className="text-muted-foreground block text-[10px] font-bold tracking-widest uppercase">
-                      自定义数据
-                    </span>
-                    <div className="flex gap-2">
-                      <input
-                        id="custom-array"
-                        aria-describedby="custom-array-help"
-                        aria-invalid={Boolean(arrayText.trim() && !parsedArray)}
-                        value={arrayText}
-                        onChange={e => setArrayText(e.target.value)}
-                        placeholder="1, 5, 8..."
-                        aria-label="自定义数组：2–50 个 1–999 的整数"
-                        className="border-border bg-muted text-foreground focus:ring-ring flex-1 rounded-xl border px-3 py-2 text-xs font-bold focus:ring-1 focus:outline-none"
-                      />
-                      {parsedArray && (
-                        <button
-                          onClick={() => setArrayFromInput(parsedArray)}
-                          aria-label="应用自定义数组"
-                          disabled={isPlaying}
-                          className="bg-primary rounded-xl px-3 py-2 text-[10px] font-bold text-white"
-                        >
-                          应用
-                        </button>
-                      )}
-                    </div>
-                    <p
-                      id="custom-array-help"
-                      className="text-muted-foreground text-xs"
-                      role={arrayText.trim() && !parsedArray ? 'alert' : undefined}
-                    >
-                      {arrayText.trim() && !parsedArray
-                        ? '请输入 2–50 个 1–999 的整数；原数组未改变。'
-                        : '支持逗号、中文逗号或空格分隔。'}
-                    </p>
-                  </div>
-                </div>
-              </PopoverContent>
-            </Popover>
-          </div>
-
-          <div className="sv-board bg-card relative flex min-h-[500px] flex-1 flex-col overflow-hidden rounded-[32px] shadow-[0_8px_40px_rgba(0,0,0,0.03)] ring-1 ring-black/5 transition-all dark:shadow-none dark:ring-white/10">
-            {/* Real-time Monitor - Simplified */}
-            <div className="pointer-events-none absolute top-24 left-8 z-20">
-              <div className="flex flex-col gap-1">
-                <div className="flex items-center gap-6 opacity-60">
-                  <div className="flex flex-col">
-                    <span className="text-muted-foreground text-[9px] font-bold tracking-widest uppercase">
-                      比较
-                    </span>
-                    <span className="text-foreground text-lg font-bold tabular-nums">
-                      {metrics.comparisons}
-                    </span>
-                  </div>
-                  <div className="border-border flex flex-col border-l pl-4">
-                    <span className="text-muted-foreground text-[9px] font-bold tracking-widest uppercase">
-                      交换
-                    </span>
-                    <span className="text-foreground text-lg font-bold tabular-nums">
-                      {metrics.swaps}
-                    </span>
-                  </div>
-                  <div className="border-border flex flex-col border-l pl-4">
-                    <span className="text-muted-foreground text-[9px] font-bold tracking-widest uppercase">
-                      写入
-                    </span>
-                    <span className="text-foreground text-lg font-bold tabular-nums">
-                      {metrics.overwrites}
-                    </span>
-                  </div>
-                </div>
-              </div>
             </div>
-
-            {/* Visualization Area */}
-            <figure
-              aria-label={`当前数组：${array.join('、')}`}
-              className="flex flex-1 items-end justify-center gap-1.5 px-10 pt-40 pb-28 sm:gap-2"
-            >
-              {array.map((value, idx) => {
-                let state: BarState = 'default'
-                if (activeSet.has(idx))
-                  state =
-                    currentStepInfo?.action === 'swap' ||
-                    currentStepInfo?.action === 'overwrite' ||
-                    currentStepInfo?.action === 'pivot'
-                      ? currentStepInfo.action
-                      : 'compare'
-                else if (sortedSet.has(idx)) state = 'sorted'
-                const dimmed =
-                  !!currentStepInfo?.range &&
-                  (idx < currentStepInfo.range[0] || idx > currentStepInfo.range[1])
-                return (
-                  <Bar
-                    key={idx}
-                    value={value}
-                    maxValue={maxValue}
-                    state={state}
-                    dimmed={dimmed}
-                    showValue={size <= 25}
-                    elementId={elementIds[idx]}
-                  />
-                )
-              })}
-            </figure>
-
-            {/* Step Narrative - Integrated */}
-            {currentStepInfo?.description && (
-              <div className="pointer-events-none absolute inset-x-0 bottom-24 z-30 flex justify-center px-8">
-                <div className="border-border/50 bg-card/80 flex max-w-xl items-center gap-3 rounded-full border px-6 py-3.5 shadow-[0_8px_30px_rgb(0,0,0,0.08)] backdrop-blur-2xl">
-                  <div
-                    className={cn(
-                      'h-1.5 w-1.5 flex-shrink-0 animate-pulse rounded-full',
-                      actionTone.rail
-                    )}
-                  />
-                  <p role="status" className="text-foreground text-xs leading-snug font-semibold">
-                    {currentStepInfo.description}
-                  </p>
-                </div>
+            {step?.auxiliary?.map((a, index) => (
+              <div key={index} className="flex flex-wrap gap-2">
+                <span className="text-muted-foreground text-sm">{a.label}</span>
+                <span className="text-visualizer-accent font-mono text-sm">
+                  {a.elements.map(e => e.value).join(', ') || '空'}
+                </span>
+              </div>
+            ))}
+            {step?.gap && <p className="text-muted-foreground text-sm">当前间隔 {step.gap}</p>}
+            {step?.buckets && (
+              <div className="grid grid-cols-5 gap-2">
+                {step.buckets.map((b, i) => (
+                  <div key={i} className="bg-muted rounded-md p-2 text-xs">
+                    桶 {i}：{b.map(e => e.value).join(', ') || '空'}
+                  </div>
+                ))}
               </div>
             )}
-
-            {/* Dynamic Island Action Bar */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-8 z-40 flex justify-center">
-              <div className="bg-foreground/90 text-background pointer-events-auto flex items-center gap-1 rounded-full p-2 shadow-2xl backdrop-blur-2xl">
-                <button
-                  onClick={generateArray}
-                  disabled={isPlaying}
-                  className="text-background/60 hover:text-background rounded-xl p-3 transition-colors disabled:opacity-20"
-                  title="重新生成数组"
-                  aria-label="重新生成数组"
-                >
-                  <Shuffle size={16} />
-                </button>
-                <button
-                  onClick={reset}
-                  disabled={isPlaying}
-                  className="text-background/60 hover:text-background rounded-xl p-3 transition-colors disabled:opacity-20"
-                  title="回到初始数组"
-                  aria-label="回到初始数组"
-                >
-                  <RotateCcw size={16} />
-                </button>
-                <div className="bg-background/20 mx-1 h-4 w-[1px]" />
-                <button
-                  onClick={stepBack}
-                  aria-label="上一步"
-                  disabled={isPlaying || currentStep === 0}
-                  className="text-background/60 hover:text-background rounded-full p-3.5 transition-colors disabled:opacity-20"
-                >
-                  <StepBack size={18} />
-                </button>
-                <button
-                  onClick={handlePlayPause}
-                  aria-label={isPlaying ? '暂停' : isSorted ? '重播' : '播放'}
-                  className={cn(
-                    'flex h-12 w-12 items-center justify-center rounded-full transition-all active:scale-95',
-                    isPlaying
-                      ? 'bg-background/20 text-background'
-                      : 'bg-background text-foreground shadow-md hover:scale-105'
-                  )}
-                >
-                  {isPlaying ? (
-                    <Pause size={20} fill="currentColor" />
-                  ) : (
-                    <Play size={20} fill="currentColor" className="ml-0.5" />
-                  )}
-                </button>
-                <button
-                  onClick={stepForward}
-                  aria-label="下一步"
-                  disabled={isPlaying || isSorted}
-                  className="text-background/60 hover:text-background rounded-full p-3.5 transition-colors disabled:opacity-20"
-                >
-                  <StepForward size={18} />
-                </button>
-                <div className="bg-background/20 mx-2 h-5 w-[1px]" />
-                <div className="flex min-w-[72px] flex-col items-center px-4 py-1">
-                  <span className="text-background text-[11px] font-bold tracking-widest uppercase">
-                    {progressPercent}%
-                  </span>
-                  <div className="text-background/50 text-[9px] font-bold tabular-nums">
-                    {currentStep} / {totalSteps}
-                  </div>
-                </div>
-              </div>
+            <p className="min-h-12 text-sm leading-6" aria-live="polite">
+              {step?.description || step?.message || '选择播放或下一步，观察比较与移动。'}
+            </p>
+          </CardContent>
+          <CardFooter className="mt-auto flex flex-col items-stretch gap-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-muted-foreground text-xs">
+                步骤 {v.currentStep} / {v.totalSteps}
+              </span>
+              <Select value={String(v.speed)} onValueChange={s => v.setSpeed(Number(s))}>
+                <SelectTrigger aria-label="演练速度" className="w-32">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {[
+                      [1, '1× 速度'],
+                      [15, '2× 速度'],
+                      [28, '4× 速度'],
+                    ].map(([value, label]) => (
+                      <SelectItem key={value} value={String(value)}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-
-            {/* Subtle Progress Bar */}
-            <div className="absolute bottom-0 left-0 h-[2px] w-full bg-zinc-100 dark:bg-zinc-900/50">
-              <div
-                className={cn('h-full transition-all duration-300', actionTone.rail)}
-                style={{ width: `${progressPercent}%` }}
-              />
+            <Slider
+              aria-label="演练进度"
+              min={0}
+              max={Math.max(1, v.totalSteps)}
+              step={1}
+              value={[v.currentStep]}
+              onValueChange={([n]) => v.seek(n)}
+              disabled={!v.totalSteps}
+            />
+            <div className="flex items-center gap-2">
+              {[
+                { label: '上一步', Icon: SkipBack, run: v.stepBack, disabled: v.currentStep === 0 },
+              ].map(({ label, Icon, run, disabled }) => (
+                <Tooltip key={label}>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label={label}
+                      disabled={disabled}
+                      onClick={run}
+                    >
+                      <Icon />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>{label}</TooltipContent>
+                </Tooltip>
+              ))}
+              <Button disabled={!v.totalSteps} onClick={v.handlePlayPause}>
+                {v.isPlaying ? (
+                  <Pause data-icon="inline-start" />
+                ) : (
+                  <Play data-icon="inline-start" />
+                )}
+                {v.isPlaying ? '暂停' : v.isSorted ? '重新播放' : '播放'}
+              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="下一步"
+                    disabled={v.currentStep >= v.totalSteps}
+                    onClick={v.stepForward}
+                  >
+                    <SkipForward />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>下一步</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    className="ml-auto"
+                    variant="ghost"
+                    size="icon"
+                    aria-label="重置"
+                    onClick={v.reset}
+                  >
+                    <RotateCcw />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>重置</TooltipContent>
+              </Tooltip>
             </div>
-          </div>
-        </div>
-
-        {/* Right Section (4/12): Code */}
-        <div className="sv-side-panel flex h-full flex-col gap-0 lg:col-span-4">
-          <AlgorithmState step={currentStepInfo} array={array} />
-          <div className="mb-4 flex items-center gap-2 pl-2">
-            <span className="text-muted-foreground text-[10px] font-bold tracking-[0.2em] uppercase">
-              源码执行同步
-            </span>
-          </div>
-          <CodeHighlighter algorithmId={algorithmId} currentLine={currentStepInfo?.line} />
-        </div>
+            <p className="text-muted-foreground text-xs">
+              比较 {v.metrics?.comparisons || 0} 次 · 交换 {v.metrics?.swaps || 0} 次 · 写入{' '}
+              {v.metrics?.overwrites || 0} 次
+            </p>
+          </CardFooter>
+        </Card>
+        <Card className="flex min-w-0 flex-col lg:min-h-[640px]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Code2 className="text-visualizer-accent size-5" />
+              代码与分析
+            </CardTitle>
+            <CardDescription>JavaScript · 与当前执行步骤同步</CardDescription>
+          </CardHeader>
+          <CardContent className="flex min-w-0 flex-1 flex-col gap-4">
+            <CodeHighlighter algorithmId={v.algorithmId} currentLine={step?.line} />
+            <h2 className="font-medium">当前分析</h2>
+            <p className="text-sm leading-7">
+              {step?.description || step?.message || '执行算法后，这里会显示当前步骤的说明。'}
+            </p>
+            <p className="text-muted-foreground text-xs">
+              平均 {algorithm.timeComplexity.average} · 空间 {algorithm.spaceComplexity} ·{' '}
+              {algorithm.stability}
+            </p>
+            {step?.range && <p className="font-mono text-xs">区间 [{step.range.join(', ')}]</p>}
+          </CardContent>
+          <CardFooter className="mt-auto">
+            <RAGChatPanel
+              algorithmName={algorithm.name}
+              teachingContext={{
+                algorithmId: v.algorithmId,
+                courseVersion: COURSE_VERSION,
+                originalArray: v.inputArray,
+                currentArray: v.array,
+                currentStep: v.currentStep,
+                totalSteps: v.totalSteps,
+                action: step?.action,
+                activeIndices: v.activeIndices,
+                codeLine: step?.line,
+                metrics: v.metrics,
+                auxiliary: step?.auxiliary,
+                elementIds: v.elementIds,
+                sortedIndices: v.sortedIndices,
+                range: step?.range,
+                codeSnippet: SORTING_CODE[v.algorithmId],
+              }}
+            />
+          </CardFooter>
+        </Card>
       </div>
-    </div>
-  )
-}
-
-function AlgorithmState({
-  step,
-  array,
-}: {
-  step: SortingVisualizerState['currentStepInfo']
-  array: number[]
-}) {
-  if (!step) return null
-  return (
-    <div className="mt-6 space-y-3 text-[14px]" aria-live="polite">
-      {step.range && (
-        <p>
-          当前区间：[{step.range.join(', ')}]
-          {step.pivotIndex !== undefined &&
-            ` · 枢轴位置 ${step.pivotIndex}，值 ${array[step.pivotIndex]}`}
-        </p>
-      )}
-      {step.gap && (
-        <p>
-          当前增量 gap = {step.gap} · 同组位置相差 {step.gap}
-        </p>
-      )}
-      {step.localSortedIndices && (
-        <p>局部有序区间：[0, {step.localSortedIndices.length - 1}]，后续仍可移动</p>
-      )}
-      {step.auxiliary?.map(buffer => (
-        <div key={buffer.label}>
-          <strong>{buffer.label}：</strong>
-          {buffer.elements.map((element, i) => (
-            <span
-              key={i}
-              className={`mr-3 inline-block ${buffer.activeIndices.includes(i) ? 'text-primary font-semibold' : ''}`}
-            >
-              {element.value} (#{element.id + 1})
-            </span>
-          ))}
-        </div>
-      ))}
-      {step.buckets && (
-        <div>
-          <p>当前位权：{step.digitPlace}</p>
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
-            {step.buckets.map((bucket, digit) => (
-              <div key={digit}>
-                桶 {digit}：{bucket.map(e => `${e.value}(#${e.id + 1})`).join(' → ') || '空'}
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {step.heapSize !== undefined && (
-        <div>
-          <p>有效堆大小：{step.heapSize}（堆外元素已归位）</p>
-          <ol className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-            {array.slice(0, step.heapSize).map((value, i) => (
-              <li key={i}>
-                节点 {i}：{value} · {i ? `父节点 ${Math.floor((i - 1) / 2)}` : '根'} · 孩子{' '}
-                {[2 * i + 1, 2 * i + 2].filter(k => k < step.heapSize!).join(', ') || '无'}
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
-    </div>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>数据设置</DialogTitle>
+            <DialogDescription>应用新数据后将从第 0 步开始。</DialogDescription>
+          </DialogHeader>
+          <FieldGroup>
+            <Field data-invalid={!!error}>
+              <FieldLabel htmlFor="array-input">数组</FieldLabel>
+              <Input
+                id="array-input"
+                value={text}
+                onChange={e => setText(e.target.value)}
+                aria-invalid={!!error}
+              />
+              <FieldDescription>{error || '2–50 个 1–999 的整数，用逗号分隔。'}</FieldDescription>
+            </Field>
+          </FieldGroup>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setOpen(false)}>
+              取消
+            </Button>
+            <Button onClick={apply}>应用数据</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </TooltipProvider>
   )
 }

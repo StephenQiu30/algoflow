@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 点赞/取消点赞 点赞或取消点赞指定帖子 POST /post/thumb/add */

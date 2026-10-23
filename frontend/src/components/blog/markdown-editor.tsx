@@ -1,291 +1,142 @@
 'use client'
-
-import * as React from 'react'
-import {
-  Bold,
-  Code,
-  Image as ImageIcon,
-  Italic,
-  Link as LinkIcon,
-  List as ListIcon,
-  ListOrdered,
-  Maximize2,
-  Minimize2,
-  Type,
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { useRef, useState } from 'react'
+import { Bold, Italic, Code, ImagePlus, Link2, List } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
-import { MarkdownRender } from '@/components/blog/markdown-render'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-
+import { Input } from '@/components/ui/input'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { MarkdownRender } from './markdown-render'
 import { uploadFile } from '@/api/file/fileController'
 import { FileUploadBizEnum } from '@/enums/FileUploadBizEnum'
 import { toast } from 'sonner'
-
-interface MarkdownEditorProps {
-  value: string
-  onChange: (value: string) => void
-  placeholder?: string
-  className?: string
-  viewMode?: 'edit' | 'preview' | 'split'
-}
-
+import { cn } from '@/lib/utils'
 export function MarkdownEditor({
   value,
   onChange,
   placeholder,
   className,
-  viewMode = 'split',
-}: MarkdownEditorProps) {
-  const [view, setView] = React.useState<'edit' | 'preview' | 'split'>(viewMode)
-  const [isFullscreen, setIsFullscreen] = React.useState(false)
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null)
-  const fileInputRef = React.useRef<HTMLInputElement>(null)
-
-  // Sync internal view state if prop changes
-  React.useEffect(() => {
-    if (viewMode) setView(viewMode)
-  }, [viewMode])
-
-  // 处理工具栏操作
-  const insertText = (before: string, after: string = '') => {
-    const textarea = textareaRef.current
-    if (!textarea) return
-
-    const start = textarea.selectionStart
-    const end = textarea.selectionEnd
-    const text = textarea.value
-    const selected = text.substring(start, end)
-
-    const newValue = text.substring(0, start) + before + selected + after + text.substring(end)
-    onChange(newValue)
-
-    setTimeout(() => {
-      textarea.focus()
-      textarea.setSelectionRange(start + before.length, end + before.length)
-    }, 0)
+  viewMode = 'edit',
+}: {
+  value: string
+  onChange: (value: string) => void
+  placeholder?: string
+  className?: string
+  viewMode?: 'edit' | 'preview' | 'split'
+}) {
+  const [view, setView] = useState(viewMode === 'preview' ? 'preview' : 'edit'),
+    [uploading, setUploading] = useState(false),
+    textRef = useRef<HTMLTextAreaElement>(null),
+    fileRef = useRef<HTMLInputElement>(null)
+  function insert(before: string, after = '') {
+    const input = textRef.current,
+      start = input?.selectionStart ?? value.length,
+      end = input?.selectionEnd ?? value.length
+    onChange(value.slice(0, start) + before + value.slice(start, end) + after + value.slice(end))
+    requestAnimationFrame(() => {
+      input?.focus()
+      input?.setSelectionRange(start + before.length, end + before.length)
+    })
   }
-
-  const handleImageUpload = async (file: File) => {
-    const toastId = toast.loading('正在上传图片...')
+  async function upload(file?: File) {
+    if (!file) return
+    if (!file.type.startsWith('image/') || file.size > 10 * 1024 * 1024) {
+      toast.error('请选择 10MB 以内的图片')
+      return
+    }
+    setUploading(true)
     try {
-      const res = await uploadFile(
-        {
-          fileUploadRequest: { biz: FileUploadBizEnum.POST_IMAGE_COVER },
-        },
+      const r = await uploadFile(
+        { fileUploadRequest: { biz: FileUploadBizEnum.POST_IMAGE_COVER } },
         {},
         file
       )
-      if (res.code === 0 && res.data?.url) {
-        insertText(`![图片](${res.data.url})`)
-        toast.success('图片上传成功', { id: toastId })
-      } else {
-        toast.error('图片上传失败: ' + res.message, { id: toastId })
-      }
-    } catch (error) {
-      console.error('Upload error:', error)
-      toast.error('图片上传出错', { id: toastId })
+      if (r.code !== 0 || !r.data?.url) throw Error(r.message || '图片上传失败')
+      insert(`![图片](${r.data.url})`)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '图片上传失败')
+    } finally {
+      setUploading(false)
     }
   }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      handleImageUpload(file)
-    }
-    // Clean input
-    e.target.value = ''
-  }
-
-  const handlePaste = (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
-    const files = e.clipboardData.files
-    if (files && files.length > 0) {
-      const file = files[0]
-      if (file.type.startsWith('image/')) {
-        e.preventDefault()
-        handleImageUpload(file)
-      }
-    }
-  }
-
-  const toolbarItems = [
-    { icon: Bold, label: '粗体', before: '**', after: '**' },
-    { icon: Italic, label: '斜体', before: '*', after: '*' },
-    { icon: Type, label: '标题', before: '### ', after: '' },
-    { icon: ListIcon, label: '无序列表', before: '- ', after: '' },
-    { icon: ListOrdered, label: '有序列表', before: '1. ', after: '' },
-    { icon: Code, label: '代码块', before: '```\n', after: '\n```' },
-    { icon: LinkIcon, label: '链接', before: '[', after: '](url)' },
-    { icon: ImageIcon, label: '图片', before: '', after: '', upload: true },
-  ]
-
   return (
-    <div
-      className={cn(
-        'border-border/40 bg-card/30 flex flex-1 flex-col overflow-hidden rounded-xl border shadow-sm transition-all duration-300',
-        isFullscreen &&
-          'bg-background fixed inset-0 z-50 h-screen w-screen rounded-none border-none',
-        className
-      )}
+    <Tabs
+      value={view}
+      onValueChange={setView}
+      className={cn('flex min-w-0 flex-col gap-3', className)}
     >
-      {/* Hidden File Input */}
-      <input
-        type="file"
-        ref={fileInputRef}
-        className="hidden"
-        accept="image/*"
-        onChange={handleFileChange}
-      />
-
-      {/* 浮动/固定工具栏 */}
-      <div
-        className={cn(
-          'border-border/40 flex items-center justify-between border-b px-4 py-3 backdrop-blur-md',
-          isFullscreen ? 'bg-background/80 sticky top-0 z-10' : 'bg-background/80 sticky top-0 z-10'
-        )}
-      >
-        <div className="flex items-center gap-1">
-          {toolbarItems.map((item, idx) => (
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <TabsList>
+          <TabsTrigger value="edit">编辑</TabsTrigger>
+          <TabsTrigger value="preview">预览</TabsTrigger>
+        </TabsList>
+        {view === 'edit' && (
+          <div className="flex flex-wrap gap-1">
+            {[
+              { Icon: Bold, label: '粗体', before: '**', after: '**' },
+              { Icon: Italic, label: '斜体', before: '*', after: '*' },
+              { Icon: Code, label: '代码', before: '\n```javascript\n', after: '\n```\n' },
+              { Icon: Link2, label: '链接', before: '[', after: '](url)' },
+              { Icon: List, label: '列表', before: '\n- ', after: '' },
+            ].map(({ Icon, label, before, after }) => (
+              <Button
+                key={label}
+                type="button"
+                size="icon"
+                variant="ghost"
+                aria-label={label}
+                onClick={() => insert(before, after)}
+              >
+                <Icon />
+              </Button>
+            ))}
             <Button
-              key={idx}
-              variant="ghost"
+              type="button"
               size="icon"
-              className="text-muted-foreground hover:bg-primary/10 hover:text-primary h-8 w-8 rounded-lg"
-              onClick={() => { if (item.upload) fileInputRef.current?.click(); else insertText(item.before, item.after) }}
-              aria-label={item.label}
-              title={item.label}
+              variant="ghost"
+              aria-label="插入图片"
+              disabled={uploading}
+              onClick={() => fileRef.current?.click()}
             >
-              <item.icon className="h-4 w-4" />
+              <ImagePlus />
             </Button>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-2 pl-4">
-          {/* View Switcher using Radix Tabs */}
-          <Tabs value={view} onValueChange={v => setView(v as 'edit' | 'preview' | 'split')} className="hidden lg:block">
-            <TabsList className="bg-muted/10 h-8 p-1">
-              <TabsTrigger
-                value="edit"
-                className="h-6 px-3 text-[11px] font-bold tracking-wider uppercase"
-              >
-                编辑
-              </TabsTrigger>
-              <TabsTrigger
-                value="split"
-                className="h-6 px-3 text-[11px] font-bold tracking-wider uppercase"
-              >
-                分栏
-              </TabsTrigger>
-              <TabsTrigger
-                value="preview"
-                className="h-6 px-3 text-[11px] font-bold tracking-wider uppercase"
-              >
-                预览
-              </TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:bg-primary/10 hover:text-primary h-8 w-8 rounded-lg"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-          >
-            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-          </Button>
-        </div>
-      </div>
-
-      {/* 编辑与预览区域 */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* 移动端/小屏 Tab 切换 */}
-        <div className="flex h-full w-full flex-col lg:hidden">
-          {/* 使用简单的条件渲染代替 Tabs 组件以减少层级 */}
-          {view === 'edit' ? (
-            <Textarea
-              ref={textareaRef}
-              value={value}
-              onChange={e => onChange(e.target.value)}
-              onPaste={handlePaste}
-              placeholder={placeholder || '开始写作...'}
-              className="h-full w-full resize-none rounded-none border-none bg-transparent p-6 font-mono text-base leading-relaxed focus-visible:ring-0"
-            />
-          ) : (
-            <div className="flex-1 overflow-auto p-6">
-              <MarkdownRender content={value} />
-            </div>
-          )}
-          {/* 底部简单的切换器 */}
-          <div className="border-border/40 flex border-t">
-            <button
-              className={cn(
-                'flex-1 py-3 text-sm font-medium transition-colors',
-                view === 'edit' ? 'text-primary bg-muted/20' : 'text-muted-foreground'
-              )}
-              onClick={() => setView('edit')}
-            >
-              编辑
-            </button>
-            <button
-              className={cn(
-                'flex-1 py-3 text-sm font-medium transition-colors',
-                view === 'preview' ? 'text-primary bg-muted/20' : 'text-muted-foreground'
-              )}
-              onClick={() => setView('preview')}
-            >
-              预览
-            </button>
-          </div>
-        </div>
-
-        {/* PC/宽屏分栏 */}
-        <div className="divide-border/40 hidden h-full w-full divide-x lg:flex">
-          <div
-            className={cn(
-              'transition-all duration-300',
-              view === 'edit' && 'w-full',
-              view === 'preview' && 'w-0 overflow-hidden opacity-0',
-              view === 'split' && 'w-1/2'
-            )}
-          >
-            <textarea
-              ref={textareaRef}
-              value={value}
-              onChange={e => onChange(e.target.value)}
-              onPaste={handlePaste}
-              placeholder={placeholder || '开始写作...'} // Localized
-              className="placeholder:text-muted-foreground/40 h-full w-full resize-none border-none bg-transparent p-6 font-mono text-[15px] leading-relaxed focus:outline-none lg:p-10"
-              style={{ fontFamily: 'var(--font-mono)' }}
+            <Input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              aria-label="上传正文图片"
+              onChange={e => {
+                void upload(e.target.files?.[0])
+                e.target.value = ''
+              }}
             />
           </div>
-          <div
-            className={cn(
-              'bg-muted/5 overflow-auto transition-all duration-300',
-              view === 'preview' && 'w-full',
-              view === 'edit' && 'w-0 overflow-hidden opacity-0',
-              view === 'split' && 'w-1/2'
-            )}
-          >
-            <div className="mx-auto w-full p-6 lg:p-10">
-              <MarkdownRender content={value || '*暂无内容预览*'} /> {/* Localized */}
-            </div>
-          </div>
-        </div>
+        )}
       </div>
-
-      {/* 底部状态栏 */}
-      {!isFullscreen && (
-        <div className="border-border/40 bg-muted/10 text-muted-foreground/60 flex items-center justify-between border-t px-4 py-1.5 text-[9px] font-black tracking-[0.2em] uppercase">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <div className="bg-primary/40 h-1 w-1 rounded-full" />
-              字数: {value.length}
-            </span>
-          </div>
-          <span>Built with Passion · Markdown Supported</span>
-        </div>
-      )}
-    </div>
+      <TabsContent value="edit">
+        <Textarea
+          ref={textRef}
+          aria-label="内容正文"
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          placeholder={placeholder || '使用 Markdown 记录思路…'}
+          className="min-h-80 font-mono"
+          onPaste={e => {
+            const file = e.clipboardData.files?.[0]
+            if (file?.type.startsWith('image/')) {
+              e.preventDefault()
+              void upload(file)
+            }
+          }}
+        />
+      </TabsContent>
+      <TabsContent value="preview" className="min-h-80">
+        {value ? (
+          <MarkdownRender content={value} />
+        ) : (
+          <p className="text-muted-foreground">填写正文后在这里预览。</p>
+        )}
+      </TabsContent>
+    </Tabs>
   )
 }

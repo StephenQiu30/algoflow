@@ -1,137 +1,51 @@
 'use client'
-
-import * as React from 'react'
-import { MessageSquare, MoreHorizontal } from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import { deletePostComment } from '@/api/post/postCommentController'
-import { CommentInput } from './comment-input'
-import { useAppSelector } from '@/store/hooks'
-import { RootState } from '@/store'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import 'dayjs/locale/zh-cn'
-
+import { useState } from 'react'
 import { UserAvatar } from '@/components/header/user-avatar'
-
-dayjs.extend(relativeTime)
-dayjs.locale('zh-cn')
-
-interface CommentItemProps {
+import { Button } from '@/components/ui/button'
+import { CommentInput } from './comment-input'
+export function CommentItem({
+  comment,
+  postId,
+  onReplySuccess,
+}: {
   comment: PostAPI.PostCommentVO
   postId: string
   onReplySuccess?: () => void
-}
-
-export function CommentItem({ comment, postId, onReplySuccess }: CommentItemProps) {
-  const [isReplying, setIsReplying] = React.useState(false)
-  const { user } = useAppSelector((state: RootState) => state.user)
-
+}) {
+  const [reply, setReply] = useState(false)
   return (
-    <div className="group animate-in fade-in slide-in-from-bottom-4 duration-500">
-      <div className="flex gap-5">
-        {/* Avatar */}
-        <div className="mt-1 shrink-0">
-          <UserAvatar
-            user={comment.userVO}
-            size="md"
-            className="border-border/10 h-10 w-10 border shadow-sm transition-transform group-hover:scale-105"
-          />
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 space-y-2.5">
-          {/* Header */}
-          <div className="flex items-center gap-3">
-            <span className="text-foreground text-[15px] font-black tracking-tight">
-              {comment.userVO?.userName || '匿名用户'}
+    <article className="flex min-w-0 flex-col gap-3 py-3">
+      <div className="flex gap-3">
+        <UserAvatar user={comment.userVO} className="size-8" />
+        <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <p className="text-sm font-medium">{comment.userVO?.userName || '社区成员'}</p>
+          <p className="text-sm leading-7 break-words whitespace-pre-wrap">{comment.content}</p>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="text-muted-foreground text-xs">
+              {comment.createTime ? new Date(comment.createTime).toLocaleString('zh-CN') : ''}
             </span>
-            <span className="text-foreground/30 text-[11px] font-bold tracking-wider uppercase">
-              {comment.createTime ? dayjs(comment.createTime).fromNow() : ''}
-            </span>
-          </div>
-
-          {/* Body */}
-          <div className="text-foreground/80 text-[15px] leading-relaxed font-medium">
-            <div className="wrap-break-word whitespace-pre-wrap">{comment.content}</div>
-          </div>
-
-          {/* Actions */}
-          <div className="text-muted-foreground flex items-center gap-4 pt-1 text-[13px]">
-            <button
-              onClick={() => setIsReplying(!isReplying)}
-              className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 font-medium transition-colors"
-            >
+            <Button variant="ghost" onClick={() => setReply(!reply)}>
               回复
-            </button>
-
-            {user && user.id === comment.userId && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button className="text-muted-foreground hover:text-foreground flex items-center gap-1.5 font-medium transition-colors focus:outline-none">
-                    更多
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
-                  <DropdownMenuItem
-                    className="cursor-pointer text-red-500 focus:text-red-500"
-                    onClick={async () => {
-                      if (!comment.id) return
-                      try {
-                        const res = await deletePostComment({ id: comment.id })
-                        if (res.code === 0) {
-                          onReplySuccess?.() // Trigger refresh
-                        } else {
-                          // Could add toast here
-                        }
-                      } catch (e) {
-                        console.error('Delete failed', e)
-                      }
-                    }}
-                  >
-                    删除评论
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+            </Button>
           </div>
-
-          {/* Reply Input */}
-          {isReplying && (
-            <div className="border-border/50 mt-4 border-l pl-4">
-              <CommentInput
-                postId={postId}
-                parentId={comment.id}
-                onSuccess={() => {
-                  setIsReplying(false)
-                  onReplySuccess?.()
-                }}
-                onCancel={() => setIsReplying(false)}
-                autoFocus
-                placeholder={`回复 @${comment.userVO?.userName || '匿名用户'}...`}
-              />
-            </div>
+          {reply && (
+            <CommentInput
+              postId={postId}
+              parentId={comment.id}
+              onSuccess={() => {
+                setReply(false)
+                onReplySuccess?.()
+              }}
+              onCancel={() => setReply(false)}
+            />
           )}
         </div>
       </div>
-
-      {/* Nested Replies */}
-      {comment.children && comment.children.length > 0 && (
-        <div className="border-border/30 mt-5 ml-5 space-y-6 border-l pl-6">
-          {comment.children.map(reply => (
-            <CommentItem
-              key={reply.id}
-              comment={reply}
-              postId={postId}
-              onReplySuccess={onReplySuccess}
-            />
-          ))}
+      {comment.children?.map(c => (
+        <div className="pl-4" key={c.id}>
+          <CommentItem comment={c} postId={postId} onReplySuccess={onReplySuccess} />
         </div>
-      )}
-    </div>
+      ))}
+    </article>
   )
 }

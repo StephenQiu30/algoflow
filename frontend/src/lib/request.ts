@@ -6,11 +6,18 @@ const JSONBigStr = JSONBig({ storeAsString: true })
 
 type RequestExtras = { silent?: boolean }
 
+function expireSession() {
+  if (typeof window !== 'undefined' && localStorage.getItem('token')) {
+    localStorage.removeItem('token')
+    window.dispatchEvent(new Event('algoflow:session-expired'))
+  }
+}
+
 /**
  * 创建 Axios 实例
  */
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || '/api',
   timeout: 10000,
   withCredentials: true,
   transformResponse: [
@@ -54,6 +61,7 @@ axiosInstance.interceptors.response.use(
   function (response) {
     // 处理响应数据
     const { data } = response
+    if (data?.code === 40100) expireSession()
     return data
   },
   // 非 2xx 响应触发
@@ -62,6 +70,7 @@ axiosInstance.interceptors.response.use(
       RequestExtras
     const method = (config.method || 'get').toLowerCase()
     const status = isAxiosError(error) ? error.response?.status : undefined
+    if (status === 401) expireSession()
     const silent = (config.silent ?? true) || method === 'get' || status === 401 || status === 403
 
     // 处理响应错误

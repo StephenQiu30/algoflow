@@ -57,7 +57,7 @@ export type SortingAlgorithmInfo = {
 export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   {
     id: 'bubble',
-    name: '冒泡排序 (Bubble Sort)',
+    name: '冒泡排序',
     shortName: '冒泡',
     description: '通过重复走访要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。',
     timeComplexity: { best: 'O(n)', average: 'O(n²)', worst: 'O(n²)' },
@@ -67,7 +67,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'selection',
-    name: '选择排序 (Selection Sort)',
+    name: '选择排序',
     shortName: '选择',
     description: '每一次从待排序的数据元素中选出最小（或最大）的一个元素，存放在序列的起始位置。',
     timeComplexity: { best: 'O(n²)', average: 'O(n²)', worst: 'O(n²)' },
@@ -77,7 +77,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'insertion',
-    name: '插入排序 (Insertion Sort)',
+    name: '插入排序',
     shortName: '插入',
     description:
       '通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。',
@@ -88,7 +88,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'shell',
-    name: '希尔排序 (Shell Sort)',
+    name: '希尔排序',
     shortName: '希尔',
     description:
       '通过将整个有序列分割成若干个子序列分别进行直接插入排序，待整个序列中的记录“基本有序”时，再对全部记录进行依次直接插入排序。',
@@ -99,7 +99,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'merge',
-    name: '归并排序 (Merge Sort)',
+    name: '归并排序',
     shortName: '归并',
     description:
       '建立在归并操作上的一种有效的排序算法，该算法是采用分治法（Divide and Conquer）的一个非常典型的应用。',
@@ -110,7 +110,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'quick',
-    name: '快速排序 (Quick Sort)',
+    name: '快速排序',
     shortName: '快速',
     description:
       '通过一趟排序将要排序的数据分割成独立的两部分，其中一部分的所有数据都比另外一部分的所有数据都要小，然后再按此方法对这两部分数据分别进行快速排序。',
@@ -121,7 +121,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'heap',
-    name: '堆排序 (Heap Sort)',
+    name: '堆排序',
     shortName: '堆',
     description:
       '利用堆这种数据结构所设计的一种排序算法。堆积是一个近似完全二叉树的结构，并同时满足堆积的性质。',
@@ -132,7 +132,7 @@ export const SORTING_ALGORITHMS: SortingAlgorithmInfo[] = [
   },
   {
     id: 'radix',
-    name: '基数排序 (Radix Sort)',
+    name: '基数排序',
     shortName: '基数',
     description: '透过键值的部份资讯，将要排序的元素分配至某些“桶”中，借以达到排序的作用。',
     timeComplexity: { best: 'O(d(n+b))', average: 'O(d(n+b))', worst: 'O(d(n+b))' },

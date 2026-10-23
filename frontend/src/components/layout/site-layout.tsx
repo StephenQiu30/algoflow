@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import { Suspense, type ReactNode } from 'react'
 import { SiteHeader } from '@/components/header/site-header'
 import { Footer } from '@/components/footer/footer'
 
@@ -11,7 +11,15 @@ export function SiteLayout({ children }: { children: ReactNode }) {
       </a>
       <SiteHeader />
       <main id="main-content" className="min-w-0 flex-1 scroll-mt-20" tabIndex={-1}>
-        {children}
+        <Suspense
+          fallback={
+            <div className="page-container py-12" role="status">
+              正在加载…
+            </div>
+          }
+        >
+          {children}
+        </Suspense>
       </main>
       <Footer />
     </div>

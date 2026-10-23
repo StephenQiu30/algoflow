@@ -1,0 +1,2 @@
+# Shared Redis sessions contain this exact, non-sensitive user view.
+com.stephen.cloud.api.user.model.vo.UserVO

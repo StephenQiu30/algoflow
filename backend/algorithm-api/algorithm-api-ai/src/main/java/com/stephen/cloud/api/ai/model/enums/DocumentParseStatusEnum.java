@@ -11,6 +11,7 @@ import lombok.Getter;
 public enum DocumentParseStatusEnum {
 
     PENDING("PENDING", "待解析"),
+    DRAFT("DRAFT", "待索引"),
     PROCESSING("PROCESSING", "解析中"),
     COMPLETED("COMPLETED", "解析完成"),
     FAILED("FAILED", "解析失败"),

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '用户中心 - Stephen Radix',
+  title: '个人中心',
   description: '管理您的个人资料和设置。',
 }
 

@@ -83,6 +83,10 @@ public class Document implements Serializable {
     @Schema(description = "版本")
     private String version;
 
+    private Long revision;
+
+    private Long publishedRevision;
+
     @Schema(description = "扩展元数据")
     private String extraMeta;
 

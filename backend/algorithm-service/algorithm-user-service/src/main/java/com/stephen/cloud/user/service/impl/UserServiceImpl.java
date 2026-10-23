@@ -311,6 +311,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
             }
         }
 
+        queryWrapper.orderByDesc(User::getId);
         return queryWrapper;
     }
 

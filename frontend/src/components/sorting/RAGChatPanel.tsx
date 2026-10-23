@@ -14,17 +14,20 @@ import {
 } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { useAppSelector } from '@/store/hooks'
-import { AnimatePresence, motion } from 'framer-motion'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import {
-  Bot,
-  Database,
-  Loader2,
-  MessageSquarePlus,
-  Send,
-  Sparkles,
-  Trash2,
-  WandSparkles,
-} from 'lucide-react'
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+} from '@/components/ui/select'
+import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
+import { Switch } from '@/components/ui/switch'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import request from '@/lib/request'
+import { Bot, MessageSquarePlus, Send } from 'lucide-react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 type Message = {
@@ -120,7 +123,7 @@ const getGuestClientId = () => {
 const createWelcomeMessage = (algorithmName: string): Message => ({
   id: createMessageId(),
   role: 'assistant',
-  content: `你好！我是 AI 算法助手 🤖。关于 **${algorithmName}**，你有什么疑问吗？无论是原理解释还是时间复杂度分析，我都可以为你解答！`,
+  content: `可以结合 **${algorithmName}** 的当前步骤，提问比较、交换与排序原理。`,
 })
 
 const createInterruptedMessage = (): Message => ({
@@ -128,19 +131,6 @@ const createInterruptedMessage = (): Message => ({
   role: 'assistant',
   content: '上次回答被中断，可继续提问。',
 })
-
-const formatThreadTime = (timestamp: number) => {
-  if (!timestamp) {
-    return ''
-  }
-  const date = new Date(timestamp)
-  return date.toLocaleString('zh-CN', {
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
 
 const buildThreadTitle = (messages: Message[]) => {
   const firstUserMessage = messages.find(message => message.role === 'user')
@@ -228,7 +218,9 @@ export function RAGChatPanel({
   const [kbState, setKbState] = useState<'idle' | 'loading' | 'ready' | 'empty' | 'error'>('idle')
   const [enableWebSearch, setEnableWebSearch] = useState(false)
   const streamControllerRef = useRef<AbortController | null>(null)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const messageAreaRef = useRef<HTMLDivElement>(null)
+  const followMessagesRef = useRef(true)
+
   const persistTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const threadSummariesRef = useRef<ThreadSummary[]>([])
   const currentThreadRef = useRef<ThreadDetail | null>(null)
@@ -272,12 +264,6 @@ export function RAGChatPanel({
     }
     setClientId(getGuestClientId())
   }, [])
-
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-    }
-  }, [currentThread?.messages, isLoading, statusText])
 
   useEffect(() => {
     return () => {
@@ -325,13 +311,6 @@ export function RAGChatPanel({
     )
   }
 
-  const deleteThreadDetail = (storageKey: string, threadId: string) => {
-    if (typeof window === 'undefined') {
-      return
-    }
-    safeStorage.removeItem(getThreadDetailStorageKey(storageKey, threadId))
-  }
-
   const setActiveThreadId = (storageKey: string, knowledgeBaseId: string, threadId: string) => {
     if (typeof window === 'undefined') {
       return
@@ -343,13 +322,6 @@ export function RAGChatPanel({
     typeof window === 'undefined'
       ? ''
       : safeStorage.getItem(getActiveThreadStorageKey(storageKey, knowledgeBaseId)) || ''
-
-  const removeActiveThreadId = (storageKey: string, knowledgeBaseId: string) => {
-    if (typeof window === 'undefined') {
-      return
-    }
-    safeStorage.removeItem(getActiveThreadStorageKey(storageKey, knowledgeBaseId))
-  }
 
   const scheduleThreadDetailPersist = React.useCallback(
     (storageKey: string, detail: ThreadDetail) => {
@@ -506,40 +478,6 @@ export function RAGChatPanel({
     activateThread(detail)
   }
 
-  const handleDeleteThread = (threadId: string) => {
-    if (isLoading || !userStorageKey) {
-      return
-    }
-    const existingThread = threadSummariesRef.current.find(item => item.threadId === threadId)
-    const nextSummaries = sortThreadSummaries(
-      threadSummariesRef.current.filter(item => item.threadId !== threadId)
-    )
-    threadSummariesRef.current = nextSummaries
-    setThreadSummaries(nextSummaries)
-    deleteThreadDetail(userStorageKey, threadId)
-    writeThreadSummaries(userStorageKey, nextSummaries)
-    if (existingThread) {
-      removeActiveThreadId(userStorageKey, existingThread.knowledgeBaseId)
-    }
-
-    if (currentThread?.threadId !== threadId) {
-      return
-    }
-
-    const nextThread =
-      nextSummaries.find(item => item.knowledgeBaseId === selectedKnowledgeBaseId) || null
-    if (!nextThread) {
-      createThread(selectedKnowledgeBaseId)
-      return
-    }
-    const nextDetail = readThreadDetail(userStorageKey, nextThread.threadId)
-    if (!nextDetail) {
-      createThread(selectedKnowledgeBaseId)
-      return
-    }
-    activateThread(nextDetail)
-  }
-
   useEffect(() => {
     if (!isOpen || kbState !== 'idle') {
       return
@@ -663,40 +601,25 @@ export function RAGChatPanel({
       controller.abort()
     }, 120_000)
     try {
-      const token = typeof window !== 'undefined' ? safeStorage.getItem('token') || '' : ''
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || ''
-
-      const response = await fetch(`${baseUrl}/ai/rag/ask/stream/events`, {
+      const response = await request<ReadableStream<Uint8Array>>('/ai/rag/ask/stream/events', {
         method: 'POST',
-        credentials: 'include',
+        adapter: 'fetch',
+        responseType: 'stream',
+        timeout: 0,
+        transformResponse: [(data: unknown) => data],
         signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
+        data: {
           question,
           knowledgeBaseId: selectedKnowledgeBaseId,
           topK: 5,
           conversationId: nextThreadBeforeStream.conversationId,
           enableWebSearchFallback: enableWebSearch,
           teachingContext,
-        }),
+        },
       })
-
-      if (!response.ok) {
-        throw new Error(
-          response.status === 401 || response.status === 403
-            ? '请先登录后使用 AI 答疑。'
-            : '请求失败，请稍后重试。'
-        )
-      }
-
-      if (!response.body) {
-        throw new Error('Streaming not supported')
-      }
-
-      for await (const eventData of readRagEvents(response.body)) {
+      if (!response || typeof response.getReader !== 'function')
+        throw new Error('当前浏览器无法读取流式回答。')
+      for await (const eventData of readRagEvents(response)) {
         if (currentThreadRef.current?.threadId !== nextThreadBeforeStream.threadId) {
           controller.abort()
           return
@@ -773,6 +696,7 @@ export function RAGChatPanel({
         }
 
         if (eventType === 'error') {
+          setInput(current => current || question)
           terminalEvent = true
           setStatusText('')
           const errorMessage =
@@ -805,6 +729,7 @@ export function RAGChatPanel({
       if (!terminalEvent) throw new Error('Stream ended before done')
     } catch (error) {
       if (currentThreadRef.current?.threadId !== nextThreadBeforeStream.threadId) return
+      setInput(current => current || question)
       console.error('Failed to send rag message:', error)
       setStatusText('')
       const baseThread = currentThreadRef.current || nextThreadBeforeStream
@@ -852,351 +777,189 @@ export function RAGChatPanel({
 
   const fallbackMessages = useMemo(() => [createWelcomeMessage(algorithmName)], [algorithmName])
   const currentMessages = currentThread?.messages || fallbackMessages
+  useEffect(() => {
+    const viewport = messageAreaRef.current?.querySelector('[data-radix-scroll-area-viewport]')
+    if (viewport && followMessagesRef.current) viewport.scrollTop = viewport.scrollHeight
+  }, [currentMessages, isOpen])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="fixed right-8 bottom-8 z-50 flex items-center gap-2 rounded-full bg-[#007AFF] px-5 py-3.5 text-sm font-semibold text-white shadow-[0_8px_30px_rgba(0,122,255,0.3)] transition-all hover:bg-[#0066CC] dark:bg-[#007AFF] dark:hover:bg-[#0066CC]"
-        >
-          <Sparkles className="h-4 w-4" />
-          <span>AI 答疑</span>
-        </motion.button>
+        <Button variant="ghost">
+          <Bot data-icon="inline-start" />
+          解释当前步骤
+        </Button>
       </DialogTrigger>
-
-      <DialogContent className="overflow-hidden border-none bg-transparent p-0 shadow-none sm:max-w-[min(1320px,96vw)]">
-        <div className="flex h-[min(92vh,920px)] w-full overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-2xl dark:border-slate-800 dark:bg-slate-950">
-          <aside className="hidden w-[280px] shrink-0 flex-col border-r border-slate-200 bg-slate-50 px-5 py-5 lg:flex dark:border-slate-800 dark:bg-slate-900">
-            <div className="mb-5 flex items-center justify-between gap-3">
-              <div>
-                <div className="text-xs font-semibold tracking-[0.12em] text-slate-600 uppercase dark:text-slate-400">
-                  会话线程
-                </div>
-                <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  当前知识库下的对话历史
-                </div>
-              </div>
-              <Button
-                size="icon"
-                variant="outline"
-                aria-label="创建新对话"
-                onClick={handleCreateThread}
-                disabled={isLoading || !selectedKnowledgeBaseId}
-                className="h-9 w-9 rounded-full border-slate-200 bg-white shadow-sm hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-800"
-              >
-                <MessageSquarePlus className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="space-y-3 overflow-y-auto pr-1">
-              {visibleThreads.map(thread => {
-                const isActive = thread.threadId === currentThread?.threadId
-                return (
-                  <div
-                    key={thread.threadId}
-                    className={`group flex items-start gap-3 rounded-2xl border p-4 transition ${
-                      isActive
-                        ? 'border-blue-200 bg-blue-50 dark:border-blue-500/30 dark:bg-blue-500/10'
-                        : 'border-slate-200 bg-white hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700'
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => handleSwitchThread(thread.threadId)}
-                      disabled={isLoading}
-                      className="min-w-0 flex-1 text-left"
-                    >
-                      <div className="truncate text-sm font-semibold text-slate-900 dark:text-slate-100">
-                        {thread.title}
-                      </div>
-                      <div className="mt-1 line-clamp-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
-                        {thread.preview}
-                      </div>
-                      <div className="mt-3 text-[11px] font-medium text-slate-500 dark:text-slate-500">
-                        {formatThreadTime(thread.updatedAt)}
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      aria-label="删除对话"
-                      onClick={() => handleDeleteThread(thread.threadId)}
-                      disabled={isLoading}
-                      className="rounded-full p-2 text-slate-400 opacity-0 transition group-hover:opacity-100 hover:bg-slate-100 hover:text-slate-700 disabled:cursor-not-allowed dark:hover:bg-slate-800 dark:hover:text-slate-200"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                )
-              })}
-
-              {visibleThreads.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-4 py-5 text-sm leading-6 text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-                  当前知识库下还没有会话，点击右上角按钮创建新对话。
-                </div>
-              ) : null}
-            </div>
-          </aside>
-
-          <div className="relative flex min-w-0 flex-1 flex-col">
-            <DialogHeader className="gap-3 border-b border-slate-200 bg-slate-50 px-5 py-4 text-left dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-start justify-between gap-4 pr-8">
-                <div className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
-                    <Bot className="h-4 w-4" />
-                  </div>
-                  <div className="space-y-1">
-                    <DialogTitle className="text-[1.6rem] font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-                      AI 算法导师
-                    </DialogTitle>
-                    <DialogDescription className="text-sm leading-5 text-slate-600 dark:text-slate-400">
-                      结合当前数组和步骤答疑；知识库引用随答案展示。
-                    </DialogDescription>
-                  </div>
-                </div>
-                <div className="hidden rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 md:inline-flex dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300">
-                  {algorithmName}
-                </div>
-              </div>
-
-              {teachingContext && (
-                <p className="text-muted-foreground text-[14px]">
-                  当前演示：第 {Number(teachingContext.currentStep) || 0} /{' '}
-                  {Number(teachingContext.totalSteps) || 0} 步
-                </p>
-              )}
-              <div className="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 lg:flex-row lg:items-center lg:justify-between dark:border-slate-800 dark:bg-slate-950">
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <div className="flex shrink-0 items-center gap-2 text-xs font-semibold tracking-[0.08em] text-slate-600 uppercase dark:text-slate-400">
-                    <Database className="h-3.5 w-3.5" />
-                    当前知识库
-                  </div>
-                  <select
-                    aria-label="当前知识库"
-                    value={selectedKnowledgeBaseId}
-                    onChange={e => setSelectedKnowledgeBaseId(e.target.value)}
-                    disabled={isKnowledgeBaseLoading || knowledgeBases.length === 0 || isLoading}
-                    className="h-10 min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-3 pr-10 text-sm text-slate-900 transition outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:ring-blue-900/40"
-                  >
-                    {isKnowledgeBaseLoading ? (
-                      <option value="">正在加载知识库...</option>
-                    ) : knowledgeBases.length === 0 ? (
-                      <option value="">暂无可用知识库</option>
-                    ) : (
-                      knowledgeBases.map(item => (
-                        <option key={item.id} value={item.id}>
-                          {item.name}
-                        </option>
-                      ))
-                    )}
-                  </select>
-                </div>
-                <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                  <WandSparkles className="h-3.5 w-3.5 shrink-0" />
-                  <span>新对话保留上下文，切库会自动切到最近线程，生成中会锁定切换。</span>
-                </div>
-              </div>
-
-              <label className="text-sm">
-                <input
-                  type="checkbox"
-                  checked={enableWebSearch}
-                  onChange={e => setEnableWebSearch(e.target.checked)}
-                  disabled={isLoading}
-                />{' '}
-                允许知识不足时联网搜索
-              </label>
-              {teachingContext && (
-                <p className="text-xs">
-                  将发送当前算法、数组、步骤、计数和辅助数组作为课堂上下文。
-                </p>
-              )}
-              <div className="lg:hidden">
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="text-xs font-semibold tracking-[0.12em] text-slate-600 uppercase dark:text-slate-400">
-                    当前会话
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={handleCreateThread}
-                    disabled={isLoading || !selectedKnowledgeBaseId}
-                    className="rounded-full border-slate-200 bg-white hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-950 dark:hover:bg-slate-800"
-                  >
-                    <MessageSquarePlus className="mr-1 h-4 w-4" />
-                    新对话
-                  </Button>
-                </div>
-                <div className="flex gap-2 overflow-x-auto pb-1">
-                  {visibleThreads.map(thread => {
-                    const isActive = thread.threadId === currentThread?.threadId
-                    return (
-                      <button
-                        key={thread.threadId}
-                        type="button"
-                        onClick={() => handleSwitchThread(thread.threadId)}
-                        disabled={isLoading}
-                        className={`shrink-0 rounded-full border px-4 py-2 text-sm transition ${
-                          isActive
-                            ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200'
-                            : 'border-slate-300 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300'
-                        }`}
-                      >
-                        {thread.title}
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            </DialogHeader>
-
-            <div
-              ref={scrollRef}
-              className="scrollbar-thin scrollbar-track-transparent scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-700 flex-1 space-y-6 overflow-y-auto bg-slate-50 px-6 py-6 dark:bg-slate-900"
+      <DialogContent className="flex max-h-[90dvh] flex-col gap-4 overflow-y-auto sm:max-w-3xl">
+        <DialogHeader>
+          <DialogTitle>AI 算法导师</DialogTitle>
+          <DialogDescription>
+            {algorithmName} · 当前第 {Number(teachingContext?.currentStep) || 0}{' '}
+            步。回答依据与来源随内容展示。
+          </DialogDescription>
+        </DialogHeader>
+        <FieldGroup>
+          <Field>
+            <FieldLabel>知识库</FieldLabel>
+            <Select
+              value={selectedKnowledgeBaseId}
+              onValueChange={setSelectedKnowledgeBaseId}
+              disabled={isLoading || isKnowledgeBaseLoading || !knowledgeBases.length}
             >
-              <AnimatePresence initial={false}>
-                {currentMessages.map(msg => {
-                  const cleanContent = cleanMessageContent(msg.content)
-
-                  return (
-                    <motion.div
-                      key={msg.id}
-                      initial={{ opacity: 0, y: 10, scale: 0.98 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`group relative max-w-[min(85%,760px)] px-5 py-4 text-[15px] leading-relaxed transition-all ${
-                          msg.role === 'user'
-                            ? 'rounded-2xl rounded-br-md bg-blue-600 text-white shadow-sm'
-                            : 'rounded-2xl rounded-bl-md border border-slate-200 bg-white text-slate-900 shadow-sm dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100'
-                        }`}
-                      >
-                        {msg.role === 'user' ? (
-                          <div className="font-medium tracking-wide">{cleanContent}</div>
-                        ) : (
-                          <>
-                            {msg.webSearchTriggered ? (
-                              <div className="mb-3 inline-flex rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 dark:border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-200">
-                                本次启用联网搜索兜底
-                              </div>
-                            ) : null}
-                            {msg.interrupted && (
-                              <p role="status" className="mb-3 text-sm">
-                                回答未完成，已保留收到的内容。
-                              </p>
-                            )}
-                            <div className="prose prose-slate prose-sm dark:prose-invert prose-p:my-3 prose-p:leading-[1.75] prose-pre:bg-slate-100 prose-pre:ring-1 prose-pre:ring-slate-200 dark:prose-pre:bg-slate-900 dark:prose-pre:ring-slate-700 prose-headings:mt-5 prose-headings:mb-2 prose-headings:font-semibold max-w-none text-slate-900">
-                              <MarkdownRender content={cleanContent} />
-                            </div>
-                            {msg.webSearchTriggered &&
-                              !msg.sources?.some(source =>
-                                /^https?:\/\//.test(source.url || '')
-                              ) && (
-                                <p className="mt-3 text-sm">
-                                  联网服务未提供可核验的网页来源，请核对答案；检索不足的原因不作为引用。
-                                </p>
-                              )}
-                            {!!msg.sources?.length && (
-                              <details className="mt-4 text-sm">
-                                <summary>查看引用（{msg.sources.length}）</summary>
-                                {msg.sources.map((source, index) => (
-                                  <article key={index} className="mt-3">
-                                    <p>
-                                      {source.documentName || '来源'} ·{' '}
-                                      {source.sectionTitle || '未标注章节'} · 版本{' '}
-                                      {source.version || '未标注'}
-                                    </p>
-                                    <p className="break-all">片段：{source.chunkId || '未提供'}</p>
-                                    {source.content && (
-                                      <blockquote className="mt-2 whitespace-pre-wrap">
-                                        {source.content}
-                                      </blockquote>
-                                    )}
-                                    {source.url && /^https?:\/\//.test(source.url) ? (
-                                      <a
-                                        className="text-primary hover:underline"
-                                        href={source.url}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                      >
-                                        打开原文
-                                      </a>
-                                    ) : source.sourceType === 'web_search' ? (
-                                      <p>模型未提供可核验网页链接，请自行核对。</p>
-                                    ) : null}
-                                  </article>
-                                ))}
-                              </details>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </motion.div>
+              <SelectTrigger aria-label="当前知识库">
+                <SelectValue
+                  placeholder={isKnowledgeBaseLoading ? '正在加载知识库…' : '选择知识库'}
+                />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {knowledgeBases.map(k => (
+                    <SelectItem value={k.id} key={k.id}>
+                      {k.name || '未命名知识库'}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </Field>
+          <Field orientation="horizontal">
+            <FieldLabel htmlFor="web-search">知识不足时允许联网搜索</FieldLabel>
+            <Switch
+              id="web-search"
+              checked={enableWebSearch}
+              onCheckedChange={setEnableWebSearch}
+              disabled={isLoading}
+            />
+          </Field>
+        </FieldGroup>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Select
+            value={currentThread?.threadId || ''}
+            onValueChange={handleSwitchThread}
+            disabled={isLoading || !visibleThreads.length}
+          >
+            <SelectTrigger aria-label="对话历史" className="max-w-64">
+              <SelectValue placeholder="对话历史" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {visibleThreads.map(t => (
+                  <SelectItem key={t.threadId} value={t.threadId}>
+                    {t.title}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="secondary"
+            onClick={handleCreateThread}
+            disabled={isLoading || !selectedKnowledgeBaseId}
+          >
+            <MessageSquarePlus data-icon="inline-start" />
+            新对话
+          </Button>
+        </div>
+        <ScrollArea
+          ref={messageAreaRef}
+          viewportProps={{
+            tabIndex: 0,
+            role: 'region',
+            'aria-label': '导师对话',
+            className:
+              'focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
+          }}
+          className="h-[min(38dvh,360px)] min-w-0"
+          onScrollCapture={e => {
+            const viewport = e.target as HTMLElement
+            followMessagesRef.current =
+              viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight < 48
+          }}
+        >
+          <div className="flex flex-col gap-6 pr-4">
+            {currentMessages.map(message => (
+              <article key={message.id} className="flex min-w-0 flex-col gap-2">
+                <p className="text-muted-foreground text-xs">
+                  {message.role === 'user' ? '你' : 'AI 导师'}
+                  {message.interrupted ? ' · 已中断' : ''}
+                </p>
+                <MarkdownRender content={message.content || '正在生成…'} />
+                {message.webSearchTriggered && (
+                  <p className="text-muted-foreground text-xs">此回答使用了联网搜索。</p>
+                )}
+                {message.sources?.length ? (
+                  <div className="flex flex-wrap gap-2">
+                    {message.sources.map((source, index) => (
+                      <Dialog key={source.chunkId || index}>
+                        <DialogTrigger asChild>
+                          <Button variant="secondary">
+                            [{index + 1}] {source.documentName || '知识来源'}
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-h-[80dvh] overflow-y-auto">
+                          <DialogHeader>
+                            <DialogTitle>{source.documentName || '知识来源'}</DialogTitle>
+                            <DialogDescription>
+                              {source.sectionTitle || '相关章节'} · 版本{' '}
+                              {source.version || '未提供'}
+                            </DialogDescription>
+                          </DialogHeader>
+                          <MarkdownRender content={source.content || '当前来源没有提供摘录。'} />
+                        </DialogContent>
+                      </Dialog>
+                    ))}
+                  </div>
+                ) : (
+                  message.role === 'assistant' &&
+                  message.content && (
+                    <p className="text-muted-foreground text-xs">未提供可核验的引用来源。</p>
                   )
-                })}
-                {isLoading && statusText ? (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex justify-start"
-                  >
-                    <div className="flex max-w-[min(85%,760px)] items-center gap-3 rounded-2xl rounded-bl-md border border-slate-200 bg-white px-5 py-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-                      <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
-                      <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                        {statusText}
-                      </span>
-                    </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </div>
-
-            <div className="border-t border-slate-200 bg-white px-6 py-4 dark:border-slate-800 dark:bg-slate-950">
-              {knowledgeBases.length === 0 && !isKnowledgeBaseLoading ? (
-                <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/20 dark:text-amber-300">
-                  {kbState === 'error' ? '知识库列表加载失败。' : '暂无可用知识库。'}{' '}
-                  <button className="underline" onClick={() => setKbState('idle')}>
-                    重新加载
-                  </button>
-                </div>
-              ) : null}
-              {isLoading && (
-                <Button
-                  variant="outline"
-                  className="mb-3"
-                  onClick={() => streamControllerRef.current?.abort()}
-                >
-                  停止生成
-                </Button>
-              )}
-              <div className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2.5 dark:border-slate-800 dark:bg-slate-900">
-                <div className="relative flex items-end gap-2">
-                  <Textarea
-                    aria-label="向 AI 提问"
-                    value={input}
-                    onChange={e => setInput(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="继续提问，Enter 发送，Shift + Enter 换行"
-                    className="max-h-36 min-h-[56px] w-full resize-none rounded-xl border-0 bg-transparent px-3 py-2.5 text-[15px] text-slate-900 shadow-none placeholder:text-slate-400 focus-visible:ring-0 dark:text-slate-100 dark:placeholder:text-slate-500"
-                    rows={1}
-                  />
-                  <Button
-                    size="icon"
-                    aria-label="发送问题"
-                    onClick={handleSend}
-                    disabled={
-                      !input.trim() || isLoading || !selectedKnowledgeBaseId || !currentThread
-                    }
-                    className="mb-1 h-10 w-10 shrink-0 rounded-full bg-blue-600 text-white shadow-none transition-all hover:bg-blue-700 disabled:opacity-30"
-                  >
-                    <Send className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            </div>
+                )}
+              </article>
+            ))}
           </div>
+        </ScrollArea>
+        {statusText && (
+          <p role="status" className="text-muted-foreground text-sm">
+            {statusText}
+          </p>
+        )}
+        {(kbState === 'error' || kbState === 'empty') && (
+          <Alert>
+            <AlertDescription>
+              {kbState === 'error' ? '知识库列表加载失败。' : '暂无可用知识库。'}
+              <Button variant="ghost" onClick={() => setKbState('idle')}>
+                重新加载
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+        <Field>
+          <FieldLabel htmlFor="tutor-input">继续提问</FieldLabel>
+          <Textarea
+            id="tutor-input"
+            aria-label="向 AI 提问"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="描述你的疑问…"
+            rows={2}
+          />
+        </Field>
+        <div className="flex justify-end gap-2">
+          {isLoading ? (
+            <Button variant="secondary" onClick={() => streamControllerRef.current?.abort()}>
+              停止生成
+            </Button>
+          ) : (
+            <Button
+              onClick={handleSend}
+              disabled={!input.trim() || !selectedKnowledgeBaseId || !currentThread}
+            >
+              <Send data-icon="inline-start" />
+              发送问题
+            </Button>
+          )}
         </div>
       </DialogContent>
     </Dialog>

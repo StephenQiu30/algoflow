@@ -90,6 +90,7 @@ public class KnowledgeBaseServiceImpl extends ServiceImpl<KnowledgeBaseMapper, K
         } else {
             queryWrapper.orderByDesc(KnowledgeBase::getCreateTime);
         }
+        queryWrapper.orderByDesc(KnowledgeBase::getId);
         return queryWrapper;
     }
 
@@ -176,7 +177,9 @@ public class KnowledgeBaseServiceImpl extends ServiceImpl<KnowledgeBaseMapper, K
         KnowledgeBase oldKnowledgeBase = this.getById(id);
         ThrowUtils.throwIf(oldKnowledgeBase == null, ErrorCode.NOT_FOUND_ERROR);
         ThrowUtils.throwIf(!Objects.equals(oldKnowledgeBase.getUserId(), loginUserId) && !isAdmin, ErrorCode.NO_AUTH_ERROR);
-        vectorStoreService.deleteByKnowledgeBaseId(id);
+        if (documentChunkMapper.hasKnowledgeBaseHistory(id)) {
+            vectorStoreService.deleteByKnowledgeBaseId(id);
+        }
         documentChunkMapper.delete(new LambdaQueryWrapper<DocumentChunk>().eq(DocumentChunk::getKnowledgeBaseId, id));
         documentService.remove(new LambdaQueryWrapper<Document>().eq(Document::getKnowledgeBaseId, id));
         return this.removeById(id);

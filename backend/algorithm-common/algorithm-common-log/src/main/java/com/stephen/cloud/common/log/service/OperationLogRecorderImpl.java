@@ -7,25 +7,29 @@ import com.stephen.cloud.common.common.BaseResponse;
 import com.stephen.cloud.common.common.ErrorCode;
 import com.stephen.cloud.common.log.model.OperationLogContext;
 import com.stephen.cloud.common.utils.IpUtils;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConditionalOnBean(LogFeignClient.class)
 @Slf4j
 public class OperationLogRecorderImpl implements OperationLogRecorder {
 
-    @Resource
-    private LogFeignClient logFeignClient;
+    @Autowired
+    private ObjectProvider<LogFeignClient> logClients;
 
     @Async
     @Override
     public void recordOperationLogAsync(OperationLogContext context) {
         try {
             if (context == null) {
+                return;
+            }
+            LogFeignClient logFeignClient = logClients.getIfAvailable();
+            if (logFeignClient == null) {
+                log.warn("日志客户端未配置，无法记录操作: {}", context.getAction());
                 return;
             }
 

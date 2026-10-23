@@ -1,5 +1,7 @@
 package com.stephen.cloud.ai.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.stephen.cloud.common.constants.UserConstant;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stephen.cloud.ai.service.RAGService;
 import com.stephen.cloud.api.ai.model.dto.rag.BatchRecallRequest;
@@ -106,6 +108,7 @@ public class RAGController {
      * @return 召回分析结果
      */
     @PostMapping("/recall/analyze")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     @Operation(summary = "召回效果分析", description = "分析给定问题的召回效果，评估检索到的知识片段的相关性")
     @OperationLog(module = "RAG问答", action = "召回效果分析")
     public BaseResponse<RecallAnalysisVO> analyzeRecall(@RequestBody RecallAnalysisRequest request) {
@@ -122,6 +125,7 @@ public class RAGController {
      * @return 批量召回分析结果
      */
     @PostMapping("/recall/batch/analyze")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     @Operation(summary = "批量召回效果分析", description = "批量分析多个问题的召回效果，用于评估检索系统的整体性能")
     @OperationLog(module = "RAG问答", action = "批量召回效果分析")
     public BaseResponse<BatchRecallVO> batchAnalyzeRecall(@RequestBody BatchRecallRequest request) {

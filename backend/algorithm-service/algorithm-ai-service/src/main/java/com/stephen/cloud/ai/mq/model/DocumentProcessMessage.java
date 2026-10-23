@@ -23,6 +23,7 @@ public class DocumentProcessMessage implements Serializable {
      * 文档 ID
      */
     private Long documentId;
+    private Long revision;
 
     /**
      * 知识库 ID

@@ -1,120 +1,72 @@
 'use client'
-
-import * as React from 'react'
-import { Loader2, MessageSquare } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { listPostCommentVoByPage } from '@/api/post/postCommentController'
+import { useRemoteResource } from '@/hooks/useRemoteResource'
+import { Button } from '@/components/ui/button'
+import { PageState } from '@/components/design/page-state'
 import { CommentInput } from './comment-input'
 import { CommentItem } from './comment-item'
-import { listPostCommentVoByPage } from '@/api/post/postCommentController'
-
-interface CommentSectionProps {
+export function CommentSection({
+  postId,
+  onTotalChange,
+}: {
   postId: string
   onTotalChange?: (total: number) => void
-}
-
-export function CommentSection({ postId, onTotalChange }: CommentSectionProps) {
-  const [flatComments, setFlatComments] = React.useState<PostAPI.PostCommentVO[]>([])
-  const [loading, setLoading] = React.useState(true)
-  const [total, setTotal] = React.useState(0)
-  const [page, setPage] = React.useState(1)
-
-  // Memoized comment tree
-  const treeComments = React.useMemo(() => {
-    if (!flatComments.length) return []
-
-    const commentMap = new Map<string, PostAPI.PostCommentVO>()
-    const roots: PostAPI.PostCommentVO[] = []
-
-    // First pass: create a map of all comments
-    flatComments.forEach(comment => {
-      if (comment.id) {
-        commentMap.set(String(comment.id), { ...comment, children: [] })
-      }
+}) {
+  const [page, setPage] = useState(1),
+    [retry, setRetry] = useState(0)
+  const load = useCallback(async () => {
+    const r = await listPostCommentVoByPage({
+      postId: postId as unknown as number,
+      current: page,
+      pageSize: 10,
     })
-
-    // Second pass: link children to parents
-    commentMap.forEach(comment => {
-      const parentIdStr = comment.parentId ? String(comment.parentId) : null
-      if (parentIdStr && parentIdStr !== '0' && commentMap.has(parentIdStr)) {
-        const parent = commentMap.get(parentIdStr)
-        if (parent) {
-          if (!parent.children) parent.children = []
-          parent.children.push(comment)
-        }
-      } else {
-        roots.push(comment)
-      }
-    })
-
-    // Sort roots by createTime (newest first)
-    return roots.sort((a, b) => {
-      return new Date(b.createTime || '').getTime() - new Date(a.createTime || '').getTime()
-    })
-  }, [flatComments])
-
-  const fetchComments = React.useCallback(async () => {
-    try {
-      // Sort by createTime descending to show newest first
-      const res = await listPostCommentVoByPage({
-        postId: postId as unknown as number,
-        current: 1,
-        pageSize: 20,
-      })
-      if (res.code === 0 && res.data) {
-        setFlatComments(res.data.records || [])
-        setTotal(res.data.total || 0)
-        onTotalChange?.(res.data.total || 0)
-      }
-    } catch (error) {
-      console.error('Failed to fetch comments:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [postId, onTotalChange])
-
-  React.useEffect(() => {
-    if (postId) {
-      fetchComments()
-    }
-  }, [postId, fetchComments])
-
+    if (r.code !== 0 || !r.data) throw Error()
+    onTotalChange?.(Number(r.data.total || 0))
+    return r.data
+  }, [postId, page, onTotalChange])
+  const data = useRemoteResource(`${postId}:${page}:${retry}`, load, '讨论暂时无法加载。')
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-8 bg-card/20 border-border/10 space-y-12 rounded-[3rem] border p-8 backdrop-blur-sm duration-1000 md:p-16">
-      <div className="flex items-center gap-6">
-        <div className="bg-primary h-14 w-2 rounded-full shadow-[0_0_30px_rgba(var(--primary),0.4)]" />
-        <div>
-          <h3 className="text-foreground text-3xl font-black tracking-tight uppercase">
-            参与讨论 <span className="text-primary/40 ml-2 font-mono">({total})</span>
-          </h3>
-          <p className="text-foreground/40 mt-2 ml-1 text-[11px] font-black tracking-[0.3em] uppercase">
-            已有 {total} 条深度见解 · 开启你的对话
-          </p>
-        </div>
-      </div>
-
-      {/* Main Input */}
-      <CommentInput postId={postId} onSuccess={fetchComments} />
-
-      {/* Comment List */}
-      <div className="mt-8 space-y-8">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="text-muted-foreground/50 h-8 w-8 animate-spin" />
-          </div>
-        ) : treeComments.length > 0 ? (
-          treeComments.map(comment => (
-            <CommentItem
-              key={comment.id}
-              comment={comment}
-              postId={postId}
-              onReplySuccess={fetchComments}
-            />
-          ))
-        ) : (
-          <div className="text-muted-foreground flex flex-col items-center justify-center py-16 text-center">
-            <MessageSquare className="mb-3 h-6 w-6 opacity-30" />
-            <p className="text-sm">暂无评论，成为第一个留言的人吧。</p>
-          </div>
-        )}
+    <div className="flex flex-col gap-6">
+      <h2 className="text-xl font-medium">
+        参与讨论 {data.data?.total === undefined ? '' : `(${data.data.total})`}
+      </h2>
+      <CommentInput postId={postId} onSuccess={() => setRetry(n => n + 1)} />
+      {data.loading ? (
+        <PageState title="加载讨论" loading />
+      ) : data.error ? (
+        <PageState title="讨论加载失败" description={data.error}>
+          <Button variant="secondary" onClick={() => setRetry(n => n + 1)}>
+            重试
+          </Button>
+        </PageState>
+      ) : data.data?.records?.length ? (
+        data.data.records.map(c => (
+          <CommentItem
+            key={c.id}
+            comment={c}
+            postId={postId}
+            onReplySuccess={() => setRetry(n => n + 1)}
+          />
+        ))
+      ) : (
+        <PageState title="还没有讨论" description="分享你的思考，或提出一个具体问题。" />
+      )}
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          disabled={page <= 1 || data.loading}
+          onClick={() => setPage(n => n - 1)}
+        >
+          上一页
+        </Button>
+        <Button
+          variant="ghost"
+          disabled={!data.data || page * 10 >= Number(data.data.total) || data.loading}
+          onClick={() => setPage(n => n + 1)}
+        >
+          下一页
+        </Button>
       </div>
     </div>
   )

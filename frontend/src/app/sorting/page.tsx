@@ -1,67 +1,79 @@
 'use client'
-
-import React, { useRef } from 'react'
+import { useState } from 'react'
+import { PageShell } from '@/components/design/page-shell'
 import { AlgorithmCard } from '@/components/sorting/AlgorithmCard'
 import { SORTING_ALGORITHMS } from '@/lib/sortingAlgorithms'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
-
-export default function SortingPage() {
-  const containerRef = useRef<HTMLDivElement>(null)
-
-  useGSAP(
-    () => {
-      gsap.fromTo('.reveal', 
-        { y: 40, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          stagger: 0.1,
-          ease: 'power3.out',
-          clearProps: 'all',
-        }
-      )
-    },
-    { scope: containerRef }
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { useListQuery } from '@/hooks/use-list-query'
+import { PageState } from '@/components/design/page-state'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
+const groups: Record<string, string[]> = {
+  basic: ['bubble', 'selection', 'insertion'],
+  advanced: ['shell', 'merge', 'quick', 'heap'],
+  distribution: ['radix'],
+}
+export default function Page() {
+  const query = useListQuery()
+  const [search, setSearch] = useState(query.q)
+  const rows = SORTING_ALGORITHMS.filter(
+    a =>
+      (!groups[query.status] || groups[query.status].includes(a.id)) &&
+      `${a.name} ${a.description} ${a.tags.join(' ')}`.includes(query.q.trim())
   )
-
   return (
-    <main ref={containerRef} className="relative min-h-screen bg-background text-foreground pb-32 pt-24 overflow-hidden transition-colors duration-500">
-      {/* Pure solid background, no grid per user request */}
-      <div className="pointer-events-none absolute top-0 right-0 -z-10 h-[600px] w-[600px] rounded-full bg-[#007AFF]/5 opacity-80 blur-[130px] dark:bg-[#007AFF]/10" />
-
-      <div className="relative z-10 container mx-auto px-6">
-        {/* Fluid Primary Header Section */}
-        <header className="mb-24 pt-16 w-full flex flex-col md:flex-row md:items-end justify-between gap-8">
-          <div>
-            <div className="reveal mb-8 inline-flex items-center gap-2 rounded-full border border-[#007AFF]/20 bg-[#007AFF]/5 px-4 py-1.5 shadow-sm">
-              <span className="flex h-2 w-2 rounded-full bg-[#007AFF] shadow-[0_0_8px_rgba(0,122,255,0.8)]" />
-              <span className="text-[12px] font-semibold tracking-wide text-[#007AFF]">
-                Algorithm Index
-              </span>
-            </div>
-            <h1 className="reveal text-[3.5rem] leading-[1.05] font-black tracking-tight text-foreground sm:text-[4.5rem] lg:text-[5rem]">
-              引擎级算法沙盘。
-            </h1>
-          </div>
-          <p className="reveal max-w-lg mb-2 text-lg font-medium leading-relaxed text-zinc-500 dark:text-zinc-400">
-            通过高频阵列堆栈刷新，实时拦截并展现每一种排序算法底层调度所带来的微小性能起伏。
-          </p>
-        </header>
-
-        {/* Algorithm Structured Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
-          {SORTING_ALGORITHMS.map((algo) => (
-            <div key={algo.id} className="reveal">
-              <AlgorithmCard algorithm={algo} href={`/sorting/${algo.id}`} />
-            </div>
+    <PageShell title="算法学习" description="从比较与交换开始，逐步理解分治、堆和按位排序。">
+      <form
+        className="flex w-full max-w-md gap-2"
+        onSubmit={e => {
+          e.preventDefault()
+          query.update({ q: search, page: 1 })
+        }}
+      >
+        <Input
+          aria-label="搜索算法"
+          placeholder="搜索算法名称或概念…"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+        />
+        <Button type="submit" variant="secondary">
+          搜索
+        </Button>
+      </form>
+      <ToggleGroup
+        type="single"
+        value={query.status}
+        onValueChange={status => {
+          if (status) query.update({ status })
+        }}
+        aria-label="算法分类"
+        className="flex flex-wrap justify-start gap-2"
+      >
+        {[
+          ['all', '全部'],
+          ['basic', '基础比较'],
+          ['advanced', '进阶比较'],
+          ['distribution', '非比较'],
+        ].map(([v, l]) => (
+          <ToggleGroupItem key={v} value={v}>
+            {l}
+          </ToggleGroupItem>
+        ))}
+      </ToggleGroup>
+      <p className="text-muted-foreground text-xs">{rows.length} 个算法</p>
+      {rows.length ? (
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {rows.map(a => (
+            <AlgorithmCard
+              key={a.id}
+              algorithm={a}
+              href={`/sorting/${a.id}?returnTo=${encodeURIComponent(query.href)}`}
+            />
           ))}
         </div>
-      </div>
-    </main>
+      ) : (
+        <PageState title="暂无匹配算法" />
+      )}
+    </PageShell>
   )
 }

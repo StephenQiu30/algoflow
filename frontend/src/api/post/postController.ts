@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 创建帖子 创建新帖子，初始状态为待审核 POST /post/add */

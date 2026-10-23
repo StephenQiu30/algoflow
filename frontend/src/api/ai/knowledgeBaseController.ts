@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 创建知识库 创建新的知识库，用于组织和管理文档 POST /ai/kb/add */

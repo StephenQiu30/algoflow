@@ -24,6 +24,14 @@ public class DocumentVO implements Serializable {
     @Schema(description = "文档ID")
     private Long id;
 
+    private Long revision;
+
+    private Long publishedRevision;
+
+    private String version;
+
+    private Date processStartTime;
+
     @Schema(description = "知识库ID")
     private Long knowledgeBaseId;
 

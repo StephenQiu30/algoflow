@@ -1,124 +1,69 @@
-# 衍序 · AlgoFlow 项目接力与研发交接文档 (HANDOVER.md)
+# AlgoFlow 当前研发交接
 
-> **文档定位**：面向开发者与 AI Agent 的研发交接单（Context Handover）。在会话切换、人员轮换或阶段任务接力时，通过本文档快速对齐系统当前状态、正在进行中的任务细节与下一步行动指引。  
-> **最后交接时间**：2026-10-22  
-> **交接状态**：🟢 系统健康 / 可正常编译运行 / 核心测试全绿
+> 更新：2026-10-23。仅维护当前状态；任务见 [BACKLOG](BACKLOG.md)，页面范围见 [实施计划](docs/plan/05-全站前端页面实现计划.md)。没有暂存、提交、推送或部署。
 
----
+## 当前实现
 
-## 🎯 1. 当前系统状态快照 (System Status Snapshot)
+全站沿用单层顶部布局、Logo A、shadcn/Radix、Geist 与语义 token。个人和六个管理模块在同一 frontend 中实现；正文提供模块入口和返回，不增加二次导航。演练桌面两卡同高，按钮使用黑白主题，执行提示局部蓝色。
 
-| 检查项 | 当前状态 | 验证依据 / 结果 |
-| :--- | :---: | :--- |
-| **Git 分支与状态** | `main` 分支 / 工作区整洁 | `git status` 干净，代码已与规范全面对齐 |
-| **后端工程 (Java 21)** | 🟢 全部编译通过 | 30 个子模块 `mvn test-compile -DskipTests` 全量 SUCCESS (耗时 ~2.0s) |
-| **前端工程 (Next.js 15)**| 🟢 编译与测试全绿 | `pnpm typecheck` 0 错误；`pnpm test` 17 项核心算法与 SSE 单测 100% 通过；生产构建与冒烟测试全绿 |
-| **文档中心体系 (docs/)** | 🟢 全链路闭环 | 已重构 `requirement` → `design` → `prd` → `plan` → `algorithms` 体系 |
-| **核心中间件依赖** | 准备就绪 | `docker-compose-env.yml` 支持一键拉起 MySQL 8.0, Redis 7.0, Nacos, ES 9.3, RabbitMQ |
+算法引擎支持 8 种排序，19 种仍是规划。学习记录、草稿、偏好和导师会话摘要保存在按账户隔离的浏览器数据中，不冒充服务端跨设备同步。
 
----
+## 本机服务与配置
 
-## 🧭 2. 关键代码入口与核心文件导航
+本轮复用既有 MySQL 3306 / algorithm、Redis 6379、RabbitMQ 5672、Elasticsearch 9200（已有 IK）、Nacos 8848 / algorithm-cloud。未保留新建隔离环境；原有 Nacos 容器恢复启动，原始业务记录与基础服务保留。
 
-### 2.1 前端核心交互入口 (`frontend/`)
-* **算法工作台主页面**：[`frontend/src/app/sorting/[algo]/page.tsx`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/app/sorting/[algo]/page.tsx)
-* **算法核心演练组件**：[`frontend/src/components/sorting/SortingVisualizer.tsx`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/components/sorting/SortingVisualizer.tsx)
-* **演练控制器面板**：[`frontend/src/components/sorting/ControlPanel.tsx`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/components/sorting/ControlPanel.tsx)
-* **RAG 智能导师前端侧栏**：[`frontend/src/components/sorting/RAGChatPanel.tsx`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/components/sorting/RAGChatPanel.tsx)
-* **19 种排序算法计算引擎**：[`frontend/src/lib/algorithms/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/lib/algorithms/)
-* **全局状态机管理 (Zustand)**：[`frontend/src/store/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/store/)
-* **Apple 极简风格原子组件**：[`frontend/src/components/ui/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/frontend/src/components/ui/)
+本地连接值已填写到被 Git 忽略的 backend/nacos-config/common-secret.properties，权限 0600；已更新现有 Nacos 的对应配置。凭证不写入文档、截图或检查清单。修复 common-web 开发配置误引用 prod 前缀的问题。
 
-### 2.2 后端微服务集群入口 (`backend/`)
-* **统一路由与鉴权网关**：[`backend/algorithm-gateway/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-gateway/)
-* **RAG 向量问答与知识库服务**：[`backend/algorithm-service/algorithm-ai-service/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-service/algorithm-ai-service/)
-* **用户账户与权限服务**：[`backend/algorithm-service/algorithm-user-service/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-service/algorithm-user-service/)
-* **社区讨论与题解博客服务**：[`backend/algorithm-service/algorithm-post-service/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-service/algorithm-post-service/)
-* **Elasticsearch 检索服务**：[`backend/algorithm-service/algorithm-search-service/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-service/algorithm-search-service/)
-* **RPC 契约与传输 DTO 声明**：[`backend/algorithm-api/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-api/)
-* **通用组件与基础设施 Starter**：[`backend/algorithm-common/`](file:///Users/stephenqiu/Desktop/StephenQiu/AlgoFlow/backend/algorithm-common/)
+生产预览为 <http://127.0.0.1:3111>，请求经 /api 转发到 8080 网关。网关及 user / post / notification / search / log / AI 服务在本机运行；浏览器不直连微服务。WebSocket 转发到已发现通知实例的 Netty 端口，可读取 websocket-port 元数据，默认使用 websocket.port。
 
----
+用户明确暂不配置 DashScope。当前 AI 服务使用以下启动参数，关闭模型自动配置而不注入伪模型：
 
-## ⚡ 3. 正在推进中的工作 (In-flight Work & Context)
-
-接手者请重点关注以下正在进行的模块上下文：
-
-1. **TSK-201: 演练工作台步骤快照与 RAG 导师实时联动**
-   - **现状**：用户在演练工作台单步步进时，`useSortingVisualizer` 会产生瞬时快照（`comparing`, `swapping`, `activeLine`）。目前前端 `RAGChatPanel.tsx` 已经具备感知能力；
-   - **待办细节**：需要进一步完善当用户在复杂算法（如快速排序的双指针收缩）中提问时，将当前指针的语义信息（`low`, `high`, `pivot`）完整注入 Prompt 的流程，杜绝大模型在特定分区状态下的误判。
-
-2. **TSK-202: 知识库切片引用卡片跳转与联动**
-   - **现状**：SSE 会下发 `event: source`，返回切片来源（如 `06-快速排序.md`）；
-   - **待办细节**：前端卡片点击后，需要支持在当前页面平滑呼出文档预览 Drawer 或平滑锚点跳转，避免打开空白页打断学习心流。
-
----
-
-## 🛠️ 4. 本地环境启动与验证指令速查
-
-接手开发时，请依序执行以下命令验证环境：
-
-### 4.1 基础中间件启动
-```bash
-# 启动 MySQL, Redis, RabbitMQ, Nacos, ES
-docker-compose -f docker-compose-env.yml up -d
+```text
+--spring.ai.dashscope.enabled=false
+--spring.ai.vectorstore.type=none
+--spring.ai.chat.client.enabled=false
 ```
 
-### 4.2 前端校验与启动
-```bash
-cd frontend
+现有数据库缺少切片发布字段。已先备份 document_chunk，再应用既有 backend/sql/migrations/20260930_chunk_publication.sql 的增量变更：metadata_json 与 idx_chunk_vector_active。变更前后切片均为 0，没有重建数据库。敏感备份及运行日志保存在本机 /tmp/algoflow-live/，不进入 Git。
 
-# 1. 类型校验 (必须 0 错误)
-npm run typecheck
+## 已修复的问题
 
-# 2. 核心算法与流式解析单测 (17 项必须全绿)
-npm test
+- 登录：邮箱校验支持常见点号、加号和连字符；Sa-Token 1.46 仅对白名单 UserVO 开放共享会话反序列化，没有放开任意类型。
+- 权限：用户更新、单次/批量召回评测增加管理员鉴权；角色变更和删除撤销旧会话。前端真实 401 会清除旧身份、更新头像入口、提示重新登录并保留 URL。
+- 分页：内容、用户、通知、文档、知识库、操作审计增加唯一 ID 次序，修复相同时间戳导致的跨页重复。文档支持更新时间排序，通知搜索传入后端条件。
+- 通知：修复网关 WebSocket 协议、端口与路径；认证帧不记录 token。前端读取实际 MQ data 内标题和正文，预览随事件刷新。提示置于页底，最多一条并可关闭。
+- RAG：无模型时保留知识库元数据管理，问答返回 error / success=false，不生成答案或引用。失败恢复问题供重试；有历史文档/切片的库不能跳过索引清理，完全空库可在无模型时删除。
+- 可访问性：社区/通知 Tabs 关联真实面板；代码、数组、对话滚动区域具名且可聚焦；滑块名称绑定 Thumb；安全页邮箱有标签。审计客户端恢复注册，验证码和 OAuth 登录参数不记录到操作审计。
 
-# 3. 启动开发服务器 (http://localhost:3000)
-npm run dev
-```
+## 验证证据与范围
 
-### 4.3 后端构建与语法检查
-```bash
-cd backend
+| 检查 | 当前结果 |
+| --- | --- |
+| 前端 | typecheck、lint、test、build 通过；20 个测试，0 失败/跳过 |
+| 后端 | Java 21 下 Maven clean test-compile、install（含 package）通过；51 个测试，0 失败/跳过；单元测试与真实运行证据分别记录 |
+| 真实 API | 23 项检查通过：登录会话、资料保存/读取、个人三页去重、管理三页去重、匿名拒绝、5 类管理接口拒绝、通知归属、跨用户删除拒绝、角色变化撤销、重新登录授权、审计落库 |
+| 浏览器 | agent-browser 0.33.0 操作实际生产构建；没有网络拦截或替换业务响应 |
+| 自动无障碍 | 桌面演练、手机 RAG、通知、资料、安全页均 0 violations；RAG 两个 incomplete 项需人工复核，不代表 WCAG 全面认证 |
 
-# 快速编译全部 30 个微服务子模块
-mvn clean test-compile -DskipTests
-```
+实际浏览器已覆盖：
 
----
+- 390×844：管理员头像进入管理后关闭菜单，六模块逐项进入/返回；头像 Esc 关闭；普通用户菜单无管理入口，直达 /admin 显示无权限。
+- 个人中心 → 我的内容三页（12 条，末页 11–12，边界禁用正确）→ 详情 → 返回保留 page=3；评论、收藏后能读取；资料保存后刷新仍保持；学习偏好/通知设置/安全页返回正确。
+- 社区审核：退回缺少说明时阻止提交，填写后真实保存并关闭 Dialog。管理三页实际 13 条无重复，搜索重置页码。
+- 通知：铃铛最多三条，查看全部后关闭；5→10 条回第一页；全部已读后未读为空且分页禁用。真实 RabbitMQ→WebSocket 消息展示标题和正文；错误 token 收到认证失败。
+- 会话撤销：专用学习者旧会话失效后，访问内容页触发真实 401，自动清除 token 和旧头像，保留 /user/content 并显示登录入口。
+- RAG：真实 SSE 返回模型未配置，UI 展示错误、不伪造来源、恢复输入且可重试。管理召回保留问题并显示配置错误。未验收真实回答、向量召回或配置恢复后的成功回答。
+- 1440×1000：演练两卡均 705px；320px 深色演练/导航与 768px 安全页无整页横向溢出。手机导航选择算法学习后关闭。
 
-## ⚠️ 5. 核心架构红线与避坑指南 (Gotchas & Rules)
+登录使用专用账号，在 Redis 设置短期验证码作为受控前置条件，再调用真实登录接口并通过浏览器登录；这不代表邮件投递成功。分页记录通过真实 API 创建并持久化，不是响应夹具。验收后已通过真实接口逻辑删除本轮 12 篇帖子、14 条通知、1 条评论、1 个空知识库和 3 个测试账号，清除对应验证码和收藏关联；保留正常审计记录。原有有效用户、帖子、知识库各 1 条，首页复核没有测试内容。范围和结果写入当前 audit.json。
 
-1. **严禁创建独立的 Admin 项目**：
-   - 所有的后台管理页面统一内嵌在 `frontend/src/app/admin/` 路由下；
-2. **前后端接口分层与契约守则**：
-   - 后端服务间相互调用**严禁**直接注入其他微服务的 service 实现类，**必须**通过 `algorithm-api/*` 声明的 OpenFeign 客户端；
-   - 所有 Controller 响应必须使用 `Result<T>` 封装，禁止返回裸对象；
-3. **算法计算与 UI 彻底解耦**：
-   - 算法的核心演算逻辑存放在 `frontend/src/lib/algorithms/`，必须保持为纯函数/生成器，严禁在算法计算循环体内直接操作 DOM 或直接更新 React state；
-4. **设计系统规范守则**：
-   - 遵循 Apple 极简风格（`#0066cc` 唯一主色、SF Pro 字体、发丝线分割），杜绝添加花哨无意义的毛玻璃与浓烈渐变；
-5. **安全凭证防泄漏**：
-   - 包含真实密码与密钥的 `*-secret.properties` 或 `.env` 严禁提交至 Git。
+当前截图：[桌面演练](docs/design/assets/current/frontend-desktop.png)、[手机 RAG 错误与重试](docs/design/assets/current/frontend-mobile.png)。检查清单复用 [audit.json](docs/design/assets/current/audit.json) 的 frontendAcceptance。原有 Figma 原型证据保持独立，本轮代码测试不冒充 Figma 逐页复验；只覆盖当前文件，不新增日期目录或历史副本。
 
----
+## 未完成的验收
 
-## 📋 6. 下一步立即行动建议 (Next Immediate Steps)
+1. 邮件投递、GitHub OAuth、COS 上传：现有配置缺少可用供应商凭证，本轮未发送外部邮件或上传真实资源。
+2. DashScope 回答、Embedding/真实向量召回、重排质量、文档全链路入库：按用户选择暂不配置。空文档列表和元数据 CRUD 不代表向量管道通过。
+3. 多实例/跨设备 WebSocket、真实手机读屏与键盘、200% 缩放、低性能设备与性能基准待验收。单实例浏览器测试不覆盖每个业务分支。
+4. 切片编辑/版本冲突、重试索引、活动会话管理、关注流和举报处理仍缺完整流程，不提供虚构成功操作。
 
-接力开发者/Agent 可直接挑选以下切入点展开：
-
-* [ ] **行动点 1**：完善 `frontend/src/components/sorting/RAGChatPanel.tsx` 中的引用切片点击预览交互（对应任务 `TSK-202`）；
-* [ ] **行动点 2**：在 `frontend/src/app/admin/` 下补充知识库切片管理列表视图与手动重新向量化按钮（对应任务 `TSK-303`）；
-* [ ] **行动点 3**：参考 `docs/prd/04-社区讨论与题解博客PRD.md`，推进题解博客阅读器的目录大纲（TOC）监听组件开发（对应任务 `TSK-301`）。
-
----
-
-## 📜 7. 交接变更日志 (Handover Change Log)
-
-| 日期 | 交接人 / Agent | 阶段核心动作 | 交付状态 |
-| :--- | :--- | :--- | :---: |
-| **2026-10-22** | Antigravity | 全面重构 `docs/` 研发体系（涵盖 `requirement` -> `design` -> `prd` -> `plan` -> `algorithms` 链路），并在根目录建立 `BACKLOG.md` 与 `HANDOVER.md` 任务跟踪体系 | 🟢 已交付 |
-| **2026-10-22** | Antigravity | 整理并迁入 `docs/templates/` 标准工程写作模板库（设计、故事、场景、PRD、计划），并建立全阶段 `00-xx导航.md` 矩阵 | 🟢 已交付 |
-| **2026-10-22** | Antigravity | 按模板全面重构 `requirement`、`design`、`prd`、`plan` 下各文档内容结构，并完成严格顺序连续编号与双向映射 | 🟢 已交付 |
-| **2026-10-22** | Antigravity | 排查并修复 GitHub Actions CI 失败问题：升级前端 CI 流水线为 pnpm + frozen-lockfile，清理过时 package-lock.json，升级 setup-java@v5 | 🟢 已修复 |
+原有 frontend/tests/fixtures-api.cjs 和受控 SSE 冒烟仍是显式夹具测试，不计入上述真实服务结果。此前未提交的前端和文档变更均保留，没有广泛暂存、重置或清理其他工作。

@@ -1,5 +1,5 @@
 // @ts-ignore
-/* eslint-disable */
+
 import request from '@/lib/request'
 
 /** 异步发送邮件 基于 MQ 分离发送流程，提升接口吞吐量 POST /mail/send/async */

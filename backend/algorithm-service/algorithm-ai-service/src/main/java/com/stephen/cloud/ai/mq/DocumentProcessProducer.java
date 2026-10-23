@@ -28,12 +28,13 @@ public class DocumentProcessProducer {
             return;
         }
         try {
-            String bizId = "knowledge_doc:" + message.getDocumentId();
+            String bizId = "knowledge_doc:" + message.getDocumentId() + ":" + message.getRevision();
             mqSender.send(MqBizTypeEnum.KNOWLEDGE_DOC_INGEST, bizId, message);
             log.info("[DocumentProcessProducer] 发送文档处理消息成功, documentId={}, bizId={}",
                     message.getDocumentId(), bizId);
         } catch (Exception e) {
             log.error("[DocumentProcessProducer] 发送文档处理消息失败, documentId={}", message.getDocumentId(), e);
+            throw e;
         }
     }
 }

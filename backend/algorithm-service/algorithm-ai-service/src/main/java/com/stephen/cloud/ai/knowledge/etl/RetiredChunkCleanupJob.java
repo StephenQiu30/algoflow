@@ -7,16 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /** Soft-deleted inventory is the durable retry queue for retired index cleanup. */
 @Slf4j
 @Component
 public class RetiredChunkCleanupJob {
     @Resource private DocumentChunkMapper mapper;
-    @Resource private VectorStore vectorStore;
+    @Autowired(required = false) private VectorStore vectorStore;
     @Resource private KeywordIndexPublisher keywordIndexPublisher;
     @Scheduled(fixedDelay = 600000)
     public void retryCleanup() {
+        if (vectorStore == null) return;
         var retired = mapper.selectRetiredForCleanup();
         if (retired == null || retired.isEmpty()) return;
         try {

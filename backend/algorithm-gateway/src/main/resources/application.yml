@@ -46,6 +46,8 @@ spring:
           - /api/post/list/page/vo
           - /api/post/get/vo
           - /api/notification/page
+          - /api/websocket
+          - /api/websocket/**
           - /doc.html
           - /swagger-ui/**
           - /swagger-resources/**
@@ -83,7 +85,7 @@ spring:
                     key-resolver: "#{@userKeyResolver}"
 
             - id: algorithm-websocket-service
-              uri: lb://algorithm-notification-service
+              uri: lb:ws://algorithm-notification-service
               predicates:
                 - Path=/api/websocket/**
 

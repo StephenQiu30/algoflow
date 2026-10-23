@@ -12,10 +12,10 @@ import {
 } from '@/components/ui/navigation-menu'
 
 const menuItems = [
-  { title: '学习首页', href: '/', activePrefix: '' },
-  { title: '算法大厅', href: '/sorting', activePrefix: '/sorting' },
-  { title: '题解社区', href: '/blog', activePrefix: '/blog' },
-  { title: '我的学习', href: '/user/profile', activePrefix: '/user' },
+  { title: '发现', href: '/', activePrefix: '' },
+  { title: '算法学习', href: '/sorting', activePrefix: '/sorting' },
+  { title: '可视化演练', href: '/visualizer', activePrefix: '/visualizer' },
+  { title: '学习社区', href: '/blog', activePrefix: '/blog' },
 ]
 
 export function Menus({

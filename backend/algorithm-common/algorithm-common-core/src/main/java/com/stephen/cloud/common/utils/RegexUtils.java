@@ -1,5 +1,6 @@
 package com.stephen.cloud.common.utils;
 
+import cn.hutool.core.lang.Validator;
 import java.util.regex.Pattern;
 
 /**
@@ -46,7 +47,7 @@ public class RegexUtils {
      * @return 是否符合正则
      */
     public static boolean checkEmail(String email) {
-        return Pattern.matches(EMAIL_REGEX, email);
+        return Validator.isEmail(email);
     }
 
     /**

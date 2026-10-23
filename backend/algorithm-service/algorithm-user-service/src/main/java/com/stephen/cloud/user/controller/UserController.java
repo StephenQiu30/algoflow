@@ -1,6 +1,7 @@
 package com.stephen.cloud.user.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stephen.cloud.api.user.model.dto.*;
@@ -65,7 +66,7 @@ public class UserController {
      */
     @PostMapping("/login/github")
     @Operation(summary = "GitHub 登录", description = "通过 GitHub 授权码进行登录或注册")
-    @OperationLog(module = "用户认证", action = "GitHub登录")
+    @OperationLog(module = "用户认证", action = "GitHub登录", recordParams = false)
     public BaseResponse<LoginUserVO> userLoginByGitHub(@RequestBody GitHubLoginRequest gitHubLoginRequest,
                                                        HttpServletRequest request) {
         ThrowUtils.throwIf(gitHubLoginRequest == null || StringUtils.isBlank(gitHubLoginRequest.getCode())
@@ -85,7 +86,7 @@ public class UserController {
      */
     @PostMapping("/login/email")
     @Operation(summary = "用户邮箱登录", description = "使用邮箱 and 验证码进行登录")
-    @OperationLog(module = "用户认证", action = "邮箱登录")
+    @OperationLog(module = "用户认证", action = "邮箱登录", recordParams = false)
     public BaseResponse<LoginUserVO> userLoginByEmail(
             @Validated @RequestBody UserEmailLoginRequest userEmailLoginRequest,
             HttpServletRequest request) {
@@ -104,7 +105,7 @@ public class UserController {
      */
     @PostMapping("/login/email/code")
     @Operation(summary = "发送邮箱验证码", description = "向指定邮箱发送登录或注册所需的验证码")
-    @OperationLog(module = "用户认证", action = "发送邮箱验证码")
+    @OperationLog(module = "用户认证", action = "发送邮箱验证码", recordParams = false)
     public BaseResponse<Integer> sendEmailLoginCode(@Validated @RequestBody UserEmailCodeSendRequest request,
                                                     HttpServletRequest httpRequest) {
         ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR, "请求不能为空");
@@ -239,6 +240,7 @@ public class UserController {
         // 操作数据库
         boolean result = userService.removeById(id);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        StpUtil.logout(id);
 
         // 发送 ES 同步消息（失败不影响用户删除）
         try {
@@ -262,6 +264,7 @@ public class UserController {
      * @return BaseResponse<Boolean>
      */
     @PostMapping("/update")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     @OperationLog(module = "用户管理", action = "更新用户")
     public BaseResponse<Boolean> updateUser(@Validated @RequestBody UserUpdateRequest userUpdateRequest,
                                             HttpServletRequest request) {
@@ -273,6 +276,10 @@ public class UserController {
         ThrowUtils.throwIf(oldUser == null, ErrorCode.NOT_FOUND_ERROR);
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
+        // Role changes revoke existing sessions so cached privileges cannot survive a demotion.
+        if (user.getUserRole() != null && !user.getUserRole().equals(oldUser.getUserRole())) {
+            StpUtil.logout(id);
+        }
 
         try {
             User updatedUser = userService.getById(id);

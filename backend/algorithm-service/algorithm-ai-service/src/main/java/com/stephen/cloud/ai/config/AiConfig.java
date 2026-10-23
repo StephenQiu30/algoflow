@@ -11,6 +11,7 @@ import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryReposito
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
@@ -55,6 +56,7 @@ public class AiConfig {
      * @return {@link ChatClient}
      */
     @Bean
+    @ConditionalOnProperty(name = "spring.ai.dashscope.enabled", havingValue = "true", matchIfMissing = true)
     public ChatClient chatClient(ChatClient.Builder builder) {
         return builder
                 .defaultAdvisors(advisors -> advisors.advisors(new SimpleLoggerAdvisor()))

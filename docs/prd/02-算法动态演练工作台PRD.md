@@ -2,7 +2,7 @@
 
 > **文档编号**：PRD-02  
 > **所属模块**：03. PRD  
-> **唯一来源设计**：[设计01 平台顶层微服务架构设计](../design/01-平台顶层微服务架构设计.md) 与 [设计02 Apple极简视觉与高帧率动效设计](../design/02-Apple极简视觉与高帧率动效设计.md)  
+> **唯一来源设计**：[设计01 平台顶层微服务架构设计](../design/01-平台顶层微服务架构设计.md) 与 [设计05 页面交互与动效](../design/05-shadcn顶部布局与全站交互规范.md)
 > **路由入口**：`frontend/src/app/sorting/[algo]/page.tsx`  
 > **核心组件**：`SortingVisualizer.tsx` / `ControlPanel.tsx` / `Bar.tsx` / `CodeHighlighter.tsx`
 

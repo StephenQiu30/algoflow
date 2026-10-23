@@ -1,0 +1,2068 @@
+{
+  "fileKey": "cMWO5SCKWFqJafxME0yhFz",
+  "page": {
+    "id": "74:31",
+    "name": "AlgoFlow · 当前设计"
+  },
+  "checkedAt": "2026-10-23",
+  "scope": "Current Figma structure plus mobile prototype interaction checks; not production acceptance",
+  "summary": {
+    "screens": 190,
+    "overlays": 41,
+    "components": 133,
+    "instances": 6996,
+    "variables": 64,
+    "textStyles": 11,
+    "uiEdges": 3068,
+    "allEdges": 3188
+  },
+  "issues": [],
+  "missing": [],
+  "cross": [],
+  "brokenComponents": [],
+  "secondaryNavigationCount": 0,
+  "screens": [
+    {
+      "id": "77:31",
+      "name": "01 / 发现 · 学习与社区",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:134",
+      "name": "02 / 算法学习 · 目录与比较",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:226",
+      "name": "03 / 算法演练 · 执行与代码",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:321",
+      "name": "04 / 知识阅读 · 插入排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:415",
+      "name": "05 / 学习社区 · 内容发现",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:490",
+      "name": "06 / 文章详情 · 阅读与讨论",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:568",
+      "name": "07 / 内容创作 · Markdown 与预览",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:621",
+      "name": "08 / 我的学习 · 进度与收藏",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:708",
+      "name": "09 / 账户设置 · 个人资料",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:755",
+      "name": "10 / 通知中心 · 回复与系统通知",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "77:817",
+      "name": "11 / 登录 · 开启学习旅程",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:193",
+      "name": "12 / 管理概览 · 运营待办",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:285",
+      "name": "13 / 知识库 · 文档与同步状态",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:379",
+      "name": "14 / 文档导入 · 切片预览",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:445",
+      "name": "15 / 切片编辑 · 来源与版本",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:493",
+      "name": "16 / 召回评测 · 双路对比",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:590",
+      "name": "17 / 社区审核 · 内容与举报",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:662",
+      "name": "18 / 用户与权限 · 角色管理",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:757",
+      "name": "19 / 审计与系统监控",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "79:853",
+      "name": "20 / 索引任务 · 失败与恢复",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:318",
+      "name": "21 / Mobile · 学习与社区",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "80:374",
+      "name": "22 / Mobile · 执行与代码",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "80:434",
+      "name": "23 / Mobile · 社区与阅读",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "80:470",
+      "name": "24 / Mobile · AI 导师",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "80:492",
+      "name": "25 / Mobile · 知识库管理",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "80:538",
+      "name": "26 / Mobile · Sheet 导航",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "80:566",
+      "name": "27 / AI 对话 · 流式与中断",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:609",
+      "name": "28 / 引用来源 · 原文预览",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:638",
+      "name": "29 / 危险操作 · 确认与理由",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:675",
+      "name": "30 / 全站搜索 · Command",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:707",
+      "name": "31 / 发布检查 · 草稿保护",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:737",
+      "name": "32 / 系统状态 · 空加载错误与权限",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:802",
+      "name": "33 / Dark · 算法演练",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:897",
+      "name": "34 / 单步状态 · 63 已右移",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "80:992",
+      "name": "35 / Tablet · 学习社区",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "82:477",
+      "name": "36 / 权限变更 · 角色确认",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "82:513",
+      "name": "37 / 会话管理 · 强制退出",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "82:549",
+      "name": "38 / 任务恢复 · 重试确认",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "82:585",
+      "name": "39 / 内容审核 · 退回说明",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "82:621",
+      "name": "40 / 个人空间 · 概览",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "82:665",
+      "name": "41 / 演练设置 · 数据与速度",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "91:1471",
+      "name": "43 / Dark · 学习与社区",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "91:1570",
+      "name": "44 / Mobile Dark · 学习与社区",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "91:1672",
+      "name": "45 / Theme · 选择外观",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "91:1810",
+      "name": "46 / Mobile Theme · 选择外观",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "91:1913",
+      "name": "47 / Mobile · Command 搜索",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "109:3813",
+      "name": "48 / 个人主页 · 动态与共学",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "109:3874",
+      "name": "49 / Mobile · 个人主页",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "109:3911",
+      "name": "50 / 帖子操作 · 收藏与举报",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "109:3972",
+      "name": "51 / 关注动态 · 空状态",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "109:4033",
+      "name": "52 / Mobile · 讨论详情",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "110:8157",
+      "name": "71 / 知识库 · 第3页",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8244",
+      "name": "72 / Mobile · 知识库第2页",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "110:8287",
+      "name": "53 / 我的内容 · Data Table",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8376",
+      "name": "54 / 我的收藏 · Data Table",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8465",
+      "name": "55 / 知识库 · 第 2 页",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8552",
+      "name": "56 / Data Table · 本页选择",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8639",
+      "name": "57 / Data Table · 加载状态",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8726",
+      "name": "58 / Data Table · 无匹配结果",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8813",
+      "name": "59 / Data Table · 请求失败",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8900",
+      "name": "60 / 文档行操作 · 版本与索引",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:8987",
+      "name": "61 / Data Table · 列显示与每页条数",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:9074",
+      "name": "62 / Mobile · 我的学习记录",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "110:9117",
+      "name": "63 / 索引任务列表 · Data Table",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:9186",
+      "name": "64 / 知识库 · 末页",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:9273",
+      "name": "65 / 用户操作 · 权限与会话",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:9360",
+      "name": "66 / 审计事件详情",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:9450",
+      "name": "67 / 审核详情 · 原文与处理依据",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:13002",
+      "name": "68 / 学习记录操作",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:13104",
+      "name": "69 / 我的内容操作",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "110:13214",
+      "name": "70 / 收藏操作",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "137:4983",
+      "name": "73 / 学习偏好",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "137:5018",
+      "name": "74 / 通知设置",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "137:5053",
+      "name": "75 / 账户安全",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "142:5131",
+      "name": "76 / Mobile · 个人空间",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:5260",
+      "name": "77 / Mobile · 我的内容",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:5419",
+      "name": "78 / Mobile · 我的收藏",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:5578",
+      "name": "79 / Mobile · 通知中心",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:5712",
+      "name": "80 / Mobile · 运营概览",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:5822",
+      "name": "81 / Mobile · 社区审核",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:5981",
+      "name": "82 / Mobile · 用户管理",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:6140",
+      "name": "83 / Mobile · 索引任务",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "142:6299",
+      "name": "84 / Mobile · 审计日志",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:5817",
+      "name": "85 / Mobile · 个人资料",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:5919",
+      "name": "86 / Mobile · 学习偏好",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:6032",
+      "name": "87 / Mobile · 通知设置",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:6145",
+      "name": "88 / Mobile · 账户安全",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:6570",
+      "name": "92 / Mobile · 文档导入",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:6682",
+      "name": "93 / Mobile · 切片编辑",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:6776",
+      "name": "94 / Mobile · 召回评测",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:6887",
+      "name": "95 / Mobile · 任务详情",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:7018",
+      "name": "96 / Mobile · 审计详情",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "143:7108",
+      "name": "97 / Mobile · 审核详情",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "144:6361",
+      "name": "98 / Mobile · 退出其他会话",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "144:6450",
+      "name": "99 / Mobile · 重试索引任务",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "144:6539",
+      "name": "100 / Mobile · 审核退回",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "144:6631",
+      "name": "101 / Mobile · 编辑内容",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "144:6729",
+      "name": "102 / Dark · 个人空间",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "144:6796",
+      "name": "103 / Dark · 用户管理",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "144:6877",
+      "name": "104 / Mobile Dark · 个人空间",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "156:8038",
+      "name": "105 / 头像菜单 · 普通用户",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "156:8214",
+      "name": "106 / 头像菜单 · 个人中心",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "156:8427",
+      "name": "107 / 头像菜单 · 运营管理",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "156:8697",
+      "name": "108 / Mobile · 头像菜单普通用户",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "156:8830",
+      "name": "109 / Mobile · 头像菜单管理员",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "156:8955",
+      "name": "110 / Dark · 头像菜单管理员",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "156:9217",
+      "name": "111 / Tablet · 头像菜单",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "207:9817",
+      "name": "112 / Mobile · 算法学习",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "207:9901",
+      "name": "113 / Mobile · 登录",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "207:9981",
+      "name": "114 / Mobile · 无权限",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "207:10048",
+      "name": "115 / 无权限 · 运营管理",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "216:9867",
+      "name": "116 / Mobile · 知识库显示设置",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "216:9972",
+      "name": "117 / Mobile · 学习记录显示设置",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "217:14556",
+      "name": "118 / Tablet · 学习与社区",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:14648",
+      "name": "119 / Tablet · 执行与代码",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:14746",
+      "name": "120 / Tablet · AI 导师",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:14799",
+      "name": "121 / Tablet · 知识库管理",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:14926",
+      "name": "122 / Tablet · Sheet 导航",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:14975",
+      "name": "123 / Tablet · Command 搜索",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15034",
+      "name": "124 / Tablet · 个人主页",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15156",
+      "name": "125 / Tablet · 讨论详情",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15329",
+      "name": "126 / Tablet · 知识库第2页",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15456",
+      "name": "127 / Tablet · 我的学习记录",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15578",
+      "name": "128 / Tablet · 个人空间",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15664",
+      "name": "129 / Tablet · 我的内容",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15779",
+      "name": "130 / Tablet · 我的收藏",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15894",
+      "name": "131 / Tablet · 通知中心",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:15984",
+      "name": "132 / Tablet · 运营概览",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16053",
+      "name": "133 / Tablet · 社区审核",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16168",
+      "name": "134 / Tablet · 用户管理",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16283",
+      "name": "135 / Tablet · 索引任务",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16398",
+      "name": "136 / Tablet · 审计日志",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16513",
+      "name": "137 / Tablet · 个人资料",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16577",
+      "name": "138 / Tablet · 学习偏好",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16652",
+      "name": "139 / Tablet · 通知设置",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16727",
+      "name": "140 / Tablet · 账户安全",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:16997",
+      "name": "144 / Tablet · 文档导入",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17071",
+      "name": "145 / Tablet · 切片编辑",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17127",
+      "name": "146 / Tablet · 召回评测",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17200",
+      "name": "147 / Tablet · 任务详情",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17293",
+      "name": "148 / Tablet · 审计详情",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17345",
+      "name": "149 / Tablet · 审核详情",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17403",
+      "name": "150 / Tablet · 退出其他会话",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17453",
+      "name": "151 / Tablet · 重试索引任务",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17503",
+      "name": "152 / Tablet · 审核退回",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17556",
+      "name": "153 / Tablet · 编辑内容",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17616",
+      "name": "154 / Tablet · 算法学习",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17671",
+      "name": "155 / Tablet · 登录",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17726",
+      "name": "156 / Tablet · 无权限",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17768",
+      "name": "157 / Tablet · 知识库显示设置",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "217:17847",
+      "name": "158 / Tablet · 学习记录显示设置",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "218:12711",
+      "name": "159 / Mobile · 内容操作",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "218:12796",
+      "name": "160 / Mobile · 关注动态",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "218:12864",
+      "name": "161 / Mobile · 引用来源",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "218:12930",
+      "name": "162 / Mobile · 导师对话",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "218:13010",
+      "name": "163 / Tablet · 内容操作",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "218:13095",
+      "name": "164 / Tablet · 关注动态",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "218:13163",
+      "name": "165 / Tablet · 引用来源",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "218:13229",
+      "name": "166 / Tablet · 导师对话",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "219:13175",
+      "name": "167 / Mobile · 知识阅读",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "219:13311",
+      "name": "168 / Tablet · 知识阅读",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "245:12931",
+      "name": "168 / Mobile · 演练下一步",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "245:12997",
+      "name": "169 / Tablet · 演练下一步",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "251:14344",
+      "name": "170 / Mobile · 演练设置",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "251:14467",
+      "name": "171 / Tablet · 演练设置",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:14475",
+      "name": "172 / Desktop · 冒泡排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:14562",
+      "name": "173 / Desktop · 选择排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:14649",
+      "name": "174 / Desktop · 希尔排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:14736",
+      "name": "175 / Desktop · 归并排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:14823",
+      "name": "176 / Desktop · 快速排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:14910",
+      "name": "177 / Desktop · 堆排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:14997",
+      "name": "178 / Desktop · 基数排序",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "270:15084",
+      "name": "179 / Tablet · 冒泡排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15171",
+      "name": "180 / Tablet · 选择排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15258",
+      "name": "181 / Tablet · 希尔排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15345",
+      "name": "182 / Tablet · 归并排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15432",
+      "name": "183 / Tablet · 快速排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15519",
+      "name": "184 / Tablet · 堆排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15606",
+      "name": "185 / Tablet · 基数排序",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "270:15693",
+      "name": "186 / Mobile · 冒泡排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "270:15780",
+      "name": "187 / Mobile · 选择排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "270:15867",
+      "name": "188 / Mobile · 希尔排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "270:15954",
+      "name": "189 / Mobile · 归并排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "270:16041",
+      "name": "190 / Mobile · 快速排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "270:16128",
+      "name": "191 / Mobile · 堆排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "270:16215",
+      "name": "192 / Mobile · 基数排序",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "424:16448",
+      "name": "Mobile / 知识库 · 第 3 页",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "424:16584",
+      "name": "Mobile / 知识库 · 第 4 页",
+      "width": 390,
+      "height": 844
+    },
+    {
+      "id": "424:16726",
+      "name": "Tablet / 知识库 · 第 3 页",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "424:16862",
+      "name": "Tablet / 知识库 · 第 4 页",
+      "width": 768,
+      "height": 1024
+    }
+  ],
+  "overlays": [
+    {
+      "id": "156:7100",
+      "name": "Overlay / Account / 1440/light/public/admin"
+    },
+    {
+      "id": "156:7172",
+      "name": "Overlay / Account / 1440/light/personal/admin"
+    },
+    {
+      "id": "156:7241",
+      "name": "Overlay / Account / 1440/light/admin/admin"
+    },
+    {
+      "id": "156:7315",
+      "name": "Overlay / Account / 390/light/public/admin"
+    },
+    {
+      "id": "156:7384",
+      "name": "Overlay / Account / 390/light/admin/admin"
+    },
+    {
+      "id": "156:7457",
+      "name": "Overlay / Account / 1440/dark/public/admin"
+    },
+    {
+      "id": "156:7597",
+      "name": "Overlay / Account / 390/dark/public/admin"
+    },
+    {
+      "id": "156:7682",
+      "name": "Overlay / Account / 390/light/personal/admin"
+    },
+    {
+      "id": "156:7785",
+      "name": "Overlay / Account / 1440/dark/personal/admin"
+    },
+    {
+      "id": "156:7851",
+      "name": "Overlay / Account / 1440/dark/admin/admin"
+    },
+    {
+      "id": "156:7917",
+      "name": "Overlay / Account / 390/dark/personal/admin"
+    },
+    {
+      "id": "156:7983",
+      "name": "Overlay / Account / 1440/light/public/learner"
+    },
+    {
+      "id": "156:8642",
+      "name": "Overlay / Account / 390/light/personal/learner"
+    },
+    {
+      "id": "195:10550",
+      "name": "Overlay / Account / 1440/light/personal/learner"
+    },
+    {
+      "id": "195:10687",
+      "name": "Overlay / Account / 1440/light/admin/learner"
+    },
+    {
+      "id": "195:10824",
+      "name": "Overlay / Account / 390/light/public/learner"
+    },
+    {
+      "id": "195:10961",
+      "name": "Overlay / Account / 390/light/admin/learner"
+    },
+    {
+      "id": "195:11098",
+      "name": "Overlay / Account / 1440/dark/public/learner"
+    },
+    {
+      "id": "195:11372",
+      "name": "Overlay / Account / 390/dark/public/learner"
+    },
+    {
+      "id": "195:11509",
+      "name": "Overlay / Account / 1440/dark/personal/learner"
+    },
+    {
+      "id": "195:11646",
+      "name": "Overlay / Account / 1440/dark/admin/learner"
+    },
+    {
+      "id": "195:11783",
+      "name": "Overlay / Account / 390/dark/personal/learner"
+    },
+    {
+      "id": "196:9678",
+      "name": "Overlay / Theme / 1440"
+    },
+    {
+      "id": "196:9720",
+      "name": "Overlay / Theme / 390"
+    },
+    {
+      "id": "196:9762",
+      "name": "Overlay / Theme / 768"
+    },
+    {
+      "id": "217:17926",
+      "name": "Overlay / Account / 768/light/public/admin"
+    },
+    {
+      "id": "217:18000",
+      "name": "Overlay / Account / 768/light/admin/admin"
+    },
+    {
+      "id": "217:18074",
+      "name": "Overlay / Account / 768/dark/public/admin"
+    },
+    {
+      "id": "217:18148",
+      "name": "Overlay / Account / 768/light/personal/admin"
+    },
+    {
+      "id": "217:18222",
+      "name": "Overlay / Account / 768/dark/personal/admin"
+    },
+    {
+      "id": "217:18296",
+      "name": "Overlay / Account / 768/light/personal/learner"
+    },
+    {
+      "id": "217:18358",
+      "name": "Overlay / Account / 768/light/public/learner"
+    },
+    {
+      "id": "217:18420",
+      "name": "Overlay / Account / 768/light/admin/learner"
+    },
+    {
+      "id": "217:18482",
+      "name": "Overlay / Account / 768/dark/public/learner"
+    },
+    {
+      "id": "217:18544",
+      "name": "Overlay / Account / 768/dark/personal/learner"
+    },
+    {
+      "id": "344:16504",
+      "name": "Overlay / Notifications / 1440/light"
+    },
+    {
+      "id": "344:16602",
+      "name": "Overlay / Notifications / 1440/dark"
+    },
+    {
+      "id": "344:16700",
+      "name": "Overlay / Notifications / 768/light"
+    },
+    {
+      "id": "344:16798",
+      "name": "Overlay / Notifications / 768/dark"
+    },
+    {
+      "id": "344:16896",
+      "name": "Overlay / Notifications / 390/light"
+    },
+    {
+      "id": "344:16994",
+      "name": "Overlay / Notifications / 390/dark"
+    }
+  ],
+  "variableCollections": [
+    {
+      "name": "AlgoFlow / Primitives",
+      "count": 15
+    },
+    {
+      "name": "AlgoFlow / Semantic",
+      "count": 24
+    },
+    {
+      "name": "AlgoFlow / Layout",
+      "count": 21
+    },
+    {
+      "name": "AlgoFlow / Prototype state",
+      "count": 4
+    }
+  ],
+  "historicalNodes": [],
+  "adminRoutes": [
+    {
+      "id": "79:193",
+      "entries": [
+        {
+          "name": "shadcn / Card / 知识库",
+          "target": "79:285"
+        },
+        {
+          "name": "shadcn / Card / 召回评测",
+          "target": "79:493"
+        },
+        {
+          "name": "shadcn / Card / 社区审核",
+          "target": "79:590"
+        },
+        {
+          "name": "shadcn / Card / 用户与权限",
+          "target": "79:662"
+        },
+        {
+          "name": "shadcn / Card / 索引任务",
+          "target": "110:9117"
+        },
+        {
+          "name": "shadcn / Card / 审计日志",
+          "target": "79:757"
+        }
+      ]
+    },
+    {
+      "id": "217:15984",
+      "entries": [
+        {
+          "name": "shadcn / Card / 知识库",
+          "target": "217:14799"
+        },
+        {
+          "name": "shadcn / Card / 召回评测",
+          "target": "217:17127"
+        },
+        {
+          "name": "shadcn / Card / 社区审核",
+          "target": "217:16053"
+        },
+        {
+          "name": "shadcn / Card / 用户与权限",
+          "target": "217:16168"
+        },
+        {
+          "name": "shadcn / Card / 索引任务",
+          "target": "217:16283"
+        },
+        {
+          "name": "shadcn / Card / 审计日志",
+          "target": "217:16398"
+        }
+      ]
+    },
+    {
+      "id": "142:5712",
+      "entries": [
+        {
+          "name": "shadcn / Card / 知识库",
+          "target": "80:492"
+        },
+        {
+          "name": "shadcn / Card / 召回评测",
+          "target": "143:6776"
+        },
+        {
+          "name": "shadcn / Card / 社区审核",
+          "target": "142:5822"
+        },
+        {
+          "name": "shadcn / Card / 用户与权限",
+          "target": "142:5981"
+        },
+        {
+          "name": "shadcn / Card / 索引任务",
+          "target": "142:6140"
+        },
+        {
+          "name": "shadcn / Card / 审计日志",
+          "target": "142:6299"
+        }
+      ]
+    }
+  ],
+  "menuIssues": [],
+  "paginationChains": [
+    [
+      {
+        "id": "79:285",
+        "labels": [
+          "显示 1–5，共 19 项"
+        ],
+        "pageControls": [
+          {
+            "id": "110:9683",
+            "name": "Button / Icon / 上一页",
+            "opacity": 0.3499999940395355,
+            "targets": []
+          },
+          {
+            "id": "110:9698",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "110:8465"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "110:8465",
+        "labels": [
+          "显示 6–10，共 19 项"
+        ],
+        "pageControls": [
+          {
+            "id": "110:9880",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "79:285"
+            ]
+          },
+          {
+            "id": "110:9895",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "110:8157"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "110:8157",
+        "labels": [
+          "显示 11–15，共 19 项"
+        ],
+        "pageControls": [
+          {
+            "id": "110:10077",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "110:8465"
+            ]
+          },
+          {
+            "id": "110:10092",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "110:9186"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "110:9186",
+        "labels": [
+          "显示 16–19，共 19 项"
+        ],
+        "pageControls": [
+          {
+            "id": "110:10252",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "110:8157"
+            ]
+          },
+          {
+            "id": "110:10267",
+            "name": "Button / Icon / 下一页",
+            "opacity": 0.3499999940395355,
+            "targets": []
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "id": "80:492",
+        "labels": [
+          "1–5 / 19 项",
+          "第 1 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "110:12264",
+            "name": "Button / Icon / 上一页",
+            "opacity": 0.3499999940395355,
+            "targets": []
+          },
+          {
+            "id": "110:12273",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "110:8244"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "110:8244",
+        "labels": [
+          "6–10 / 19 项",
+          "第 2 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "110:12460",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "80:492"
+            ]
+          },
+          {
+            "id": "110:12469",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "424:16448"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "424:16448",
+        "labels": [
+          "11–15 / 19 项",
+          "第 3 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "424:16504",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "110:8244"
+            ]
+          },
+          {
+            "id": "424:16507",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "424:16584"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "424:16584",
+        "labels": [
+          "16–19 / 19 项",
+          "第 4 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "424:16640",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "424:16448"
+            ]
+          },
+          {
+            "id": "424:16643",
+            "name": "Button / Icon / 下一页",
+            "opacity": 0.3499999940395355,
+            "targets": []
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "id": "217:14799",
+        "labels": [
+          "1–5 / 19 项",
+          "第 1 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "217:14850",
+            "name": "Button / Icon / 上一页",
+            "opacity": 0.3499999940395355,
+            "targets": []
+          },
+          {
+            "id": "217:14853",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "217:15329"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "217:15329",
+        "labels": [
+          "6–10 / 19 项",
+          "第 2 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "217:15380",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "217:14799"
+            ]
+          },
+          {
+            "id": "217:15383",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "424:16726"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "424:16726",
+        "labels": [
+          "11–15 / 19 项",
+          "第 3 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "424:16782",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "217:15329"
+            ]
+          },
+          {
+            "id": "424:16785",
+            "name": "Button / Icon / 下一页",
+            "opacity": 1,
+            "targets": [
+              "424:16862"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "424:16862",
+        "labels": [
+          "16–19 / 19 项",
+          "第 4 / 4 页"
+        ],
+        "pageControls": [
+          {
+            "id": "424:16918",
+            "name": "Button / Icon / 上一页",
+            "opacity": 1,
+            "targets": [
+              "424:16726"
+            ]
+          },
+          {
+            "id": "424:16921",
+            "name": "Button / Icon / 下一页",
+            "opacity": 0.3499999940395355,
+            "targets": []
+          }
+        ]
+      }
+    ]
+  ],
+  "runtimeVerification": {
+    "date": "2026-10-23",
+    "surface": "Figma prototype in IAB, 390x844 mobile frame",
+    "passed": [
+      "Learner avatar menu hides administration",
+      "Avatar to personal center closes menu",
+      "Avatar to account settings closes menu",
+      "Repeated avatar, outside click and Escape close menu",
+      "My content and collection navigation reset scroll; explicit return reaches personal overview",
+      "Learning preferences opens and returns to account settings",
+      "Administrator avatar menu opens administration and personal center; Escape closes",
+      "Six admin modules open and return to administration overview",
+      "Knowledge pages 1 to 2 to 3 to 4 and 4 to 3; first previous and last next disabled",
+      "Collection and admin users single-page previous/next disabled",
+      "Learner direct admin access shows no-permission view; return reaches personal center",
+      "Prototype logout reaches login; demo login restores learner menu",
+      "Final account-menu single-target fix retested between administration and personal center"
+    ],
+    "notCovered": [
+      "Every page and every action",
+      "Tablet and desktop per-click regression in this pass",
+      "Real API pagination, authentication or authorization",
+      "Browser focus restoration, screen readers and device keyboard",
+      "Production frontend"
+    ]
+  },
+  "fixes": [
+    "Reset scroll on cross-module and explicit overview-return navigation",
+    "Complete mobile and tablet knowledge pages 3 and 4",
+    "Remove inherited home placeholder actions from account menu items"
+  ],
+  "retention": "Same current file and current assets; four required pagination states added, no historical snapshots",
+  "frontendAcceptance": {
+    "checkedAt": "2026-10-23T09:31:29.099549+00:00",
+    "browser": "agent-browser 0.33.0",
+    "target": "http://127.0.0.1:3111",
+    "backend": "real local gateway and existing native dependencies",
+    "networkMocks": false,
+    "environment": "Reused existing MySQL, Redis, RabbitMQ, Elasticsearch and Nacos; no retained isolated stack",
+    "validation": {
+      "frontendTypecheck": true,
+      "frontendLint": true,
+      "frontendTests": {
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      "productionBuild": true,
+      "backendJava": 21,
+      "backendCleanTestCompile": true,
+      "backendInstallIncludingPackage": true,
+      "backendTests": {
+        "passed": 51,
+        "failed": 0,
+        "skipped": 0
+      }
+    },
+    "apiChecks": [
+      {
+        "name": "admin persisted session",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "learner persisted session",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "learner denied /user/list/page",
+        "passed": true,
+        "detail": "11041"
+      },
+      {
+        "name": "learner denied /user/update",
+        "passed": true,
+        "detail": "11041"
+      },
+      {
+        "name": "learner denied /ai/doc/list/page",
+        "passed": true,
+        "detail": "11041"
+      },
+      {
+        "name": "learner denied /ai/rag/recall/analyze",
+        "passed": true,
+        "detail": "11041"
+      },
+      {
+        "name": "learner denied /log/operation/list/page",
+        "passed": true,
+        "detail": "11041"
+      },
+      {
+        "name": "anonymous denied",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "personal real page 1",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "personal real page 2",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "personal real page 3",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "personal pages unique",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "admin pages unique for equal timestamps",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "other cannot delete learner post",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "notification ownership",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "profile save",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "profile persisted",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "admin promotes scoped account",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "role change revokes old token",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "new admin token authorized",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "admin demotes scoped account",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "demotion revokes active admin token",
+        "passed": true,
+        "detail": ""
+      },
+      {
+        "name": "audit persisted",
+        "passed": true,
+        "detail": ""
+      }
+    ],
+    "mobileAdminModules": [
+      {
+        "module": "知识库",
+        "passed": true,
+        "viewport": {
+          "scroll": 390,
+          "width": 390
+        }
+      },
+      {
+        "module": "召回评测",
+        "passed": true,
+        "viewport": {
+          "scroll": 390,
+          "width": 390
+        }
+      },
+      {
+        "module": "社区审核",
+        "passed": true,
+        "viewport": {
+          "scroll": 390,
+          "width": 390
+        }
+      },
+      {
+        "module": "用户与权限",
+        "passed": true,
+        "viewport": {
+          "scroll": 390,
+          "width": 390
+        }
+      },
+      {
+        "module": "索引任务",
+        "passed": true,
+        "viewport": {
+          "scroll": 390,
+          "width": 390
+        }
+      },
+      {
+        "module": "审计日志",
+        "passed": true,
+        "viewport": {
+          "scroll": 390,
+          "width": 390
+        }
+      }
+    ],
+    "browserFlows": {
+      "personalThreePagesAndReturnQuery": true,
+      "profileSaveAndReload": true,
+      "commentAndFavourPersistence": true,
+      "settingsSubpageReturns": true,
+      "ordinaryUserAdminDenied": true,
+      "notificationReadFilterAndPageSize": true,
+      "realMqPushTitleAndBody": true,
+      "invalidWebsocketTokenRejected": true,
+      "expiredSessionClearsIdentityAndKeepsUrl": true,
+      "ragUnconfiguredErrorRestoresQuestionAndAllowsRetry": true,
+      "desktopCardsHeight": 705,
+      "viewports": [
+        320,
+        390,
+        768,
+        1440
+      ]
+    },
+    "accessibility": {
+      "home": {
+        "counts": {
+          "inapplicable": 37,
+          "incomplete": 0,
+          "passes": 23,
+          "violations": 0
+        },
+        "manualReview": []
+      },
+      "desktop": {
+        "counts": {
+          "inapplicable": 34,
+          "incomplete": 0,
+          "passes": 26,
+          "violations": 0
+        },
+        "manualReview": []
+      },
+      "notifications": {
+        "counts": {
+          "inapplicable": 32,
+          "incomplete": 0,
+          "passes": 28,
+          "violations": 0
+        },
+        "manualReview": []
+      },
+      "settings": {
+        "counts": {
+          "inapplicable": 38,
+          "incomplete": 0,
+          "passes": 22,
+          "violations": 0
+        },
+        "manualReview": []
+      },
+      "security": {
+        "counts": {
+          "inapplicable": 38,
+          "incomplete": 0,
+          "passes": 22,
+          "violations": 0
+        },
+        "manualReview": []
+      },
+      "rag": {
+        "counts": {
+          "inapplicable": 38,
+          "incomplete": 2,
+          "passes": 22,
+          "violations": 0
+        },
+        "manualReview": [
+          {
+            "id": "aria-hidden-focus",
+            "impact": "serious"
+          },
+          {
+            "id": "color-contrast",
+            "impact": "serious"
+          }
+        ]
+      }
+    },
+    "cleanup": {
+      "notifications": 14,
+      "posts": 12,
+      "comments": 1,
+      "knowledgeBases": 1,
+      "users": 3,
+      "originalActiveCounts": {
+        "users": 1,
+        "posts": 1,
+        "knowledgeBases": 1
+      },
+      "scopedFavourLinksRemoved": true
+    },
+    "pending": [
+      "Actual email delivery and GitHub OAuth",
+      "COS upload",
+      "DashScope answers and embedding/vector retrieval",
+      "Model recovery success after valid configuration",
+      "Multi-instance and cross-device WebSocket",
+      "Manual accessibility review, screen reader, 200 percent zoom, low-end device performance"
+    ],
+    "evidence": {
+      "desktop": "frontend-desktop.png",
+      "mobileRagError": "frontend-mobile.png"
+    },
+    "figmaBoundary": "Existing prototype evidence retained separately; no per-screen Figma rerun claimed"
+  }
+}

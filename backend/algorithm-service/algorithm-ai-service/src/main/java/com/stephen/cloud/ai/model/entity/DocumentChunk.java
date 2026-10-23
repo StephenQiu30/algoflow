@@ -56,6 +56,12 @@ public class DocumentChunk implements Serializable {
     @Schema(description = "分片内容")
     private String content;
 
+    private String draftContent;
+
+    private String draftSectionTitle;
+
+    private String draftSectionPath;
+
     /**
      * 章节标题（SmartTextSplitter 切分时的当前标题）
      */

@@ -10,17 +10,17 @@ interface UserAvatarProps {
 }
 
 const sizeMap = {
-  sm: 'h-5 w-5',
-  md: 'h-10 w-10',
-  lg: 'h-16 w-16',
-  xl: 'h-32 w-32',
+  sm: 'size-5',
+  md: 'size-10',
+  lg: 'size-16',
+  xl: 'size-32',
 }
 
 const iconSizeMap = {
-  sm: 'h-4 w-4',
-  md: 'h-6 w-6',
-  lg: 'h-10 w-10',
-  xl: 'h-20 w-20',
+  sm: 'size-4',
+  md: 'size-6',
+  lg: 'size-10',
+  xl: 'size-20',
 }
 
 export function UserAvatar({ user, size = 'md', className, alt }: UserAvatarProps) {

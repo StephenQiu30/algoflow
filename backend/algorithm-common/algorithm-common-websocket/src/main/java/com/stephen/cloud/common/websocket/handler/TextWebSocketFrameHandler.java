@@ -63,7 +63,8 @@ public class TextWebSocketFrameHandler extends SimpleChannelInboundHandler<TextW
     protected void channelRead0(ChannelHandlerContext ctx, TextWebSocketFrame msg) {
         try {
             String text = msg.text();
-            log.info("收到 WebSocket 消息：{}", text);
+            // Authentication frames contain bearer tokens; never log their payload.
+            log.debug("收到 WebSocket 帧，长度：{}", text.length());
 
             // 解析消息
             WebSocketMessage message = JSONUtil.toBean(text, WebSocketMessage.class);

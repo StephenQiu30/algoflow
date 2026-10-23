@@ -1,135 +1,145 @@
 'use client'
-
-import * as React from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
-import { useGSAP } from '@gsap/react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import Image from 'next/image'
+import { Heart, Bookmark, Share2, MessageSquare } from 'lucide-react'
 import { UserAvatar } from '@/components/header/user-avatar'
-import { ArrowUpRight, Bookmark, Heart, Clock } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { doThumb } from '@/api/post/postThumbController'
+import { doFavour } from '@/api/post/postFavourController'
+import { useAppSelector } from '@/store/hooks'
+import { AuthModal } from '@/components/auth/auth-modal'
+import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
-import dayjs from '@/lib/dayjs'
-
-gsap.registerPlugin(ScrollTrigger)
-
-interface PostCardProps {
+export function PostCard({
+  post,
+  className,
+  href,
+  onClick,
+  hideContent = false,
+}: {
   post: Partial<PostAPI.PostVO>
   className?: string
   href?: string
   onClick?: () => void
-}
-
-export function PostCard({ post, className, href, onClick }: PostCardProps) {
-  const cardRef = React.useRef<HTMLDivElement>(null)
-  const { id, title, content, cover, thumbNum = 0, favourNum = 0, createTime, userVO } = post
-
-  const excerpt =
-    (
-      content
-        ?.replace(/!\[.*?\]\(.*?\)/g, '')
-        .replace(/\[([^\]]+)\]\(.*?\)/g, '$1')
-        .replace(/[#*`>~_]/g, '')
-        .trim() || ''
-    ).slice(0, 70) + ((content?.length ?? 0) > 70 ? '...' : '')
-
-  const formattedDate = createTime ? dayjs(createTime).format('MMM D, YYYY') : ''
-
+  hideContent?: boolean
+}) {
+  const { user } = useAppSelector(s => s.user),
+    [login, setLogin] = useState(false),
+    [pending, setPending] = useState(false)
+  const [liked, setLiked] = useState(!!post.hasThumb),
+    [saved, setSaved] = useState(!!post.hasFavour),
+    [likes, setLikes] = useState(post.thumbNum || 0)
+  const url = href || `/blog/${post.id}`
+  async function react(kind: 'like' | 'save') {
+    if (!user) {
+      setLogin(true)
+      return
+    }
+    if (!post.id || pending) return
+    setPending(true)
+    try {
+      const r = await (kind === 'like'
+        ? doThumb({ postId: post.id })
+        : doFavour({ postId: post.id }))
+      if (r.code !== 0) throw Error(r.message || '操作失败')
+      if (kind === 'like') {
+        setLiked(!liked)
+        setLikes(n => Math.max(0, n + (liked ? -1 : 1)))
+      } else setSaved(!saved)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : '操作失败，请重试')
+    } finally {
+      setPending(false)
+    }
+  }
+  async function share() {
+    try {
+      await navigator.clipboard.writeText(new URL(url, window.location.origin).href)
+      toast.success('链接已复制')
+    } catch {
+      toast.error('无法复制，请复制浏览器地址栏中的链接')
+    }
+  }
   return (
-    <div ref={cardRef} className={cn('group relative h-full cursor-pointer', className)}>
-      <div
-        className={cn(
-          'relative flex h-full flex-col overflow-hidden rounded-[32px] bg-card transition-all duration-500 will-change-transform border border-transparent dark:border-white/5',
-          'shadow-[0_8px_40px_rgba(0,0,0,0.03)] dark:shadow-none group-hover:scale-[1.01] group-hover:shadow-[0_16px_60px_rgba(0,0,0,0.06)]'
-        )}
-      >
-        {/* Cover Image Area */}
-        <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-zinc-100 dark:border-zinc-800">
-          {cover ? (
-            <img
-              src={cover}
-              alt={title || ''}
-              className="h-full w-full object-cover grayscale-[0.2] transition-transform duration-500 group-hover:scale-105 group-hover:grayscale-0"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-zinc-50 dark:bg-zinc-900">
-              <span className="text-xs font-bold tracking-widest text-zinc-300 uppercase dark:text-zinc-700">
-                No Cover
-              </span>
-            </div>
+    <article className={cn('flex min-w-0 gap-3 py-5', className)}>
+      <UserAvatar user={post.userVO} size="md" className="size-8" />
+      <div className="flex min-w-0 flex-1 flex-col gap-3">
+        <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-xs">
+          <Link
+            href={`/user/${post.userId || post.userVO?.id}`}
+            className="text-foreground font-medium"
+          >
+            {post.userVO?.userName || '社区成员'}
+          </Link>
+          {post.createTime && (
+            <time dateTime={post.createTime}>
+              {new Date(post.createTime).toLocaleDateString('zh-CN')}
+            </time>
           )}
         </div>
-
-        {/* Content Area */}
-        <div className="flex flex-1 flex-col space-y-4 p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <UserAvatar user={userVO} size="sm" className="h-4 w-4" />
-              <span className="text-[10px] font-bold tracking-widest text-zinc-400 uppercase">
-                {userVO?.userName || 'Anonymous'}
-              </span>
-            </div>
-            <span className="font-mono text-[9px] font-bold tracking-widest text-zinc-300 uppercase italic dark:text-zinc-600">
-              {formattedDate}
-            </span>
-          </div>
-
-          <div className="space-y-3">
-            <h3 className="line-clamp-2 text-xl font-black tracking-tight text-foreground transition-colors group-hover:text-[#007AFF]">
-              {title || 'Untitled'}
-            </h3>
-            <p className="line-clamp-2 text-xs leading-relaxed font-medium text-zinc-500 dark:text-zinc-400">
-              {excerpt}
-            </p>
-          </div>
-
-          <div className="mt-auto flex items-center justify-between pt-4 opacity-60">
-            <div className="flex items-center gap-3 text-zinc-400">
-              <div className="flex items-center gap-1.5 transition-colors group-hover:text-amber-500">
-                <Heart size={12} className={thumbNum > 0 ? 'fill-current' : ''} />
-                <span className="text-[10px] font-bold tabular-nums">{thumbNum}</span>
-              </div>
-              <div className="flex items-center gap-1.5 transition-colors group-hover:text-primary">
-                <Bookmark size={12} className={favourNum > 0 ? 'fill-current' : ''} />
-                <span className="text-[10px] font-bold tabular-nums">{favourNum}</span>
-              </div>
-            </div>
-              <ArrowUpRight
-                size={16}
-                className="text-zinc-300 transition-colors group-hover:text-[#007AFF] group-hover:scale-110"
-              />
-            </div>
-          </div>
-
-        {onClick ? (
-          <button onClick={onClick} className="absolute inset-0 z-20" aria-label="Details" />
-        ) : (
-          <Link href={href || `/blog/${id}`} className="absolute inset-0 z-20">
-            <span className="sr-only">View</span>
+        {!hideContent && (
+          <Link href={url} onClick={onClick} className="rounded-sm focus-visible:outline-2">
+            <h2 className="text-lg leading-7 font-medium">{post.title || '未命名内容'}</h2>
           </Link>
         )}
-      </div>
-    </div>
-  )
-}
-
-export function PostCardSkeleton({ index = 0 }: { index?: number }) {
-  return (
-    <div
-      className="shimmer border-border/10 bg-card/40 flex h-full flex-col overflow-hidden rounded-[2.5rem] border"
-      style={{ animationDelay: `${index * 0.15}s` }}
-    >
-      <div className="aspect-[16/10] w-full bg-zinc-100 dark:bg-zinc-900/50" />
-      <div className="flex flex-1 flex-col space-y-5 p-7">
-        <div className="flex items-center gap-2">
-          <div className="h-5 w-5 rounded-full bg-zinc-200 dark:bg-zinc-800" />
-          <div className="h-2 w-20 rounded bg-zinc-200 dark:bg-zinc-800" />
+        {!hideContent && (
+          <p className="text-muted-foreground line-clamp-3 text-sm leading-7 break-words">
+            {post.content?.replace(/[#*>`]/g, '').slice(0, 240)}
+          </p>
+        )}
+        {!hideContent && post.cover && (
+          <Image
+            src={post.cover}
+            alt={post.title || '内容配图'}
+            width={800}
+            height={450}
+            unoptimized
+            className="h-auto max-h-80 w-full rounded-lg object-cover"
+          />
+        )}
+        {!hideContent && !!post.tags?.length && (
+          <div className="flex flex-wrap gap-2">
+            {post.tags.map(t => (
+              <Badge key={t} variant="secondary">
+                {t}
+              </Badge>
+            ))}
+          </div>
+        )}
+        <div className="flex flex-wrap items-center gap-1">
+          <Button variant="ghost" asChild>
+            <Link href={`${url}#comments`} aria-label="查看讨论">
+              <MessageSquare />
+            </Link>
+          </Button>
+          <Button
+            variant="ghost"
+            aria-label={liked ? '取消赞同' : '赞同'}
+            aria-pressed={liked}
+            disabled={pending}
+            onClick={() => void react('like')}
+          >
+            <Heart data-icon="inline-start" className={cn(liked && 'fill-current')} />
+            {likes}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label={saved ? '取消收藏' : '收藏'}
+            aria-pressed={saved}
+            disabled={pending}
+            onClick={() => void react('save')}
+          >
+            <Bookmark className={cn(saved && 'fill-current')} />
+          </Button>
+          <Button variant="ghost" size="icon" aria-label="分享" onClick={() => void share()}>
+            <Share2 />
+          </Button>
         </div>
-        <div className="h-6 w-3/4 rounded-xl bg-zinc-200 dark:bg-zinc-800" />
-        <div className="space-y-3 pt-2">
-          <div className="h-3 w-full rounded-full bg-zinc-100 dark:bg-zinc-900" />
-          <div className="h-3 w-2/3 rounded-full bg-zinc-100 dark:bg-zinc-900" />
-        </div>
       </div>
-    </div>
+      <AuthModal open={login} onOpenChange={setLogin} />
+    </article>
   )
 }

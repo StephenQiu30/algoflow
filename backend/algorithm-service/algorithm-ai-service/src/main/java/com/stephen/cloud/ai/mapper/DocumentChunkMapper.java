@@ -20,12 +20,16 @@ import java.util.List;
 @Mapper
 public interface DocumentChunkMapper extends BaseMapper<DocumentChunk> {
 
-    @Select("SELECT id FROM document WHERE id = #{documentId} AND knowledge_base_id = #{knowledgeBaseId} AND is_delete = 0 AND version <=> #{version,jdbcType=VARCHAR} AND file_path = #{filePath} FOR UPDATE")
-    Long lockDocument(@Param("documentId") Long documentId, @Param("knowledgeBaseId") Long knowledgeBaseId,
-                      @Param("version") String version, @Param("filePath") String filePath);
+    // Include retired rows: an unavailable vector store must not hide existing index cleanup work.
+    @Select("SELECT EXISTS(SELECT 1 FROM document WHERE knowledge_base_id = #{id}) OR EXISTS(SELECT 1 FROM document_chunk WHERE knowledge_base_id = #{id})")
+    boolean hasKnowledgeBaseHistory(@Param("id") Long id);
 
-    @Update("UPDATE document SET status = 'COMPLETED', chunk_count = #{count}, error_message = NULL, process_end_time = CURRENT_TIMESTAMP WHERE id = #{documentId} AND is_delete = 0")
-    int markDocumentPublished(@Param("documentId") Long documentId, @Param("count") int count);
+    @Select("SELECT id FROM document WHERE id = #{documentId} AND knowledge_base_id = #{knowledgeBaseId} AND is_delete = 0 AND version <=> #{version,jdbcType=VARCHAR} AND file_path = #{filePath} AND revision = #{revision} AND status = 'PROCESSING' FOR UPDATE")
+    Long lockDocument(@Param("documentId") Long documentId, @Param("knowledgeBaseId") Long knowledgeBaseId,
+                      @Param("version") String version, @Param("filePath") String filePath, @Param("revision") Long revision);
+
+    @Update("UPDATE document SET status = 'COMPLETED', published_revision = #{revision}, chunk_count = #{count}, error_message = NULL, process_end_time = CURRENT_TIMESTAMP WHERE id = #{documentId} AND revision = #{revision} AND status = 'PROCESSING' AND is_delete = 0")
+    int markDocumentPublished(@Param("documentId") Long documentId, @Param("count") int count, @Param("revision") Long revision);
 
     @Select("SELECT id, vector_id FROM document_chunk WHERE is_delete = 1 ORDER BY update_time LIMIT 100")
     List<DocumentChunk> selectRetiredForCleanup();

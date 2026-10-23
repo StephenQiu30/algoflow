@@ -143,6 +143,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
                 }
             }
         }
+        queryWrapper.orderByDesc(Post::getId);
         return queryWrapper;
     }
 

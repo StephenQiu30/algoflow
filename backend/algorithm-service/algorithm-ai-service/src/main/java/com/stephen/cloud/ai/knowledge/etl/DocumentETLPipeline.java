@@ -26,6 +26,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.transformer.splitter.TokenTextSplitter;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.stephen.cloud.ai.knowledge.retrieval.RagMetadataKeys.*;
 
@@ -59,7 +60,7 @@ public class DocumentETLPipeline {
     @Resource
     private TokenTextSplitter tokenTextSplitter;
 
-    @Resource
+    @Autowired(required = false)
     private VectorStore vectorStore;
 
     @Resource
@@ -96,10 +97,14 @@ public class DocumentETLPipeline {
      * @return 生成的分片数量
      */
     public int process(String filePath, String fileExtension, Map<String, Object> metadata) {
+        if (vectorStore == null) {
+            throw new IllegalStateException("向量模型未配置，文档尚未建立索引");
+        }
         long pipelineStart = System.currentTimeMillis();
         Map<String, Object> baseMetadata = sanitizeMetadata(metadata);
         Long documentId = parseLong(baseMetadata.get(DOCUMENT_ID));
         Long knowledgeBaseId = parseLong(baseMetadata.get(KNOWLEDGE_BASE_ID));
+        Long revision = parseLong(baseMetadata.getOrDefault("documentRevision", 0L));
 
         if (documentId == null || documentId <= 0 || knowledgeBaseId == null || knowledgeBaseId <= 0) throw new IllegalArgumentException("文档和知识库 ID 必须有效");
         // Each build gets isolated IDs: rollback can never delete the active build's vectors.
@@ -107,10 +112,16 @@ public class DocumentETLPipeline {
 
         // ---- 阶段 1: 文档读取 ----
         long readStart = System.currentTimeMillis();
-        String location = resolveLocation(filePath);
-        org.springframework.core.io.Resource springResource = resourceLoader.getResource(location);
-        DocumentReader reader = documentReaderFactory.getReader(fileExtension, springResource);
-        List<Document> documents = reader.get();
+        boolean storedChunks = Boolean.TRUE.equals(baseMetadata.get("useStoredChunks"));
+        List<Document> documents;
+        if (storedChunks) {
+            documents = readStoredChunks(documentId, baseMetadata);
+        } else {
+            String location = resolveLocation(filePath);
+            org.springframework.core.io.Resource springResource = resourceLoader.getResource(location);
+            DocumentReader reader = documentReaderFactory.getReader(fileExtension, springResource);
+            documents = reader.get();
+        }
         long readCostMs = System.currentTimeMillis() - readStart;
 
         // 注入元数据
@@ -121,7 +132,7 @@ public class DocumentETLPipeline {
         // ---- 阶段 2: 分片 ----
         long splitStart = System.currentTimeMillis();
         String strategy = documentProcessingProperties.getChunkStrategy();
-        List<Document> chunks = assignStableChunkIds(splitByStrategy(documents, strategy), baseMetadata);
+        List<Document> chunks = assignStableChunkIds(storedChunks ? documents : splitByStrategy(documents, strategy), baseMetadata);
         long splitCostMs = System.currentTimeMillis() - splitStart;
         log.info("[ETL] 分片完成, strategy={}, chunkCount={}, fileExtension={}",
                 strategy, chunks.size(), fileExtension);
@@ -145,11 +156,11 @@ public class DocumentETLPipeline {
             // ---- 阶段 5: atomic active-build switch. Retrieval checks this DB inventory. ----
             long dbStart = System.currentTimeMillis();
             List<DocumentChunk> old = transactionTemplate.execute(status -> {
-                if (documentChunkMapper.lockDocument(documentId, knowledgeBaseId, toStr(baseMetadata.get(VERSION)), filePath) == null) throw new IllegalStateException("文档已删除或源版本已变化，取消旧构建发布");
+                if (documentChunkMapper.lockDocument(documentId, knowledgeBaseId, toStr(baseMetadata.get(VERSION)), filePath, revision) == null) throw new IllegalStateException("文档已删除或版本已变化，取消旧构建发布");
                 List<DocumentChunk> previous = documentChunkMapper.selectList(new LambdaQueryWrapper<DocumentChunk>().eq(DocumentChunk::getDocumentId, documentId));
                 documentChunkMapper.delete(new LambdaQueryWrapper<DocumentChunk>().eq(DocumentChunk::getDocumentId, documentId));
                 batchSaveChunks(entities);
-                if (documentChunkMapper.markDocumentPublished(documentId, chunks.size()) != 1) throw new IllegalStateException("文档发布状态更新失败");
+                if (documentChunkMapper.markDocumentPublished(documentId, chunks.size(), revision) != 1) throw new IllegalStateException("文档发布状态更新失败");
                 return previous == null ? List.<DocumentChunk>of() : previous;
             });
             published = true;
@@ -180,6 +191,20 @@ public class DocumentETLPipeline {
      */
     private static final int EMBEDDING_BATCH_SIZE = 20;
     private static final int EMBEDDING_RETRY_COUNT = 2;
+
+    private List<Document> readStoredChunks(Long documentId, Map<String, Object> metadata) {
+        List<DocumentChunk> rows = documentChunkMapper.selectList(new LambdaQueryWrapper<DocumentChunk>()
+                .eq(DocumentChunk::getDocumentId, documentId).orderByAsc(DocumentChunk::getChunkIndex)
+                .orderByAsc(DocumentChunk::getId));
+        return rows.stream().map(row -> {
+            Map<String, Object> meta = new LinkedHashMap<>();
+            if (JSONUtil.isTypeJSONObject(row.getMetadataJson())) meta.putAll(JSONUtil.parseObj(row.getMetadataJson()));
+            meta.putAll(metadata);
+            meta.put(SECTION_TITLE, row.getDraftSectionTitle() == null ? StringUtils.defaultString(row.getSectionTitle()) : row.getDraftSectionTitle());
+            meta.put(SECTION_PATH, row.getDraftSectionPath() == null ? StringUtils.defaultString(row.getSectionPath()) : row.getDraftSectionPath());
+            return new Document(row.getDraftContent() == null ? row.getContent() : row.getDraftContent(), meta);
+        }).toList();
+    }
 
     private void batchAddToVectorStore(List<Document> chunks) {
         int totalBatches = (int) Math.ceil((double) chunks.size() / EMBEDDING_BATCH_SIZE);

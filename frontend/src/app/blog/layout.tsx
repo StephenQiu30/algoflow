@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: '文章与见解 - Stephen Radix',
-  description: '探索来自我们团队和社区的最新更新、深度技术文章和开发教程。',
+  title: '学习社区',
+  description: '分享算法学习笔记与题解，参与讨论。',
 }
 
 export default function BlogLayout({

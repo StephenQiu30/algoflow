@@ -72,6 +72,18 @@ class RAGServiceImplTest {
     }
 
     @Test
+    void missingModelReturnsErrorWithoutRetrievalOrInventedAnswer() throws Exception {
+        setField("chatClient", null);
+        reset(chatMemory);
+        var events = ragService.askEventStream("解释插入排序", 1L, 2L, 5, "test", false).collectList().block();
+        assertThat(events).hasSize(1);
+        assertThat(events.getFirst().data().getType()).isEqualTo("error");
+        assertThat(events.getFirst().data().getMessage()).contains("未配置");
+        assertThat(events.getFirst().data().getSuccess()).isFalse();
+        verifyNoInteractions(retrievalOrchestrator, ragHistoryMapper, chatClient);
+    }
+
+    @Test
     @DisplayName("触发联网兜底时应输出 fallback 事件并以 WEB_SEARCH_FALLBACK 落库")
     void shouldEmitFallbackEventsAndPersistWebSearchStrategy() throws Exception {
         RetrievalResult retrievalResult = new RetrievalResult();

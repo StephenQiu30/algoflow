@@ -67,6 +67,7 @@ public class OperationLogServiceImpl extends ServiceImpl<OperationLogMapper, Ope
                 }
             }
         }
+        queryWrapper.orderByDesc(OperationLog::getId);
         return queryWrapper;
     }
 }

@@ -7,6 +7,7 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { useRouter } from 'next/navigation'
+import { SORTING_ALGORITHMS } from '@/lib/sortingAlgorithms'
 import { useEffect, useState } from 'react'
 export function CommandMenu({
   open,
@@ -39,7 +40,7 @@ export function CommandMenu({
         value={query}
         onValueChange={setQuery}
       />
-      <CommandList>
+      <CommandList><CommandGroup heading="算法学习">{SORTING_ALGORITHMS.map(a=><CommandItem key={a.id} value={a.name} onSelect={()=>navigate(`/sorting/${a.id}`)}>{a.name}</CommandItem>)}</CommandGroup>
         <CommandGroup heading="搜索文章">
           <CommandItem
             forceMount

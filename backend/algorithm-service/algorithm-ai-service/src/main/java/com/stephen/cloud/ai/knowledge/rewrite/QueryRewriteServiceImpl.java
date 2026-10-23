@@ -14,6 +14,7 @@ import org.springframework.ai.rag.preretrieval.query.expansion.MultiQueryExpande
 import org.springframework.ai.rag.preretrieval.query.transformation.CompressionQueryTransformer;
 import org.springframework.ai.rag.preretrieval.query.transformation.RewriteQueryTransformer;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -51,13 +52,13 @@ public class QueryRewriteServiceImpl implements QueryRewriteService {
     @Resource
     private RagRetrievalProperties ragRetrievalProperties;
 
-    @Resource
+    @Autowired(required = false)
     private ChatClient.Builder chatClientBuilder;
 
     @Override
     public RewriteResult rewrite(String question, List<Message> history) {
         String normalized = normalize(question);
-        if (!ragRetrievalProperties.isLlmRewriteEnabled()) {
+        if (!ragRetrievalProperties.isLlmRewriteEnabled() || chatClientBuilder == null) {
             return ruleRewrite(normalized);
         }
         try {

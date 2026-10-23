@@ -130,9 +130,9 @@ class DocumentETLPipelineTest {
         when(documentReaderFactory.getReader(anyString(), eq(resource))).thenReturn(documentReader);
         when(documentReader.get()).thenReturn(List.of(new Document("有效课程文档".repeat(30))));
         var old = new com.stephen.cloud.ai.model.entity.DocumentChunk();old.setId(99L);old.setVectorId("1001_0");
-        when(documentChunkMapper.lockDocument(1001L, 2002L, "course-v2", "/tmp/test.md")).thenReturn(1001L);
+        when(documentChunkMapper.lockDocument(1001L, 2002L, "course-v2", "/tmp/test.md", 0L)).thenReturn(1001L);
         when(documentChunkMapper.selectList(any())).thenReturn(List.of(old));
-        when(documentChunkMapper.markDocumentPublished(eq(1001L), anyInt())).thenReturn(1);
+        when(documentChunkMapper.markDocumentPublished(eq(1001L), anyInt(), eq(0L))).thenReturn(1);
         when(documentChunkMapper.batchInsert(anyList())).thenAnswer(i -> ((List<?>) i.getArgument(0)).size());
         when(transactionTemplate.execute(any())).thenAnswer(i -> {
             org.springframework.transaction.support.TransactionCallback<?> callback = i.getArgument(0);
@@ -141,9 +141,9 @@ class DocumentETLPipelineTest {
         org.junit.jupiter.api.Assertions.assertTrue(documentETLPipeline.process("/tmp/test.md", "md", Map.of("documentId",1001L,"knowledgeBaseId",2002L,"version","course-v2")) > 0);
         var order=inOrder(vectorStore,keywordIndexPublisher,documentChunkMapper);
         order.verify(vectorStore).add(anyList());order.verify(keywordIndexPublisher).publish(anyList());
-        order.verify(documentChunkMapper).lockDocument(1001L, 2002L, "course-v2", "/tmp/test.md");order.verify(documentChunkMapper).selectList(any());
+        order.verify(documentChunkMapper).lockDocument(1001L, 2002L, "course-v2", "/tmp/test.md", 0L);order.verify(documentChunkMapper).selectList(any());
         order.verify(documentChunkMapper).delete(any(com.baomidou.mybatisplus.core.conditions.Wrapper.class));order.verify(documentChunkMapper).batchInsert(anyList());
-        order.verify(documentChunkMapper).markDocumentPublished(eq(1001L), anyInt());
+        order.verify(documentChunkMapper).markDocumentPublished(eq(1001L), anyInt(), eq(0L));
         order.verify(vectorStore).delete(List.of("1001_0"));order.verify(keywordIndexPublisher).delete(List.of(old));
     }
 

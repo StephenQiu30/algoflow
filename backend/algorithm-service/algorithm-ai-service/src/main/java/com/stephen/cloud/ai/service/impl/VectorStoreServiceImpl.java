@@ -2,6 +2,8 @@ package com.stephen.cloud.ai.service.impl;
 
 import com.stephen.cloud.ai.config.RagRetrievalProperties;
 import com.stephen.cloud.ai.service.VectorStoreService;
+import com.stephen.cloud.common.exception.BusinessException;
+import com.stephen.cloud.common.common.ErrorCode;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
@@ -10,6 +12,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.stephen.cloud.ai.knowledge.retrieval.RagMetadataKeys.*;
 
@@ -28,7 +31,7 @@ import java.util.List;
 @Slf4j
 public class VectorStoreServiceImpl implements VectorStoreService {
 
-    @Resource
+    @Autowired(required = false)
     private VectorStore vectorStore;
 
     @Resource
@@ -37,6 +40,7 @@ public class VectorStoreServiceImpl implements VectorStoreService {
     @Override
     public List<Document> similaritySearch(String query, Filter.Expression filterExpression, Integer topK,
             Double similarityThreshold) {
+        requireVectorStore();
         int defaultTopK = ragRetrievalProperties.getTopK() <= 0 ? 5 : ragRetrievalProperties.getTopK();
         int finalTopK = topK == null || topK <= 0 ? defaultTopK : topK;
         SearchRequest.Builder builder = SearchRequest.builder()
@@ -56,6 +60,7 @@ public class VectorStoreServiceImpl implements VectorStoreService {
 
     @Override
     public void deleteByKnowledgeBaseId(Long knowledgeBaseId) {
+        requireVectorStore();
         if (knowledgeBaseId == null || knowledgeBaseId <= 0) {
             return;
         }
@@ -65,11 +70,16 @@ public class VectorStoreServiceImpl implements VectorStoreService {
 
     @Override
     public void deleteByDocumentId(Long documentId) {
+        requireVectorStore();
         if (documentId == null || documentId <= 0) {
             return;
         }
         vectorStore.delete(new FilterExpressionBuilder().eq(DOCUMENT_ID, documentId).build());
         log.info("[VectorStore] deleteByDocumentId success, documentId={}", documentId);
+    }
+
+    private void requireVectorStore() {
+        if (vectorStore == null) throw new BusinessException(ErrorCode.AI_ERROR, "向量模型未配置，请先完成 AI 配置");
     }
 
     @Override

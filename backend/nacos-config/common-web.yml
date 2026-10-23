@@ -80,12 +80,12 @@ sa-token:
   is-share: true
   token-style: jwt
   is-log: false
-  jwt-secret-key: ${prod.sa-token.jwt-secret-key}
+  jwt-secret-key: ${dev.sa-token.jwt-secret-key}
   alone-redis:
-    database: ${prod.redis.database}
-    host: ${prod.redis.host}
-    port: ${prod.redis.port}
-    password: ${prod.redis.password}
+    database: ${dev.redis.database:0}
+    host: ${dev.redis.host:localhost}
+    port: ${dev.redis.port:6379}
+    password: ${dev.redis.password:}
     timeout: 5000
 
 # 请求参数加密校验配置
