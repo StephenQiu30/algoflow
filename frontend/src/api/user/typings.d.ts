@@ -130,32 +130,9 @@ declare namespace UserAPI {
         }
 
 
-    type GitHubCallbackRequest =
-        {
-            /** 授权码 */
-            'code': string;
-            /** 防CSRF攻击的随机字符串 */
-            'state': string;
-        }
-
-
-    type gitHubLoginCallbackParams =
-        {
-            'request': GitHubCallbackRequest;
-        }
-
-
-    type GitHubLoginRequest =
-        {
-            /** 授权码 */
-            'code'?: string;
-            /** 防CSRF攻击的随机字符串 */
-            'state'?: string;
-        }
-
-
     type LoginUserVO =
         {
+            hasPassword?: boolean;
             /** 用户ID */
             'id'?: number;
             /** 用户昵称 */
@@ -288,22 +265,6 @@ declare namespace UserAPI {
             'userEmail'?: string;
             /** 用户电话 */
             'userPhone'?: string;
-        }
-
-
-    type UserEmailCodeSendRequest =
-        {
-            /** 邮箱 */
-            'email'?: string;
-        }
-
-
-    type UserEmailLoginRequest =
-        {
-            /** 邮箱 */
-            'email'?: string;
-            /** 验证码 */
-            'code'?: string;
         }
 
 

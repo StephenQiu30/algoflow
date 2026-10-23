@@ -7,14 +7,15 @@
   "checkedAt": "2026-10-23",
   "scope": "Current Figma structure plus mobile prototype interaction checks; not production acceptance",
   "summary": {
-    "screens": 190,
+    "screens": 193,
     "overlays": 41,
-    "components": 133,
-    "instances": 6996,
-    "variables": 64,
+    "components": 146,
+    "instances": 7317,
+    "variables": 67,
     "textStyles": 11,
-    "uiEdges": 3068,
-    "allEdges": 3188
+    "uiEdges": 3016,
+    "allEdges": 3245,
+    "componentSets": 18
   },
   "issues": [],
   "missing": [],
@@ -84,7 +85,7 @@
     },
     {
       "id": "77:817",
-      "name": "11 / 登录 · 开启学习旅程",
+      "name": "11 / 登录 · 邮箱与密码",
       "width": 1440,
       "height": 900
     },
@@ -1161,6 +1162,24 @@
       "name": "Tablet / 知识库 · 第 4 页",
       "width": 768,
       "height": 1024
+    },
+    {
+      "id": "477:17253",
+      "name": "Auth / Desktop · 注册",
+      "width": 1440,
+      "height": 900
+    },
+    {
+      "id": "477:17419",
+      "name": "Auth / Tablet · 注册",
+      "width": 768,
+      "height": 1024
+    },
+    {
+      "id": "477:17582",
+      "name": "Auth / Mobile · 注册",
+      "width": 390,
+      "height": 844
     }
   ],
   "overlays": [
@@ -1773,7 +1792,7 @@
       "frontendTypecheck": true,
       "frontendLint": true,
       "frontendTests": {
-        "passed": 20,
+        "passed": 22,
         "failed": 0,
         "skipped": 0
       },
@@ -1782,7 +1801,7 @@
       "backendCleanTestCompile": true,
       "backendInstallIncludingPackage": true,
       "backendTests": {
-        "passed": 51,
+        "passed": 61,
         "failed": 0,
         "skipped": 0
       }
@@ -2052,7 +2071,7 @@
       "scopedFavourLinksRemoved": true
     },
     "pending": [
-      "Actual email delivery and GitHub OAuth",
+      "Actual email delivery, independent verification / recovery and no-session legacy recovery",
       "COS upload",
       "DashScope answers and embedding/vector retrieval",
       "Model recovery success after valid configuration",
@@ -2355,6 +2374,11 @@
         "rateLimitRecovery": "Initial cleanup hit gateway rate limit; resumed exact IDs with throttled reads/deletes and verified DB state. No test records recreated."
       },
       "retention": "Current DESIGN/DES-05/DES-06/plan/HANDOVER/audit updated in place; no dated snapshots or extra design exports."
+    },
+    "networkMocksScope": "Existing integrationRegression remains unmocked. authModal below separates real API checks from controlled UI-state fixtures.",
+    "authModal": {
+      "status": "Current password implementation; legacy OTP/OAuth evidence superseded",
+      "evidence": "authImplementation"
     }
   },
   "visualizerAcceptance": {
@@ -2676,5 +2700,253 @@
       }
     },
     "retention": "Only current documentation, audit and knowledge-mobile.png updated; private logs/configuration remain outside Git in /tmp/algoflow-live."
+  },
+  "authDesign": {
+    "checkedAt": "2026-10-23",
+    "fileKey": "cMWO5SCKWFqJafxME0yhFz",
+    "pageId": "74:31",
+    "scope": "Current editable Figma baseline; implemented separately in authImplementation",
+    "requirement": "REQ-01 FR-05; REQ-02 US-501 / US-502; PRD-01; TSK-205",
+    "authentication": "Email + password login; independent email/password/confirm-password registration; no GitHub or OTP sign-in",
+    "brand": "Existing Logo A, component 91:1335, via existing Brand instances",
+    "screens": [
+      {
+        "id": "77:817",
+        "name": "11 / 登录 · 邮箱与密码",
+        "width": 1440,
+        "height": 900,
+        "dialog": {
+          "id": "477:17216",
+          "width": 384,
+          "height": 481
+        },
+        "contained": true
+      },
+      {
+        "id": "217:17671",
+        "name": "155 / Tablet · 登录",
+        "width": 768,
+        "height": 1024,
+        "dialog": {
+          "id": "477:17382",
+          "width": 384,
+          "height": 481
+        },
+        "contained": true
+      },
+      {
+        "id": "207:9901",
+        "name": "113 / Mobile · 登录",
+        "width": 390,
+        "height": 844,
+        "dialog": {
+          "id": "477:17545",
+          "width": 358,
+          "height": 473
+        },
+        "contained": true
+      },
+      {
+        "id": "477:17253",
+        "name": "Auth / Desktop · 注册",
+        "width": 1440,
+        "height": 900,
+        "dialog": {
+          "id": "477:17329",
+          "width": 384,
+          "height": 599
+        },
+        "contained": true
+      },
+      {
+        "id": "477:17419",
+        "name": "Auth / Tablet · 注册",
+        "width": 768,
+        "height": 1024,
+        "dialog": {
+          "id": "477:17492",
+          "width": 384,
+          "height": 599
+        },
+        "contained": true
+      },
+      {
+        "id": "477:17582",
+        "name": "Auth / Mobile · 注册",
+        "width": 390,
+        "height": 844,
+        "dialog": {
+          "id": "477:17655",
+          "width": 358,
+          "height": 591
+        },
+        "contained": true
+      }
+    ],
+    "sharedComponents": [
+      {
+        "id": "477:17176",
+        "name": "Auth / Dialog"
+      },
+      {
+        "id": "477:16751",
+        "name": "Auth / InputGroup / Password"
+      }
+    ],
+    "variantCount": 9,
+    "states": [
+      "Login",
+      "Login visible",
+      "Login error",
+      "Login submitting",
+      "Register",
+      "Register visible",
+      "Register error",
+      "Register submitting",
+      "Register success"
+    ],
+    "stateBoard": "477:17707",
+    "darkLogin": "477:17921",
+    "darkRegister": "477:17960",
+    "validation": {
+      "panelBoundsIssues": [],
+      "scopedBrokenPrototypeTargets": [],
+      "legacyGitHubAndOtpLabelsInFigma": 0,
+      "fontFamilies": [
+        "Noto Sans SC"
+      ],
+      "fullUiRasterNodes": 0,
+      "editable": "Native component instances, text and vector nodes",
+      "visualReview": [
+        "Desktop login",
+        "Mobile registration",
+        "State overview including light/dark and 320px narrow dialog"
+      ]
+    },
+    "prototypeBoundary": "Preset state transitions and same-size screen navigation only; no real text entry, network, authentication, per-field visibility, request cancellation or mobile keyboard acceptance claimed",
+    "codeBoundary": "Figma preset states remain separate from real API/browser evidence; current frontend/backend implement password flows",
+    "runtimeBoundary": "Existing 3111 preview now serves password authentication through existing 8080 gateway; no new environment",
+    "evidence": [
+      "login-desktop.png",
+      "login-mobile.png",
+      "login-mobile-dark.png",
+      "register-mobile.png",
+      "auth-states.png"
+    ]
+  },
+  "authImplementation": {
+    "checkedAt": "2026-10-23",
+    "designFile": "cMWO5SCKWFqJafxME0yhFz",
+    "registrationInstance": "477:17655",
+    "environment": "Existing native 3111 frontend, 8080 gateway, 8081 user, 8084 search and existing MySQL/Redis/Nacos; no new environment",
+    "networkMocks": false,
+    "faultInjection": "Browser offline mode explicitly used for unknown-registration-result UI; baseline flows used real gateway responses",
+    "implementation": [
+      "Email/password login and separate email/password/confirmation registration",
+      "Logo A, existing Radix Dialog/Field/InputGroup/Button/Alert/Spinner",
+      "Removed GitHub/OTP public routes, callback and unused client helpers",
+      "Unicode code-point 8-64 length; preserve password whitespace; canonicalize only email",
+      "PBKDF2-HMAC-SHA256, 600000 iterations, 16-byte random salt, version prefix",
+      "Redis per-action account 10/minute and IP 60/minute limits",
+      "Register creates unverified user only; UUID request key and unique indexes provide idempotency",
+      "CAS password change; session creation locks/rechecks password version; revoke all previous sessions",
+      "Authenticated legacy password setup requires owner-email proof; no default password",
+      "Profile/admin updates cannot rewrite login email; public profile/search views exclude contact and hash fields",
+      "Credential request/response audit disabled; MyBatis SQL parameter output disabled in repository and existing Nacos"
+    ],
+    "migration": {
+      "file": "backend/sql/migrations/20261023_password_auth.sql",
+      "applied": true,
+      "additive": true,
+      "privateUserBackup": true,
+      "originalPasswordUnchanged": true,
+      "destructiveRollbackTested": false
+    },
+    "apiChecks": [
+      "Registration succeeds without session; role/emailVerified injection rejected by server-owned values",
+      "Same UUID registration retry succeeds; new UUID duplicate fails; mismatched confirmation rejected",
+      "Case/whitespace email normalization; real login and private-safe session view",
+      "Public profile contact/hash omission and profile email-change rejection",
+      "Ordinary user admin-list denial; removed routes unavailable with a valid token",
+      "Malformed credential JSON returns redacted error; unknown/wrong credentials share message",
+      "Wrong current password rejected; successful change invalidates old password and all old sessions; new login succeeds",
+      "Two concurrent identical registrations produce one account; two concurrent changes accept only one",
+      "Legacy no-password session, owner-proof requirement, controlled proof setup and session revocation",
+      "Authentication account limit returns business code 40429 after 10 attempts",
+      "Credential operation audit exists with empty request parameters; runtime logs contain no fixture passwords/hash prefix",
+      "Public user search and aggregate user search use explicit public views; pagination is preserved"
+    ],
+    "legacyBoundary": "Dedicated real session plus SQL null-password precondition and private short-lived Redis owner-email proof. SMTP send fails explicitly; proof test does not verify email delivery. Original account untouched.",
+    "browserFlows": [
+      "390x844 registration mismatch focuses confirm; independent password visibility preserves focus/value",
+      "Registration pending disables controls; confirmation has no token; next login retains email and clears secrets",
+      "Login returns to original visualizer step=7 and focuses avatar",
+      "Avatar menu to settings/security closes; wrong current password preserves form; successful change clears session and keeps URL",
+      "Old password rejected; new password signs in; ordinary account sees no admin entry and /admin shows no permission; return to personal center and logout",
+      "Login/register switching and reopen clear secrets; Escape and outside click return focus",
+      "Confirmed real registration pending before closing; reopen remains login with no secrets/session or stale success",
+      "Explicit browser offline registration preserves input and explains unknown outcome; normal network restored",
+      "320x568 dark: 288px dialog, contained, internal scroll, 12 Tab steps trapped, no page overflow",
+      "768x1024 and 1440x900: 384px modal, 24px stable padding, 16px input, no page overflow"
+    ],
+    "accessibility": {
+      "registrationLight": {
+        "violations": 0,
+        "incomplete": 1
+      },
+      "securityLight": {
+        "violations": 0,
+        "incomplete": 0
+      },
+      "narrowDark": {
+        "violations": 0,
+        "incomplete": 1
+      },
+      "incomplete": "Radix Dialog aria-hidden-focus requires manual review; not full WCAG certification"
+    },
+    "validation": {
+      "frontendTypecheck": true,
+      "frontendLint": true,
+      "frontendTests": 22,
+      "frontendBuild": true,
+      "backendCleanTestCompile": true,
+      "backendPackage": true,
+      "backendTests": 61
+    },
+    "cleanup": {
+      "counts": {
+        "user": 1,
+        "post": 1,
+        "knowledge_base": 1,
+        "document": 0,
+        "document_chunk": 0
+      },
+      "removedDedicatedAccounts": 5,
+      "originalPasswordUnchanged": true,
+      "normalAuditRetained": true
+    },
+    "pending": [
+      "Real email delivery, independent verification/reset and legacy recovery without a valid session",
+      "Physical keyboard/screen reader, native clipboard and password-manager autofill; browser clipboard write permission was denied",
+      "Destructive migration rollback rehearsal"
+    ],
+    "evidence": [
+      "auth-runtime-mobile.png",
+      "auth-security-mobile.png"
+    ],
+    "sourceHashes": {
+      "frontend/src/components/auth/auth-modal.tsx": "a17edcc6d1cf603151c65a4b9444a63cd15c15de40ca29593992b97d9236acdb",
+      "frontend/src/components/auth/password-input.tsx": "ee4fd27dad53872a11c88cb2443bb3a2a7a09832f9d810c3e0bc16e6b8dd8b74",
+      "frontend/src/components/user/account-security.tsx": "367fcc6715fb950ad71d4641e8cfdc525b123b47de5778c1eb2e15c5b0ff5f20",
+      "backend/algorithm-service/algorithm-user-service/src/main/java/com/stephen/cloud/user/service/impl/UserPasswordServiceImpl.java": "c6fe1e658600c67e0a03d9fb1d94b4b363c2919fc3720a32b77413b8d3858bd3",
+      "backend/algorithm-service/algorithm-search-service/src/main/java/com/stephen/cloud/search/datasource/PublicUserSearchView.java": "29fe65aa1eeefafd4bc5fa0dd5d8cb22e976bde90ea73738299d15739f1e0a29"
+    },
+    "publicSearchVerification": {
+      "passed": true,
+      "controlledESFixture": true,
+      "realGatewaySearch": true,
+      "responsesReplaced": false,
+      "cleaned": true
+    }
   }
 }

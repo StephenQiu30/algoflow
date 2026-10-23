@@ -241,3 +241,20 @@ test('displayed code sorts the same element identities as the live trace', () =>
   const comparison = algorithms.merge([3, 4, 1, 2]).find(s => s.action === 'compare')
   assert(SORTING_CODE.merge.split('\n')[comparison.line - 1].includes('left[i] <= right[j]'))
 })
+
+test('password forms preserve Unicode and password whitespace while normalizing only email', () => {
+  const { normalizeEmail, emailError, passwordError } = require('../src/lib/password-auth.ts')
+  assert.equal(normalizeEmail(' Learner@Example.com '), 'learner@example.com')
+  assert.equal(emailError(' Learner@Example.com '), '')
+  for (const email of [
+    '',
+    'learner',
+    'a@b',
+    'a b@example.com',
+    'a@example.com\nBcc:other@example.com',
+  ])
+    assert(emailError(email))
+  for (const password of ['😀'.repeat(8), '😀'.repeat(64), '        ', '  secret  '])
+    assert.equal(passwordError(password), '')
+  for (const password of ['', '😀'.repeat(7), 'a'.repeat(65)]) assert(passwordError(password))
+})

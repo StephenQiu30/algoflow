@@ -46,13 +46,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public BaseResponse<?> httpMessageNotReadableExceptionHandler(HttpMessageNotReadableException e) {
-        log.error("HttpMessageNotReadableException: 请求参数格式错误", e);
+        log.warn("HttpMessageNotReadableException (request values redacted)");
         return ResultUtils.error(ErrorCode.PARAMS_ERROR, "请求参数格式错误，请检查请求体是否为有效的 JSON");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public BaseResponse<?> methodArgumentNotValidExceptionHandler(MethodArgumentNotValidException e) {
-        log.error("MethodArgumentNotValidException", e);
+        log.warn("MethodArgumentNotValidException (request values redacted)");
         String message = ErrorCode.PARAMS_ERROR.getMessage();
         org.springframework.validation.FieldError fieldError = e.getBindingResult().getFieldError();
         if (fieldError != null) {
@@ -63,7 +63,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BindException.class)
     public BaseResponse<?> bindExceptionHandler(BindException e) {
-        log.error("BindException", e);
+        log.warn("BindException (request values redacted)");
         String message = ErrorCode.PARAMS_ERROR.getMessage();
         org.springframework.validation.FieldError fieldError = e.getBindingResult().getFieldError();
         if (fieldError != null) {
@@ -74,7 +74,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     public BaseResponse<?> constraintViolationExceptionHandler(ConstraintViolationException e) {
-        log.error("ConstraintViolationException", e);
+        log.warn("ConstraintViolationException (request values redacted)");
         return ResultUtils.error(ErrorCode.PARAMS_ERROR, e.getMessage());
     }
 

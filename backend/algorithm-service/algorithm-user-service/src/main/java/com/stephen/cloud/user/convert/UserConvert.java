@@ -128,6 +128,7 @@ public class UserConvert {
         }
         User user = new User();
         BeanUtils.copyProperties(userEditRequest, user);
+        user.setUserEmail(null);
         return user;
     }
 }

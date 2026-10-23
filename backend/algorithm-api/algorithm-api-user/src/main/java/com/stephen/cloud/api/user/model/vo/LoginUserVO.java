@@ -102,4 +102,7 @@ public class LoginUserVO implements Serializable {
      */
     @Schema(description = "登录token")
     private String token;
+
+    /** 当前账户是否已设置密码，不包含密码值。 */
+    private Boolean hasPassword;
 }

@@ -19,6 +19,8 @@ CREATE TABLE `user`
     `user_avatar`     varchar(1024)         DEFAULT NULL COMMENT '用户头像',
     `user_profile`    varchar(512)          DEFAULT NULL COMMENT '用户简介',
     `user_role`       varchar(256) NOT NULL DEFAULT 'user' COMMENT '用户角色：user/admin/ban',
+    `password_hash`   varchar(256)          DEFAULT NULL COMMENT 'PBKDF2 password hash',
+    `registration_key` varchar(36)           DEFAULT NULL COMMENT 'Registration idempotency key',
     `user_email`      varchar(256)          DEFAULT NULL COMMENT '用户邮箱',
     `email_verified`  tinyint               DEFAULT 0 COMMENT '邮箱是否验证：0-未验证，1-已验证',
     `user_phone`      varchar(128)          DEFAULT NULL COMMENT '用户手机号',
@@ -31,6 +33,7 @@ CREATE TABLE `user`
     `update_time`     datetime     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     `is_delete`       tinyint      NOT NULL DEFAULT 0 COMMENT '是否删除',
     PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_user_registration_key` (`registration_key`),
     UNIQUE KEY `uk_user_email` (`user_email`) COMMENT '用户邮箱唯一索引',
     KEY `idx_github_id` (`github_id`) COMMENT 'GitHub ID索引',
     KEY `idx_github_id_is_delete` (`github_id`, `is_delete`) COMMENT 'GitHub ID删除状态索引'

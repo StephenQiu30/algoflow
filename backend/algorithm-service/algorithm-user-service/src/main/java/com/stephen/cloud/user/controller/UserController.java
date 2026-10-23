@@ -33,8 +33,7 @@ import java.util.stream.Collectors;
 /**
  * 用户管理接口
  * <p>
- * 提供用户注册登录（GitHub/邮箱）、个人信息管理、权限控制等功能。
- * 支持 GitHub OAuth2.0 授权登录及邮箱验证码登录两种方式。
+ * 提供邮箱密码注册登录、个人信息管理与账户安全；旧公开认证接口已移除。
  * 用户敏感信息在返回前均经过脱敏处理。
  * </p>
  *
@@ -49,101 +48,46 @@ public class UserController {
     @Resource
     private UserService userService;
 
-    @Resource
-    private UserEmailService userEmailService;
 
     @Resource
     private RabbitMqSender mqSender;
 
-    /**
-     * GitHub 登录
-     * <p>
-     * 通过 GitHub 授权码进行登录或注册。
-     *
-     * @param gitHubLoginRequest GitHub 登录请求参数
-     * @param request            HTTP 请求
-     * @return 登录成功的用户信息
-     */
-    @PostMapping("/login/github")
-    @Operation(summary = "GitHub 登录", description = "通过 GitHub 授权码进行登录或注册")
-    @OperationLog(module = "用户认证", action = "GitHub登录", recordParams = false)
-    public BaseResponse<LoginUserVO> userLoginByGitHub(@RequestBody GitHubLoginRequest gitHubLoginRequest,
-                                                       HttpServletRequest request) {
-        ThrowUtils.throwIf(gitHubLoginRequest == null || StringUtils.isBlank(gitHubLoginRequest.getCode())
-                || StringUtils.isBlank(gitHubLoginRequest.getState()), ErrorCode.PARAMS_ERROR, "code 或 state 不能为空");
-        String code = gitHubLoginRequest.getCode();
-        String state = gitHubLoginRequest.getState();
-        LoginUserVO loginUserVO = userService.userLoginByGitHub(code, state, request);
-        return ResultUtils.success(loginUserVO);
+    @Resource
+    private com.stephen.cloud.user.service.UserPasswordService passwordService;
+
+    @PostMapping("/login/password")
+    @Operation(summary = "邮箱密码登录")
+    @OperationLog(module = "用户认证", action = "邮箱密码登录", recordParams = false)
+    public BaseResponse<LoginUserVO> loginPassword(@RequestBody UserPasswordLoginRequest body, HttpServletRequest request) {
+        return ResultUtils.success(passwordService.login(body, request));
     }
 
-    /**
-     * 用户邮箱登录
-     *
-     * @param userEmailLoginRequest 邮箱登录请求参数
-     * @param request               HTTP 请求
-     * @return 登录成功的用户信息
-     */
-    @PostMapping("/login/email")
-    @Operation(summary = "用户邮箱登录", description = "使用邮箱 and 验证码进行登录")
-    @OperationLog(module = "用户认证", action = "邮箱登录", recordParams = false)
-    public BaseResponse<LoginUserVO> userLoginByEmail(
-            @Validated @RequestBody UserEmailLoginRequest userEmailLoginRequest,
-            HttpServletRequest request) {
-        LoginUserVO loginUserVO = userService.userLoginByEmail(userEmailLoginRequest, request);
-        return ResultUtils.success(loginUserVO);
+    @PostMapping("/register")
+    @Operation(summary = "邮箱密码注册", description = "只创建普通账户，不建立登录会话")
+    @OperationLog(module = "用户认证", action = "邮箱密码注册", recordParams = false)
+    public BaseResponse<Boolean> registerPassword(@RequestBody UserPasswordRegisterRequest body, HttpServletRequest request) {
+        return ResultUtils.success(passwordService.register(body, request));
     }
 
-    /**
-     * 发送邮箱验证码
-     * <p>
-     * 向指定邮箱发送登录或注册所需的验证码。
-     *
-     * @param request     发送邮箱验证码请求
-     * @param httpRequest HTTP 请求
-     * @return 验证码过期时间（秒）
-     */
-    @PostMapping("/login/email/code")
-    @Operation(summary = "发送邮箱验证码", description = "向指定邮箱发送登录或注册所需的验证码")
-    @OperationLog(module = "用户认证", action = "发送邮箱验证码", recordParams = false)
-    public BaseResponse<Integer> sendEmailLoginCode(@Validated @RequestBody UserEmailCodeSendRequest request,
-                                                    HttpServletRequest httpRequest) {
-        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR, "请求不能为空");
-        String clientIp = IpUtils.getClientIp(httpRequest);
-        Integer expireSeconds = userEmailService.sendEmailCode(request.getEmail(), clientIp);
-        return ResultUtils.success(expireSeconds);
+    @PostMapping("/password/change")
+    @Operation(summary = "修改本人密码并撤销会话")
+    @OperationLog(module = "账户安全", action = "修改密码", recordParams = false)
+    public BaseResponse<Boolean> changePassword(@RequestBody UserPasswordChangeRequest body, HttpServletRequest request) {
+        return ResultUtils.success(passwordService.change(body, request));
     }
 
-    /**
-     * 获取 GitHub 授权 URL
-     * <p>
-     * 获取跳转到 GitHub 授权页面的 URL。
-     *
-     * @return GitHub 授权 URL
-     */
-    @GetMapping("/login/github")
-    @Operation(summary = "获取 GitHub 授权 URL", description = "获取跳转到 GitHub 授权页面的 URL")
-    public BaseResponse<String> getGitHubAuthorizeUrl() {
-        String authorizeUrl = userService.getGitHubAuthorizeUrl();
-        return ResultUtils.success(authorizeUrl);
+    @PostMapping("/password/setup/code")
+    @Operation(summary = "向旧账户的本人邮箱发送设置密码验证邮件")
+    @OperationLog(module = "账户安全", action = "设置密码验证", recordParams = false)
+    public BaseResponse<Integer> sendSetupCode(HttpServletRequest request) {
+        return ResultUtils.success(passwordService.sendSetupCode(request));
     }
 
-    /**
-     * GitHub 登录回调接口
-     * 接收 GitHub 授权码并完成用户登录或注册
-     *
-     * @param request     GitHub 回调参数 (code, state)
-     * @param httpRequest HTTP 请求
-     * @return 登录成功的用户信息
-     */
-    @GetMapping("/login/github/callback")
-    @Operation(summary = "GitHub 登录回调", description = "用于接收 GitHub 授权重定向后的回调请求")
-    public BaseResponse<LoginUserVO> gitHubLoginCallback(@ModelAttribute GitHubCallbackRequest request,
-                                                         HttpServletRequest httpRequest) {
-        ThrowUtils.throwIf(request == null, ErrorCode.PARAMS_ERROR, "请求不能为空");
-        ThrowUtils.throwIf(StringUtils.isAnyBlank(request.getCode(), request.getState()), ErrorCode.PARAMS_ERROR, "code 或 state 不能为空");
-        LoginUserVO loginUserVO = userService.userLoginByGitHub(request.getCode(), request.getState(), httpRequest);
-        return ResultUtils.success(loginUserVO);
+    @PostMapping("/password/setup")
+    @Operation(summary = "旧账户验证本人邮箱后设置密码并撤销会话")
+    @OperationLog(module = "账户安全", action = "设置密码", recordParams = false)
+    public BaseResponse<Boolean> setupPassword(@RequestBody UserPasswordSetupRequest body, HttpServletRequest request) {
+        return ResultUtils.success(passwordService.setup(body, request));
     }
 
     /**
@@ -274,6 +218,8 @@ public class UserController {
         long id = userUpdateRequest.getId();
         User oldUser = userService.getById(id);
         ThrowUtils.throwIf(oldUser == null, ErrorCode.NOT_FOUND_ERROR);
+        ThrowUtils.throwIf(user.getUserEmail() != null && !user.getUserEmail().equals(oldUser.getUserEmail()),
+                ErrorCode.PARAMS_ERROR, "修改登录邮箱需要独立验证");
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         // Role changes revoke existing sessions so cached privileges cannot survive a demotion.
@@ -416,6 +362,7 @@ public class UserController {
                                           HttpServletRequest request) {
         ThrowUtils.throwIf(userEditRequest == null, ErrorCode.PARAMS_ERROR);
         User loginUser = userService.getLoginUser(request);
+        ThrowUtils.throwIf(userEditRequest.getUserEmail() != null, ErrorCode.PARAMS_ERROR, "修改邮箱需要独立验证，不能通过个人资料修改");
         User user = UserConvert.editRequestToObj(userEditRequest);
         user.setId(loginUser.getId());
         userService.validUser(user, false);

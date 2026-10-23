@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.ToString;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -14,7 +16,7 @@ import java.util.Date;
 /**
  * 用户实体
  * <p>
- * 支持多种登录方式：邮箱、GitHub
+ * 邮箱密码认证；保留历史第三方账户标识用于兼容
  * 用户角色包含：普通用户、管理员、封禁用户
  * </p>
  *
@@ -64,6 +66,16 @@ public class User implements Serializable {
      */
     @Schema(description = "用户邮箱")
     private String userEmail;
+
+    /** 独立盐的密码哈希；永不返回或记录。 */
+    @JsonIgnore
+    @ToString.Exclude
+    private String passwordHash;
+
+    /** 注册幂等键，不作为认证凭证。 */
+    @JsonIgnore
+    @ToString.Exclude
+    private String registrationKey;
 
     /**
      * 邮箱是否验证：0-未验证，1-已验证

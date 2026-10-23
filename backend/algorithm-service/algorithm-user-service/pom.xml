@@ -14,6 +14,10 @@
     <description>衍序 (AlgoFlow) - 面向排序算法教学的 RAG 增强型交互式系统</description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-crypto</artifactId>
+        </dependency>
 
         <!-- algorithm-api-user -->
         <dependency>

@@ -7,6 +7,8 @@ import com.stephen.cloud.common.common.ErrorCode;
 import com.stephen.cloud.common.exception.BusinessException;
 import com.stephen.cloud.common.web.exception.GlobalExceptionHandler;
 import com.stephen.cloud.user.service.UserService;
+import com.stephen.cloud.user.service.UserPasswordService;
+import com.stephen.cloud.api.user.model.dto.UserPasswordLoginRequest;
 import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,7 +35,7 @@ class UserControllerTest {
     @BeforeEach
     void setUp() {
         UserController controller = new UserController();
-        ReflectionTestUtils.setField(controller, "userService", createUserServiceStub());
+        ReflectionTestUtils.setField(controller, "passwordService", createPasswordServiceStub());
         mockMvc = MockMvcBuilders.standaloneSetup(controller)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
@@ -43,11 +45,11 @@ class UserControllerTest {
     @Test
     @DisplayName("黑盒测试：邮箱登录接口 - 成功")
     void testUserLoginByEmailSuccess() throws Exception {
-        UserEmailLoginRequest loginRequest = new UserEmailLoginRequest();
+        UserPasswordLoginRequest loginRequest = new UserPasswordLoginRequest();
         loginRequest.setEmail("test@edu.cn");
-        loginRequest.setCode("123456");
+        loginRequest.setPassword("safe-test-password");
 
-        mockMvc.perform(post("/user/login/email")
+        mockMvc.perform(post("/user/login/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
@@ -59,28 +61,28 @@ class UserControllerTest {
     @Test
     @DisplayName("黑盒测试：邮箱登录接口 - 参数非法")
     void testUserLoginByEmailInvalidParams() throws Exception {
-        UserEmailLoginRequest loginRequest = new UserEmailLoginRequest();
+        UserPasswordLoginRequest loginRequest = new UserPasswordLoginRequest();
         loginRequest.setEmail("invalid-email");
-        loginRequest.setCode("");
+        loginRequest.setPassword("");
 
-        mockMvc.perform(post("/user/login/email")
+        mockMvc.perform(post("/user/login/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(ErrorCode.PARAMS_ERROR.getCode()))
-                .andExpect(jsonPath("$.message").value("邮箱或验证码不能为空"));
+                .andExpect(jsonPath("$.message").value("邮箱或密码不能为空"));
     }
 
-    private UserService createUserServiceStub() {
-        return (UserService) Proxy.newProxyInstance(
-                UserService.class.getClassLoader(),
-                new Class[]{UserService.class},
+    private UserPasswordService createPasswordServiceStub() {
+        return (UserPasswordService) Proxy.newProxyInstance(
+                UserPasswordService.class.getClassLoader(),
+                new Class[]{UserPasswordService.class},
                 (proxy, method, args) -> {
-                    if ("userLoginByEmail".equals(method.getName())) {
-                        UserEmailLoginRequest request = (UserEmailLoginRequest) args[0];
-                        if (request == null || request.getCode() == null || request.getCode().isBlank()
+                    if ("login".equals(method.getName())) {
+                        UserPasswordLoginRequest request = (UserPasswordLoginRequest) args[0];
+                        if (request == null || request.getPassword() == null || request.getPassword().isBlank()
                                 || request.getEmail() == null || !request.getEmail().endsWith("@edu.cn")) {
-                            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邮箱或验证码不能为空");
+                            throw new BusinessException(ErrorCode.PARAMS_ERROR, "邮箱或密码不能为空");
                         }
                         LoginUserVO loginUserVO = new LoginUserVO();
                         loginUserVO.setUserName("testUser");

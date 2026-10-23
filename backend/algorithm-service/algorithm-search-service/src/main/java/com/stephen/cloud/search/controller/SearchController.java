@@ -12,6 +12,7 @@ import com.stephen.cloud.common.common.ErrorCode;
 import com.stephen.cloud.common.common.ResultUtils;
 import com.stephen.cloud.common.common.ThrowUtils;
 import com.stephen.cloud.common.log.annotation.OperationLog;
+import com.stephen.cloud.search.datasource.PublicUserSearchView;
 import com.stephen.cloud.search.manager.EsIndexManager;
 import com.stephen.cloud.search.manager.SearchFacade;
 import com.stephen.cloud.search.service.PostEsService;
@@ -88,7 +89,7 @@ public class SearchController {
         long size = userQueryRequest.getPageSize();
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<UserEsDTO> userPage = (Page<UserEsDTO>) userEsService.searchFromEs(userQueryRequest);
-        return ResultUtils.success(userPage);
+        return ResultUtils.success(PublicUserSearchView.page(userPage, user -> user));
     }
 
     /**

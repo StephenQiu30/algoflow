@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes'
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { setLoginUser } from '@/store/modules/user/userSlice'
 import { editUser, getLoginUser } from '@/api/user/userController'
+import { AccountSecurity } from '@/components/user/account-security'
 import { AccessGate } from '@/components/design/access-gate'
 import { PageShell, ModuleEntries } from '@/components/design/page-shell'
 import { FieldGroup, Field, FieldLabel, FieldDescription } from '@/components/ui/field'
@@ -128,7 +129,7 @@ function Settings() {
     </PageShell>
   )
 }
-function Preferences({ kind }: { kind: 'preferences' | 'notifications' | 'security' }) {
+function Preferences({ kind }: { kind: 'preferences' | 'notifications' }) {
   const { user } = useAppSelector(s => s.user),
     { theme, setTheme } = useTheme()
   const [saved] = useState(() => {
@@ -209,36 +210,22 @@ function Preferences({ kind }: { kind: 'preferences' | 'notifications' | 'securi
                 <Switch id="reduce-motion" checked={motion} onCheckedChange={setMotion} />
               </Field>
             </>
-          ) : kind === 'notifications' ? (
+          ) : (
             <Field orientation="horizontal">
               <FieldLabel htmlFor="notify-toast">新通知提示</FieldLabel>
               <Switch id="notify-toast" checked={notify} onCheckedChange={setNotify} />
               <FieldDescription>此浏览器内的新通知提示；站内通知仍保留。</FieldDescription>
             </Field>
-          ) : (
-            <>
-              <Field>
-                <FieldLabel htmlFor="account-email">电子邮箱</FieldLabel>
-                <Input id="account-email" readOnly value={user?.userEmail || '未绑定邮箱'} />
-              </Field>
-              <Field>
-                <FieldLabel>登录方式</FieldLabel>
-                <p>{user?.githubLogin ? 'GitHub 及邮箱验证码' : '邮箱验证码'}</p>
-                <FieldDescription>
-                  使用验证码登录，无需保存账户密码。请通过头像菜单退出当前会话。
-                </FieldDescription>
-              </Field>
-            </>
           )}
         </FieldGroup>
-        {kind !== 'security' && (
+        {
           <>
             <p className="text-muted-foreground text-xs">偏好仅在此浏览器中生效。</p>
             <div className="flex justify-end">
               <Button onClick={save}>保存偏好</Button>
             </div>
           </>
-        )}
+        }
       </div>
     </PageShell>
   )
@@ -257,6 +244,8 @@ export function SettingsWorkspace({
     <AccessGate>
       {!hydrated ? (
         <PageState loading title="加载账户设置" />
+      ) : kind === 'security' ? (
+        <AccountSecurity />
       ) : kind ? (
         <Preferences kind={kind} />
       ) : (

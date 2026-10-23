@@ -74,6 +74,8 @@ AlgoFlow 是算法学习与分享交流社区。核心旅程是“发现算法 �
 | 算法控制 | Button、Slider、ToggleGroup、Tooltip；不用自制按钮、下拉或滑块 |
 | 对话目标结构 | MessageScroller → Message → Bubble，引用使用来源操作与 Sheet；滚动跟随由组件负责 |
 
+登录 / 注册目标方案统一 Logo A、邮箱密码和独立注册流程，移除 GitHub 与验证码登录；最大宽 384px、手机外边距至少 16px、内边距 20px，桌面内边距 24px。标题 20px、说明 / 标签 14px、输入 16px；主按钮与密码显隐目标高 44px。字段与状态以 [登录与注册弹窗](design/05-shadcn顶部布局与全站交互规范.md#登录与注册弹窗) 为准；已复用 shadcn/Radix 实现并连接真实密码 API；注册不自动登录，改密撤销全部旧会话。运行验收与邮件恢复边界见 HANDOVER。
+
 截至本轮，CLI 确认项目为 Next.js 16.4.2、React 19、Tailwind v4、Radix、Lucide、pnpm，现有组件目录为 `frontend/src/components/ui/`。使用当前 `default` 风格，不切换 preset；新增组件先通过 CLI 检查，既有组件仅做必要的样式和可访问性修复。
 
 已安装：Alert、Avatar、Badge、Button、Card、Command、Dialog、DropdownMenu、Form、Input、Label、NavigationMenu、Pagination、Popover、ScrollArea、Sheet、Skeleton、Slider、Tabs、Textarea、Tooltip，以及本轮通过 CLI 补充的 Table、Field、InputGroup、Select、ToggleGroup、AlertDialog、Empty、Checkbox、Progress、Separator、Switch、Spinner、Toggle。Data Table 使用 TanStack Table v8；保留 default / Radix，baseColor 使用 neutral。

@@ -85,7 +85,7 @@ public class UserEmailServiceImpl implements UserEmailService {
             BaseResponse<Boolean> sendResponse = mailFeignClient.doSendVerificationCode(request);
             ThrowUtils.throwIf(sendResponse == null || !Boolean.TRUE.equals(sendResponse.getData()),
                     ErrorCode.OPERATION_ERROR, "发送验证码失败");
-            String codeKey = CacheConstant.LOGIN_CODE_EMAIL + normalizedEmail;
+            String codeKey = "auth:password:setup:code:" + normalizedEmail;
             cacheUtils.putString(codeKey, code, emailCodeProperties.getExpireTime());
             log.info("[UserEmailServiceImpl] 验证码已发送, email: {}", normalizedEmail);
             return emailCodeProperties.getExpireTime();
@@ -102,7 +102,7 @@ public class UserEmailServiceImpl implements UserEmailService {
         ThrowUtils.throwIf(!RegexUtils.checkEmail(normalizedEmail), ErrorCode.PARAMS_ERROR, "用户邮箱格式有误");
         ThrowUtils.throwIf(StringUtils.isBlank(code), ErrorCode.PARAMS_ERROR, "验证码不能为空");
 
-        String codeKey = CacheConstant.LOGIN_CODE_EMAIL + normalizedEmail;
+        String codeKey = "auth:password:setup:code:" + normalizedEmail;
         String storedCode = cacheUtils.getString(codeKey);
         if (storedCode == null) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR, "验证码不存在或已过期");
@@ -118,7 +118,7 @@ public class UserEmailServiceImpl implements UserEmailService {
         String normalizedEmail = StringUtils.trimToEmpty(email);
         ThrowUtils.throwIf(StringUtils.isBlank(normalizedEmail), ErrorCode.PARAMS_ERROR, "邮箱地址不能为空");
         ThrowUtils.throwIf(!RegexUtils.checkEmail(normalizedEmail), ErrorCode.PARAMS_ERROR, "用户邮箱格式有误");
-        String codeKey = CacheConstant.LOGIN_CODE_EMAIL + normalizedEmail;
+        String codeKey = "auth:password:setup:code:" + normalizedEmail;
         cacheUtils.remove(codeKey);
         return true;
     }

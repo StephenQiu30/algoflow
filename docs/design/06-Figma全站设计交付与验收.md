@@ -19,6 +19,17 @@
 
 知识库元信息、切片、个人编辑返回和通知已读/删除的实现规则已同步到 DES-05，真实移动端证据记录在 HANDOVER 及当前 audit.json 的 knowledgeAcceptance、frontendAcceptance.integrationRegression。这些代码专项未修改 Figma 节点，也不计为 Figma 新一轮逐点击验收。
 
+登录与注册已按 REQ-01 FR-05 原位更新为 Logo A + 邮箱密码，移除 GitHub 和验证码入口。登录沿用原有三端节点；只补充独立注册画板与必要状态，不保留旧认证候选稿。共享 Auth / Dialog 有 9 个预置状态，复用既有品牌、Input、Button、Icon Button、文字样式与语义变量；密码组合映射 shadcn InputGroup，新增 Eye / EyeOff / LoaderCircle 来自现有 Lucide SVG。
+
+| 认证场景 | 桌面 | 平板 | 手机 |
+| --- | --- | --- | --- |
+| 登录 | [查看](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=77-817) | [查看](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=217-17671) | [查看](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=207-9901) |
+| 注册 | [查看](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=477-17253) | [查看](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=477-17419) | [查看](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=477-17582) |
+
+[必要状态与浅深 / 320px 响应式](https://www.figma.com/design/cMWO5SCKWFqJafxME0yhFz?node-id=477-17707) 包含凭证错误、注册确认错误、两类提交中、注册成功、深色与窄屏。六张认证画板均未出现面板越界；相关原型目标无悬空引用，文本沿用 Noto Sans SC，界面为组件 / 文字 / 矢量，未嵌入整页截图。桌面 / 手机注册和状态总览已逐张视觉检查；字体 / 尺寸 / 引用结构检查见 audit.json 的 authDesign，不把它称为所有原型逐点击验收。
+
+预览复用 [桌面登录](assets/current/login-desktop.png)、[手机登录](assets/current/login-mobile.png)、[深色登录](assets/current/login-mobile-dark.png)、[手机注册](assets/current/register-mobile.png) 与 [状态总览](assets/current/auth-states.png)，均为本轮 Figma 导出并覆盖旧认证预览。交互只演示预置状态：三端登录示意进入同尺寸个人中心，注册演示提交与成功；真实输入、邮箱唯一性、密码显隐、短屏滚动和动态返回由当前代码与浏览器独立验收，见 HANDOVER 与 audit.json 的 authImplementation。当前生产预览已移除旧入口；不将代码结果计入 Figma 逐点击验收。
+
 ## 当前结构与来源
 
 - 190 个 UI/状态画板；41 个独立浮层（账户 32、主题 3、通知 6）；133 个组件、6996 个实例。

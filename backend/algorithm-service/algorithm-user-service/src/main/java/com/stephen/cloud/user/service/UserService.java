@@ -25,6 +25,9 @@ import java.util.List;
  */
 public interface UserService extends IService<User> {
 
+    /** 仅供已完成密码与账户状态校验的内部认证服务创建会话。 */
+    LoginUserVO createPasswordSession(User user, HttpServletRequest request);
+
     /**
      * 校验用户数据合法性
      * <p>

@@ -22,6 +22,8 @@ public enum LoginTypeEnum {
      */
     EMAIL("EMAIL", "邮箱登录"),
 
+    EMAIL_PASSWORD("EMAIL_PASSWORD", "邮箱密码登录"),
+
     /**
      * 微信公众号登录
      */

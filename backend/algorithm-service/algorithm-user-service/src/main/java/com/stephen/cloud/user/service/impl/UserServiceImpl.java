@@ -152,6 +152,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (currentUser == null || currentUser.getId() == null) {
             throw new BusinessException(ErrorCode.NOT_LOGIN_ERROR);
         }
+        ThrowUtils.throwIf("ban".equals(currentUser.getUserRole()), ErrorCode.NO_AUTH_ERROR, "账户不可用");
         return currentUser;
     }
 
@@ -212,6 +213,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         }
         LoginUserVO loginUserVO = new LoginUserVO();
         BeanUtils.copyProperties(user, loginUserVO);
+        loginUserVO.setHasPassword(StringUtils.isNotBlank(user.getPasswordHash()));
         loginUserVO.setToken(StpUtil.getTokenInfo().getTokenValue());
         return loginUserVO;
     }
@@ -324,6 +326,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @param account   登录账号标识（用于日志）
      * @return 脱敏的登录用户视图，含 token
      */
+    @Override
+    public LoginUserVO createPasswordSession(User user, HttpServletRequest request) {
+        return doAfterLoginSuccess(user, request, LoginTypeEnum.EMAIL_PASSWORD, user.getUserEmail());
+    }
+
     private LoginUserVO doAfterLoginSuccess(User user, HttpServletRequest request,
                                             LoginTypeEnum loginType, String account) {
         user.setLastLoginTime(new Date());

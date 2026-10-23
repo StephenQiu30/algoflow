@@ -35,13 +35,9 @@ public class UserDataSource implements DataSource<Object> {
      */
     @Override
     public Page<Object> doSearch(SearchRequest searchRequest, HttpServletRequest request) {
-        UserQueryRequest queryRequest = new UserQueryRequest(); // Renamed userQueryRequest to queryRequest
-        BeanUtils.copyProperties(searchRequest, queryRequest); // Used queryRequest
-        Page<UserEsDTO> page = (Page<UserEsDTO>) userEsService.searchFromEs(queryRequest); // Renamed method, changed
-        // type, changed variable
-        // name
-        Page<Object> resultPage = new Page<>();
-        BeanUtils.copyProperties(page, resultPage); // Used 'page' instead of 'userPage'
-        return resultPage;
+        UserQueryRequest queryRequest = new UserQueryRequest();
+        BeanUtils.copyProperties(searchRequest, queryRequest);
+        Page<UserEsDTO> page = userEsService.searchFromEs(queryRequest);
+        return PublicUserSearchView.page(page, user -> (Object) user);
     }
 }

@@ -38,8 +38,7 @@ spring:
           - /api/user/wx/mp/portal
           - /api/user/login/wx/qrcode
           - /api/user/login/wx/status
-          - /api/user/login/github/**
-          - /api/user/login/email/**
+          - /api/user/login/password
           - /api/user/get/login
           - /api/search/post/page
           - /api/search/all

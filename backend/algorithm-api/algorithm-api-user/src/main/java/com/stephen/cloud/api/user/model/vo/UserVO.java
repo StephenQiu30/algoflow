@@ -2,6 +2,7 @@ package com.stephen.cloud.api.user.model.vo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -54,12 +55,14 @@ public class UserVO implements Serializable {
      * 用户邮箱
      */
     @Schema(description = "用户邮箱")
+    @JsonIgnore
     private String userEmail;
 
     /**
      * 用户电话
      */
     @Schema(description = "用户电话")
+    @JsonIgnore
     private String userPhone;
 
     /**

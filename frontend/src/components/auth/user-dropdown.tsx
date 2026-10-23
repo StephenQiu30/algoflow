@@ -49,7 +49,12 @@ export function UserDropdown() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="size-11 p-0" aria-label={`${name}，打开用户菜单`}>
+        <Button
+          variant="ghost"
+          className="size-11 p-0"
+          data-auth-user-trigger
+          aria-label={`${name}，打开用户菜单`}
+        >
           <Avatar className="size-7">
             <AvatarImage src={user?.userAvatar} alt="" />
             <AvatarFallback>{name.slice(0, 1)}</AvatarFallback>
