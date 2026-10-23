@@ -1,7 +1,8 @@
 'use client'
 import { use, useCallback, useState } from 'react'
 import { addDocument } from '@/api/ai/documentController'
-import { listKnowledgeBaseVoByPage } from '@/api/ai/knowledgeBaseController'
+import { listKnowledgeBaseVoByPage, getKnowledgeBaseVoById } from '@/api/ai/knowledgeBaseController'
+import Link from 'next/link'
 import { analyzeRecall } from '@/api/ai/ragController'
 import { PageShell } from '@/components/design/page-shell'
 import { PageState } from '@/components/design/page-state'
@@ -22,8 +23,14 @@ import { Spinner } from '@/components/ui/spinner'
 import { DocumentWorkspace } from './document-workspace'
 import { useRouter, useSearchParams } from 'next/navigation'
 export function KnowledgeTask({ kind }: { kind: 'import' | 'recall' }) {
+  const preselected = useSearchParams().get('knowledgeBaseId')
+  const source = useSearchParams().get('returnTo')
+  const basesBack =
+    source && /^\/admin\/knowledge\/bases(?:\?|$)/.test(source) && !/[\\\r\n]/.test(source)
+      ? source
+      : null
   const [retry, setRetry] = useState(0),
-    [kb, setKb] = useState(''),
+    [kb, setKb] = useState(preselected || ''),
     [file, setFile] = useState<File | null>(null),
     [question, setQuestion] = useState(''),
     [error, setError] = useState(''),
@@ -32,10 +39,19 @@ export function KnowledgeTask({ kind }: { kind: 'import' | 'recall' }) {
     [uploaded, setUploaded] = useState<string | null>(null)
   const router = useRouter()
   const load = useCallback(async () => {
-    const r = await listKnowledgeBaseVoByPage({ current: 1, pageSize: 20 })
+    const [r, selected] = await Promise.all([
+      listKnowledgeBaseVoByPage({ current: 1, pageSize: 20 }),
+      preselected
+        ? getKnowledgeBaseVoById({ id: preselected as unknown as number })
+        : Promise.resolve(null),
+    ])
     if (r.code !== 0 || !r.data) throw Error()
-    return r.data.records || []
-  }, [])
+    if (selected && (selected.code !== 0 || !selected.data)) throw Error('所选知识库无法加载')
+    const rows = r.data.records || []
+    return selected?.data && !rows.some(k => String(k.id) === String(selected.data?.id))
+      ? [selected.data, ...rows]
+      : rows
+  }, [preselected])
   const resource = useRemoteResource(String(retry), load, '知识库暂时无法加载。')
   async function submit(e: React.FormEvent) {
     e.preventDefault()
@@ -77,10 +93,14 @@ export function KnowledgeTask({ kind }: { kind: 'import' | 'recall' }) {
   return (
     <PageShell
       title={kind === 'import' ? '导入文档' : '召回评测'}
-      back={{
-        href: kind === 'import' ? '/admin/knowledge' : '/admin',
-        label: kind === 'import' ? '返回知识库' : '返回运营管理',
-      }}
+      back={
+        basesBack
+          ? { href: basesBack, label: '返回知识库管理' }
+          : {
+              href: kind === 'import' ? '/admin/knowledge' : '/admin',
+              label: kind === 'import' ? '返回知识库' : '返回运营管理',
+            }
+      }
     >
       <form onSubmit={e => void submit(e)} className="flex max-w-2xl flex-col gap-6">
         <FieldGroup>
@@ -100,6 +120,11 @@ export function KnowledgeTask({ kind }: { kind: 'import' | 'recall' }) {
                 </SelectGroup>
               </SelectContent>
             </Select>
+            <FieldDescription>
+              <Link className="underline underline-offset-4" href="/admin/knowledge/bases">
+                查找或新建知识库
+              </Link>
+            </FieldDescription>
             {resource.error && (
               <FieldDescription>
                 {resource.error}

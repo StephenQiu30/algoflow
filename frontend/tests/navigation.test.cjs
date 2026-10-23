@@ -38,6 +38,11 @@ test('pagination rejects malformed, fractional and unbounded URL values', () => 
 })
 test('notifications navigate only to local paths or known related records', () => {
   assert.equal(notificationHref({ contentUrl: '/blog/42' }), '/blog/42')
+  assert.equal(
+    notificationHref({ contentUrl: '/blog/42' }, '/user/notifications?page=2&q=sort'),
+    '/blog/42?returnTo=%2Fuser%2Fnotifications%3Fpage%3D2%26q%3Dsort'
+  )
+  assert.equal(notificationHref({ contentUrl: '/blog/42' }, '//example.com'), '/blog/42')
   for (const url of [
     'https://example.com',
     '//example.com',

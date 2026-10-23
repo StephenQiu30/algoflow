@@ -147,6 +147,12 @@ export function AdminList({
   const query = useListQuery(),
     router = useRouter()
   const recordId = useSearchParams().get('record')
+  const knowledgeBaseId = useSearchParams().get('knowledgeBaseId')
+  const source = useSearchParams().get('returnTo')
+  const basesBack =
+    source && /^\/admin\/knowledge\/bases(?:\?|$)/.test(source) && !/[\\\r\n]/.test(source)
+      ? source
+      : null
   const [retry, setRetry] = useState(0),
     [selected, setSelected] = useState<DataRecord | null>(null)
   const [change, setChange] = useState<{ row: DataRecord; kind: 'review' | 'role' } | null>(null)
@@ -164,6 +170,7 @@ export function AdminList({
     query.order,
     retry,
     recordId,
+    knowledgeBaseId,
   ])
   const load = useCallback(async () => {
     const p = {
@@ -175,7 +182,12 @@ export function AdminList({
     const status = query.status === 'all' ? undefined : query.status
     const res =
       module === 'knowledge' || module === 'tasks'
-        ? await listDocumentByPage({ ...p, name: query.q || undefined, status })
+        ? await listDocumentByPage({
+            ...p,
+            name: query.q || undefined,
+            status,
+            knowledgeBaseId: knowledgeBaseId ? (knowledgeBaseId as unknown as number) : undefined,
+          })
         : module === 'users'
           ? await listUserByPage({ ...p, userName: query.q || undefined, userRole: status })
           : module === 'audit'
@@ -188,7 +200,17 @@ export function AdminList({
               })
     if (res.code !== 0 || !res.data) throw new Error(res.message || '加载失败')
     return { rows: (res.data.records || []) as DataRecord[], total: Number(res.data.total || 0) }
-  }, [module, query.page, query.pageSize, query.q, query.status, query.sort, query.order, recordId])
+  }, [
+    module,
+    query.page,
+    query.pageSize,
+    query.q,
+    query.status,
+    query.sort,
+    query.order,
+    recordId,
+    knowledgeBaseId,
+  ])
   const resource = useRemoteResource(key, load, '请检查网络连接后重试。')
   const columns = columnsByModule[module]
   const title = adminEntries.find(e => e.href === `/admin/${module}`)?.title || '运营管理'
@@ -244,10 +266,17 @@ export function AdminList({
   return (
     <PageShell
       title={title}
-      back={{ href: '/admin', label: '返回运营管理' }}
+      back={
+        basesBack && (module === 'knowledge' || module === 'tasks')
+          ? { href: basesBack, label: '返回知识库管理' }
+          : { href: '/admin', label: '返回运营管理' }
+      }
       actions={
         module === 'knowledge' ? (
           <>
+            <Button asChild variant="ghost">
+              <Link href="/admin/knowledge/bases">管理知识库</Link>
+            </Button>
             <Button asChild variant="secondary">
               <Link href="/admin/tasks">查看索引任务</Link>
             </Button>
@@ -258,6 +287,17 @@ export function AdminList({
         ) : undefined
       }
     >
+      {knowledgeBaseId && (module === 'knowledge' || module === 'tasks') && (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="text-muted-foreground text-sm">仅显示所选知识库的文档</p>
+          <Button
+            variant="ghost"
+            onClick={() => query.update({ knowledgeBaseId: undefined, page: 1 })}
+          >
+            查看全部文档
+          </Button>
+        </div>
+      )}
       {module === 'tasks' && (
         <p className="text-muted-foreground text-sm">
           查看文档解析与索引处理状态。失败原因保留在对应记录中。

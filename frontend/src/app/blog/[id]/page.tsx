@@ -9,12 +9,24 @@ import { PostCard } from '@/components/blog/post-card'
 import { Button } from '@/components/ui/button'
 import { useRemoteResource } from '@/hooks/useRemoteResource'
 import { useSearchParams } from 'next/navigation'
+import Link from 'next/link'
 export default function Page({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params),
     [retry, setRetry] = useState(0)
   const target = useSearchParams().get('returnTo')
   const back =
-    target && /^\/(?:blog|user\/(?:content|collections))(?:\?|$)/.test(target) ? target : '/blog'
+    target &&
+    /^\/(?:blog|user\/(?:content|collections|notifications))(?:\?|$)/.test(target) &&
+    !/[\\\r\n]/.test(target)
+      ? target
+      : '/blog'
+  const backLabel = back.startsWith('/user/content')
+    ? '返回我的内容'
+    : back.startsWith('/user/collections')
+      ? '返回收藏'
+      : back.startsWith('/user/notifications')
+        ? '返回通知'
+        : '返回学习社区'
   const load = useCallback(async () => {
     const r = await getPostVoById({ id: id as unknown as number })
     if (r.code !== 0 || !r.data) throw Error(r.message || '内容不存在')
@@ -25,6 +37,9 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   if (!data.data || data.error)
     return (
       <PageState title="内容无法打开" description={data.error}>
+        <Button asChild variant="secondary">
+          <Link href={back}>{backLabel}</Link>
+        </Button>
         <Button variant="secondary" onClick={() => setRetry(n => n + 1)}>
           重试
         </Button>
@@ -36,11 +51,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
       title={post.title || '讨论详情'}
       back={{
         href: back,
-        label: back.startsWith('/user/content')
-          ? '返回我的内容'
-          : back.startsWith('/user/collections')
-            ? '返回收藏'
-            : '返回学习社区',
+        label: backLabel,
       }}
     >
       <div className="mx-auto flex w-full max-w-4xl flex-col gap-6">

@@ -44,6 +44,21 @@ class KnowledgeEditingServiceTest {
         assertEquals(40900, assertThrows(BusinessException.class, () -> service.saveDraft(r)).getCode());
         verifyNoInteractions(chunks);
     }
+    @Test void latestChunkUsesCurrentReadAfterParentLock() {
+        DocumentChunk earlier = new DocumentChunk(); earlier.setId(7L); earlier.setDocumentId(9L);
+        earlier.setDraftContent("earlier snapshot");
+        DocumentChunk current = new DocumentChunk(); current.setId(7L); current.setDocumentId(9L);
+        current.setDraftContent("latest committed edit");
+        when(chunks.selectById(7L)).thenReturn(earlier);
+        when(chunks.selectForEdit(7L)).thenReturn(current);
+        var result = service.getChunk(7L);
+        assertEquals("latest committed edit", result.getDraftContent());
+        assertEquals(3L, result.getDocumentRevision());
+        var order = inOrder(chunks, documents);
+        order.verify(chunks).selectById(7L);
+        order.verify(documents).lockForEdit(9L);
+        order.verify(chunks).selectForEdit(7L);
+    }
     @Test void processingDocumentCannotBeEdited() {
         document.setStatus("PROCESSING");
         assertThrows(BusinessException.class, () -> service.saveDraft(edit())); verifyNoInteractions(chunks);

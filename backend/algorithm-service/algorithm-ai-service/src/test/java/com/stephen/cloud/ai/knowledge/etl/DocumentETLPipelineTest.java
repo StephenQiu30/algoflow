@@ -147,6 +147,42 @@ class DocumentETLPipelineTest {
         order.verify(vectorStore).delete(List.of("1001_0"));order.verify(keywordIndexPublisher).delete(List.of(old));
     }
 
+    @Test
+    void editedChunksPublishDraftsWithoutReadingOrResplittingTheSource() {
+        var first = new com.stephen.cloud.ai.model.entity.DocumentChunk();
+        first.setId(1L); first.setContent("original"); first.setDraftContent("edited");
+        first.setDraftSectionTitle("edited chapter"); first.setVectorId("old-1");
+        var second = new com.stephen.cloud.ai.model.entity.DocumentChunk();
+        second.setId(2L); second.setContent("untouched"); second.setVectorId("old-2");
+        when(documentChunkMapper.selectList(any())).thenReturn(List.of(first, second));
+        when(documentChunkMapper.lockDocument(1001L, 2002L, null, "/tmp/source.md", 5L)).thenReturn(1001L);
+        when(documentChunkMapper.markDocumentPublished(1001L, 2, 5L)).thenReturn(1);
+        when(documentChunkMapper.batchInsert(anyList())).thenAnswer(i -> ((List<?>) i.getArgument(0)).size());
+        when(transactionTemplate.execute(any())).thenAnswer(i -> ((org.springframework.transaction.support.TransactionCallback<?>) i.getArgument(0))
+                .doInTransaction(mock(org.springframework.transaction.TransactionStatus.class)));
+        org.junit.jupiter.api.Assertions.assertEquals(2, documentETLPipeline.process("/tmp/source.md", "md",
+                Map.of("documentId",1001L,"knowledgeBaseId",2002L,"documentRevision",5L,"useStoredChunks",true)));
+        verifyNoInteractions(documentReaderFactory, resourceLoader, tokenTextSplitter);
+        verify(vectorStore).add(argThat((List<Document> rows) -> rows.size() == 2
+                && "edited".equals(rows.get(0).getText()) && "untouched".equals(rows.get(1).getText())
+                && "edited chapter".equals(rows.get(0).getMetadata().get("sectionTitle"))));
+    }
+
+    @Test
+    void aSupersededBuildCannotRetireTheActiveChunks() {
+        when(documentChunkMapper.lockDocument(1001L, 2002L, null, "/tmp/source.md", 5L)).thenReturn(null);
+        when(resourceLoader.getResource(anyString())).thenReturn(resource);
+        when(documentReaderFactory.getReader(anyString(), eq(resource))).thenReturn(documentReader);
+        when(documentReader.get()).thenReturn(List.of(new Document("new content".repeat(40))));
+        when(transactionTemplate.execute(any())).thenAnswer(i -> ((org.springframework.transaction.support.TransactionCallback<?>) i.getArgument(0))
+                .doInTransaction(mock(org.springframework.transaction.TransactionStatus.class)));
+        assertThrows(IllegalStateException.class, () -> documentETLPipeline.process("/tmp/source.md", "md",
+                Map.of("documentId",1001L,"knowledgeBaseId",2002L,"documentRevision",5L)));
+        verify(documentChunkMapper, never()).delete(any(com.baomidou.mybatisplus.core.conditions.Wrapper.class));
+        verify(documentChunkMapper, never()).batchInsert(anyList());
+        verify(vectorStore).delete(argThat((List<String> ids) -> ids.stream().allMatch(id -> id.startsWith("1001_0_"))));
+    }
+
     private void setField(Object target, String fieldName, Object value) throws Exception {
         var field = target.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);

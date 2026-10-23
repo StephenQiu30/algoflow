@@ -14,16 +14,24 @@ export function notificationPreview(message: Record<string, unknown>) {
   }
 }
 
-export function notificationHref(n: Record<string, unknown>) {
+export function notificationHref(n: Record<string, unknown>, returnTo?: string) {
   const url = n.contentUrl
+  let href = '/user/notifications'
   if (
     typeof url === 'string' &&
     url.startsWith('/') &&
     !url.startsWith('//') &&
     !/[\\\r\n]/.test(url)
   )
-    return url
-  if (n.relatedId && ['post', 'POST'].includes(String(n.relatedType || '')))
-    return `/blog/${n.relatedId}`
-  return '/user/notifications'
+    href = url
+  else if (n.relatedId && ['post', 'POST'].includes(String(n.relatedType || '')))
+    href = `/blog/${n.relatedId}`
+  if (returnTo && /^\/user\/notifications(?:\?|$)/.test(returnTo) && !/[\\\r\n]/.test(returnTo)) {
+    const target = new URL(href, 'https://algoflow.local')
+    if (/^\/blog\/[^/]+$/.test(target.pathname)) {
+      target.searchParams.set('returnTo', returnTo)
+      return target.pathname + target.search + target.hash
+    }
+  }
+  return href
 }

@@ -2,6 +2,9 @@ package com.stephen.cloud.post.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.stephen.cloud.common.auth.utils.SecurityUtils;
+import com.stephen.cloud.api.post.model.enums.PostReviewStatusEnum;
 import com.stephen.cloud.api.post.model.dto.favour.PostFavourQueryRequest;
 import com.stephen.cloud.api.post.model.dto.favour.PostFavourRequest;
 import com.stephen.cloud.api.post.model.dto.post.PostQueryRequest;
@@ -89,7 +92,7 @@ public class PostFavourController {
         // 限制爬虫
         ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
         Page<Post> postPage = postFavourService.listFavourPostByPage(new Page<>(current, size),
-                postService.getQueryWrapper(postQueryRequest), userId);
+                visibleQuery(postQueryRequest), userId);
         return ResultUtils.success(postService.getPostVOPage(postPage, request));
     }
 
@@ -113,7 +116,21 @@ public class PostFavourController {
         ThrowUtils.throwIf(size > 20 || userIdLong == null, ErrorCode.PARAMS_ERROR);
         long userId = userIdLong.longValue();
         Page<Post> postPage = postFavourService.listFavourPostByPage(new Page<>(current, size),
-                postService.getQueryWrapper(postFavourQueryRequest.getPostQueryRequest()), userId);
+                visibleQuery(postFavourQueryRequest.getPostQueryRequest()), userId);
         return ResultUtils.success(postService.getPostVOPage(postPage, request));
+    }
+
+    /** Custom collection SQL needs explicit visibility and soft-delete scoping. */
+    private LambdaQueryWrapper<Post> visibleQuery(PostQueryRequest request) {
+        LambdaQueryWrapper<Post> query = postService.getQueryWrapper(request);
+        query.eq(Post::getIsDelete, 0);
+        Long viewer = SecurityUtils.getLoginUserIdPermitNull();
+        if (!StpUtil.isLogin() || !SecurityUtils.isAdmin()) {
+            query.and(q -> {
+                q.eq(Post::getReviewStatus, PostReviewStatusEnum.PASS.getValue());
+                if (viewer != null) q.or().eq(Post::getUserId, viewer);
+            });
+        }
+        return query;
     }
 }

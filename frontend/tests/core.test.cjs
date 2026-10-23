@@ -9,6 +9,23 @@ require.extensions['.ts'] = (module, path) =>
     }).outputText,
     path
   )
+test('content editing returns to its scoped list and rejects redirected or malformed destinations', () => {
+  const { contentReturnTo } = require('../src/lib/personal-navigation.ts')
+  assert.equal(
+    contentReturnTo('/user/content?page=2&q=%E6%8E%92%E5%BA%8F'),
+    '/user/content?page=2&q=%E6%8E%92%E5%BA%8F'
+  )
+  for (const destination of [
+    null,
+    '//evil.test/user/content',
+    'https://evil.test/user/content',
+    '/user/content/../settings',
+    '/user/content-other',
+    '/user/content\\evil',
+    '/user/content\nLocation:evil',
+  ])
+    assert.equal(contentReturnTo(destination), '/user/content')
+})
 const {
   SORTING_ALGORITHM_MAP: algorithms,
   SORTING_ALGORITHMS,

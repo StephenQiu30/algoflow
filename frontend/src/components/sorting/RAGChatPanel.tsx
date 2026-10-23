@@ -27,7 +27,7 @@ import { Field, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import request from '@/lib/request'
-import { Bot, MessageSquarePlus, Send } from 'lucide-react'
+import { MessageCircle, MessageSquarePlus, Send } from 'lucide-react'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 type Message = {
@@ -790,7 +790,7 @@ export function RAGChatPanel({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost">
-          <Bot data-icon="inline-start" />
+          <MessageCircle data-icon="inline-start" />
           解释当前步骤
         </Button>
       </DialogTrigger>

@@ -36,7 +36,9 @@ export function PageShell({
           <h1 className="text-[32px] leading-normal font-bold tracking-tight">{title}</h1>
           {description && <p className="text-muted-foreground leading-7">{description}</p>}
         </div>
-        {actions && <div className="flex flex-wrap items-center justify-end gap-2">{actions}</div>}
+        {actions && (
+          <div className="ml-auto flex flex-wrap items-center justify-end gap-2">{actions}</div>
+        )}
       </header>
       {children}
     </div>

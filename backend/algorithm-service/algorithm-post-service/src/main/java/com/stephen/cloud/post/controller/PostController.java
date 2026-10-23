@@ -157,6 +157,12 @@ public class PostController {
         ThrowUtils.throwIf(id <= 0, ErrorCode.PARAMS_ERROR);
         Post post = postService.getById(id);
         ThrowUtils.throwIf(post == null, ErrorCode.NOT_FOUND_ERROR);
+        if (!Integer.valueOf(PostReviewStatusEnum.PASS.getValue()).equals(post.getReviewStatus())) {
+            boolean loggedIn = StpUtil.isLogin();
+            boolean owner = loggedIn && post.getUserId().equals(SecurityUtils.getLoginUserId());
+            ThrowUtils.throwIf(!owner && !(loggedIn && SecurityUtils.isAdmin()),
+                    ErrorCode.NO_AUTH_ERROR, "该内容尚未公开");
+        }
         return ResultUtils.success(postService.getPostVO(post, request));
     }
 
@@ -170,11 +176,14 @@ public class PostController {
      * @return 帖子 VO 分页列表
      */
     @PostMapping("/list/page")
-    @Operation(summary = "分页获取帖子列表（用于同步）", description = "获取完整字段的帖子列表，主要用于数据同步")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
+    @Operation(summary = "分页获取帖子列表（用于同步）", description = "管理员获取包含未审核内容的帖子列表")
     public BaseResponse<Page<PostVO>> listPostByPage(@RequestBody PostQueryRequest postQueryRequest,
                                                      HttpServletRequest request) {
+        ThrowUtils.throwIf(postQueryRequest == null, ErrorCode.PARAMS_ERROR);
         long current = postQueryRequest.getCurrent();
         long size = postQueryRequest.getPageSize();
+        ThrowUtils.throwIf(current < 1 || size < 1 || size > 20, ErrorCode.PARAMS_ERROR);
         Page<Post> postPage = postService.page(new Page<>(current, size),
                 postService.getQueryWrapper(postQueryRequest));
         return ResultUtils.success(postService.getPostVOPage(postPage, request));

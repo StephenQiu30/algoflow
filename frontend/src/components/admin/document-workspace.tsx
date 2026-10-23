@@ -117,7 +117,7 @@ export function DocumentWorkspace({ id, back }: { id: string; back: string }) {
               </p>
               {busy && <p role="status">{states[document.status]}，状态将自动刷新。</p>}
               {document.errorMessage && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" role="alert">
                   <AlertTitle>索引未完成</AlertTitle>
                   <AlertDescription>{document.errorMessage}</AlertDescription>
                 </Alert>
@@ -134,7 +134,8 @@ export function DocumentWorkspace({ id, back }: { id: string; back: string }) {
                   {
                     key: 'sectionTitle',
                     label: '章节',
-                    render: r => String(r.draftSectionTitle ?? r.sectionTitle ?? '未命名章节'),
+                    render: r =>
+                      String(r.draftSectionTitle ?? r.sectionTitle ?? '') || '未命名章节',
                   },
                   {
                     key: 'sectionPath',

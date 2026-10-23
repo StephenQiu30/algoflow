@@ -20,6 +20,11 @@ import java.util.List;
 @Mapper
 public interface DocumentChunkMapper extends BaseMapper<DocumentChunk> {
 
+    // A distinct locking read bypasses both repeatable-read snapshots and selectById's session cache.
+    // Always acquire the parent document lock first, matching draft edits and publication.
+    @Select("SELECT * FROM document_chunk WHERE id = #{id} AND is_delete = 0 FOR UPDATE")
+    DocumentChunk selectForEdit(@Param("id") Long id);
+
     // Include retired rows: an unavailable vector store must not hide existing index cleanup work.
     @Select("SELECT EXISTS(SELECT 1 FROM document WHERE knowledge_base_id = #{id}) OR EXISTS(SELECT 1 FROM document_chunk WHERE knowledge_base_id = #{id})")
     boolean hasKnowledgeBaseHistory(@Param("id") Long id);

@@ -17,6 +17,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(callSuper = true)
 @Schema(description = "分片分页查询请求")
 public class ChunkQueryRequest extends PageRequest implements Serializable {
+    @jakarta.validation.constraints.Size(max = 500)
     private String searchText;
 
     @Serial

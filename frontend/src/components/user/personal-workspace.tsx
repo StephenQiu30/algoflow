@@ -206,7 +206,11 @@ function PersonalListInner({ kind }: { kind: 'content' | 'collections' | 'learni
           kind === 'content'
             ? r => (
                 <DropdownMenuItem asChild>
-                  <Link href={`/blog/create?edit=${r.id}`}>编辑内容</Link>
+                  <Link
+                    href={`/blog/create?edit=${r.id}&returnTo=${encodeURIComponent(query.href)}`}
+                  >
+                    编辑内容
+                  </Link>
                 </DropdownMenuItem>
               )
             : undefined

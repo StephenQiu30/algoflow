@@ -92,7 +92,7 @@ export default function Workbench() {
     return () => clearTimeout(timer)
   }, [v.inputArray, v.algorithmId, v.currentStep, v.totalSteps, user?.id])
   return (
-    <div className="bg-muted min-h-[calc(100dvh-64px)]">
+    <div className="bg-background min-h-[calc(100dvh-64px)]">
       <PageShell
         title={SORTING_ALGORITHMS.find(a => a.id === v.algorithmId)!.name}
         description="逐步比较与移动，理解当前数据如何变得有序。"
@@ -100,6 +100,9 @@ export default function Workbench() {
           <>
             <Button
               variant="ghost"
+              className="size-11 p-0 sm:w-auto sm:px-4"
+              aria-label="复制演练链接"
+              title="复制演练链接"
               onClick={async () => {
                 const link = new URL('/visualizer', window.location.origin)
                 link.searchParams.set('algorithm', v.algorithmId)
@@ -114,7 +117,7 @@ export default function Workbench() {
               }}
             >
               <Link2 data-icon="inline-start" />
-              复制演练链接
+              <span className="hidden sm:inline">复制演练链接</span>
             </Button>
             <Select
               value={v.algorithmId}

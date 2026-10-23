@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Spinner } from '@/components/ui/spinner'
 import { toast } from 'sonner'
+import { useAppSelector } from '@/store/hooks'
 const values = (r: ManagedChunk) => ({
   content: r.draftContent ?? r.content,
   sectionTitle: r.draftSectionTitle ?? r.sectionTitle ?? '',
@@ -40,14 +41,48 @@ export function ChunkEditor({
   onClose: () => void
   onSaved: () => void
 }) {
-  const [form, setForm] = useState(() => values(chunk))
-  const [base, setBase] = useState(chunk)
+  const userId = useAppSelector(s => s.user.user?.id)
+  const backupKey = `algoflow:chunk-draft:${userId}:${chunk.documentId}:${chunk.id}`
+  const [backup] = useState(() => {
+    try {
+      const v = JSON.parse(sessionStorage.getItem(backupKey) || 'null')
+      return v &&
+        Number.isSafeInteger(v.revision) &&
+        v.revision >= 0 &&
+        ['content', 'sectionTitle', 'sectionPath'].every(k => typeof v.form?.[k] === 'string')
+        ? (v as { revision: number; form: ReturnType<typeof values> })
+        : null
+    } catch {
+      return null
+    }
+  })
+  const [form, setForm] = useState(() => backup?.form || values(chunk))
+  const [base, setBase] = useState(() => ({
+    ...chunk,
+    documentRevision: backup?.revision ?? chunk.documentRevision,
+  }))
   const [error, setError] = useState(''),
     [pending, setPending] = useState(false)
   const [conflict, setConflict] = useState(false),
     [latest, setLatest] = useState<ManagedChunk | null>(null)
   const [discard, setDiscard] = useState(false)
   const dirty = JSON.stringify(form) !== JSON.stringify(values(base))
+  useEffect(() => {
+    try {
+      if (dirty)
+        sessionStorage.setItem(backupKey, JSON.stringify({ revision: base.documentRevision, form }))
+      else sessionStorage.removeItem(backupKey)
+    } catch {
+      /* Editing remains available if browser storage is disabled. */
+    }
+  }, [dirty, backupKey, base.documentRevision, form])
+  function clearBackup() {
+    try {
+      sessionStorage.removeItem(backupKey)
+    } catch {
+      /* optional browser storage */
+    }
+  }
   const busy = ['PENDING', 'PROCESSING'].includes(base.documentStatus)
   useEffect(() => {
     if (!dirty) return
@@ -81,6 +116,7 @@ export function ChunkEditor({
       }
       if (res.code !== 0) throw Error(res.message || '草稿保存失败，请重试')
       toast.success('草稿已保存，检索版本尚未更新')
+      clearBackup()
       onSaved()
       onClose()
     } catch (e) {
@@ -95,7 +131,9 @@ export function ChunkEditor({
     try {
       const res = await getManagedChunk(chunk.id)
       if (res.code !== 0 || !res.data)
-        throw Error('无法读取该切片，可能已重新发布。你的编辑仍保留，请关闭编辑并刷新文档。')
+        throw Error(
+          '无法读取该切片，可能已重新发布。你的编辑仍保留，请先复制编辑，再关闭并刷新文档。'
+        )
       setLatest(res.data)
     } catch (e) {
       setError(e instanceof Error ? e.message : '最新版本加载失败，请重试')
@@ -118,6 +156,11 @@ export function ChunkEditor({
               文档版本 {base.documentRevision} · 保存为草稿，重新建立索引后才会更新检索内容。
             </DialogDescription>
           </DialogHeader>
+          {backup && dirty && (
+            <p role="status" className="text-muted-foreground text-sm">
+              已恢复本标签页未保存的编辑，保存时会重新校验版本。
+            </p>
+          )}
           {busy && (
             <Alert>
               <AlertDescription>
@@ -173,10 +216,27 @@ export function ChunkEditor({
             </FieldGroup>
             {error && <p role="alert">{error}</p>}
             {conflict && (
-              <Alert>
+              <Alert role="alert">
                 <AlertTitle>版本冲突</AlertTitle>
                 <AlertDescription className="flex flex-col gap-3">
                   <p>内容已被其他人更新。你的编辑已保留，请加载最新版本后比较。</p>
+                  <Button
+                    variant="ghost"
+                    type="button"
+                    className="self-end"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(
+                          [form.sectionTitle, form.sectionPath, form.content].join('\n\n')
+                        )
+                        toast.success('编辑内容已复制')
+                      } catch {
+                        toast.error('复制失败，请手动选择并复制内容')
+                      }
+                    }}
+                  >
+                    复制我的编辑
+                  </Button>
                   {latest ? (
                     <>
                       <Field>
@@ -253,6 +313,7 @@ export function ChunkEditor({
             <AlertDialogAction
               onClick={() => {
                 setDiscard(false)
+                clearBackup()
                 onClose()
               }}
             >

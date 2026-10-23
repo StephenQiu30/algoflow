@@ -16,31 +16,38 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping("/ai")
 @SaCheckRole(UserConstant.ADMIN_ROLE)
 @Validated
+@Tag(name = "KnowledgeEditingController", description = "切片草稿、版本校验与索引重试")
 public class KnowledgeEditingController {
     @Resource private KnowledgeEditingService editing;
 
     @PostMapping("/chunk/manage/page")
-    public BaseResponse<Page<ChunkManageVO>> list(@RequestBody ChunkQueryRequest request) {
+    @Operation(summary = "分页读取切片及草稿（管理员）")
+    public BaseResponse<Page<ChunkManageVO>> list(@Valid @RequestBody ChunkQueryRequest request) {
         return ResultUtils.success(editing.listChunks(request));
     }
 
     @GetMapping("/chunk/manage/get")
+    @Operation(summary = "读取切片最新版本（管理员）")
     public BaseResponse<ChunkManageVO> get(@RequestParam @Positive Long id) {
         return ResultUtils.success(editing.getChunk(id));
     }
 
     @PostMapping("/chunk/edit")
+    @Operation(summary = "按预期文档版本保存切片草稿")
     @OperationLog(module = "知识库管理", action = "保存切片草稿", recordParams = false)
     public BaseResponse<Long> edit(@Valid @RequestBody ChunkEditRequest request) {
         return ResultUtils.success(editing.saveDraft(request));
     }
 
     @PostMapping("/doc/retry")
+    @Operation(summary = "按预期文档版本提交索引任务")
     @OperationLog(module = "知识库管理", action = "提交文档索引")
     public BaseResponse<Long> retry(@Valid @RequestBody DocumentIndexRequest request) {
         return ResultUtils.success(editing.queueIndex(request));

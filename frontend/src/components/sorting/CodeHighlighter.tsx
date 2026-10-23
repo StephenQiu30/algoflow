@@ -10,12 +10,12 @@ export function CodeHighlighter({
 }) {
   return (
     <div
-      className="max-h-80 min-w-0 overflow-auto rounded-md py-2"
+      className="max-h-64 min-w-0 overflow-auto rounded-md"
       tabIndex={0}
       role="region"
       aria-label="算法实现代码"
     >
-      <pre className="w-max min-w-full text-sm leading-7">
+      <pre className="w-max min-w-full text-xs leading-[26px]">
         <code>
           {SORTING_CODE[algorithmId].split('\n').map((line, index) => (
             <span

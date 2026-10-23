@@ -2063,6 +2063,618 @@
       "desktop": "frontend-desktop.png",
       "mobileRagError": "frontend-mobile.png"
     },
-    "figmaBoundary": "Existing prototype evidence retained separately; no per-screen Figma rerun claimed"
+    "figmaBoundary": "Existing prototype evidence retained separately; no per-screen Figma rerun claimed",
+    "integrationRegression": {
+      "checkedAt": "2026-10-23T11:44:52.704443+00:00",
+      "baseCommit": "f613cec",
+      "scope": "Current working tree; original production preview 3111, gateway 8080 and existing services. Only owned frontend/post apps restarted. No new environment, no intercepted responses, DashScope remains disabled.",
+      "sourceHashes": {
+        "frontend/src/components/admin/knowledge-bases.tsx": "5816dd898b3d0cf47b447a47d6438f14a1630e9afd446c84fea4b57871579892",
+        "frontend/src/components/admin/knowledge-tools.tsx": "93a9c6cc1f7b30e96444a5e04e58cd5a4382245a214f87814a899d32c7e5ad0d",
+        "frontend/src/components/admin/admin-workspace.tsx": "5e5d2cf11da0cb7fa6c243af42ff376994c406aecaf51fa6cc3a3d251e04d7e6",
+        "frontend/src/components/notification/notification-preview.tsx": "3d51ba061b753164b41f576ff598e0062abb8cea777e7bbb81a56acf576cb117",
+        "frontend/src/app/user/notifications/page.tsx": "d7f899ed346cc1d27728bc6718daed6324c477c33245477e040ded705a145f19",
+        "frontend/src/components/user/personal-workspace.tsx": "dbb64da7b582dfe37f6b40abbcb305c7a09adfd0c63c169bdb94e9cf7ebd6f74",
+        "frontend/src/app/blog/create/page.tsx": "014bbfaa7701a80e5a1e11778d083bb70daecc42666ceb5970c6693447050879",
+        "frontend/src/app/blog/[id]/page.tsx": "9b07b460e0862a3dd372420fb66301edf105cca7c902ec692aa5591adc033cfb",
+        "frontend/src/lib/personal-navigation.ts": "953190c7e7cbb5bdc873f01d3b3f6ff9132c6b54a68d50984025b63100e86535",
+        "frontend/src/lib/notification.ts": "0a31cd9ab0eb75e0e0f4095700175103accd8a23ce555a9e99679a7afa99b7a8",
+        "backend/algorithm-service/algorithm-post-service/src/main/java/com/stephen/cloud/post/controller/PostController.java": "23538074f3591f24bc86c17dd8e90f15f4b77ee855b98315640746998a5bb441",
+        "backend/algorithm-service/algorithm-post-service/src/main/java/com/stephen/cloud/post/controller/PostFavourController.java": "a4c1284c2b6cb59467d87260809c6245a9d6f8e27e7f63b27ea0089b94479189"
+      },
+      "fixes": [
+        "Knowledge base metadata CRUD and paginated search using shared DataTable and Radix dialogs",
+        "KB selection outside first 20 records, scoped document filtering and context-preserving import/recall/document return",
+        "Notification preview persists individual read before closing/navigation; notification page refreshes on actual WebSocket events",
+        "Confirmed notification deletion, last-page clamping and read-all empty state",
+        "Personal content editing/submission retains list context; access/error pages retain return entry",
+        "Admin post list role/pagination guard; pending details limited to author/admin; collection reads explicitly filter deleted and nonvisible pending posts"
+      ],
+      "checks": {
+        "frontend": {
+          "typecheck": "passed",
+          "lint": "passed, zero warnings",
+          "tests": {
+            "passed": 21,
+            "failed": 0,
+            "skipped": 0
+          },
+          "productionBuild": "passed; source hashes unchanged after build"
+        },
+        "backend": {
+          "allModuleTest": {
+            "user": 12,
+            "post": 11,
+            "ai": 39,
+            "total": 62,
+            "failed": 0,
+            "skipped": 0
+          },
+          "postInstallIncludingPackage": "passed"
+        },
+        "actualApi": [
+          {
+            "name": "UI content edit persisted",
+            "passed": true
+          },
+          {
+            "name": "preview read persisted",
+            "passed": true
+          },
+          {
+            "name": "UI notification delete persisted",
+            "passed": true
+          },
+          {
+            "name": "mark all read persisted",
+            "passed": true
+          },
+          {
+            "name": "UI KB edit persisted",
+            "passed": true
+          },
+          {
+            "name": "learner denied /ai/kb/update",
+            "passed": true
+          },
+          {
+            "name": "learner denied /ai/kb/edit",
+            "passed": true
+          },
+          {
+            "name": "learner denied /ai/kb/delete",
+            "passed": true
+          },
+          {
+            "name": "learner denied /notification/delete",
+            "passed": true
+          },
+          {
+            "name": "learner denied /notification/read",
+            "passed": true
+          },
+          {
+            "name": "denied KB changes did not mutate data",
+            "passed": true
+          },
+          {
+            "name": "admin list denied /user/list/page",
+            "passed": true
+          },
+          {
+            "name": "admin list denied /post/list/page",
+            "passed": true
+          },
+          {
+            "name": "admin list denied /log/operation/list/page",
+            "passed": true
+          },
+          {
+            "name": "admin list denied /ai/doc/list/page",
+            "passed": true
+          },
+          {
+            "name": "admin list denied /ai/kb/list/page",
+            "passed": true
+          },
+          {
+            "name": "KB stable real pagination",
+            "passed": true
+          },
+          {
+            "name": "KB document filter",
+            "passed": true
+          },
+          {
+            "name": "missing model returns explicit failure",
+            "passed": true
+          }
+        ],
+        "actualVisibility": [
+          {
+            "name": "pending detail denied regression-learner",
+            "passed": true
+          },
+          {
+            "name": "pending detail denied None",
+            "passed": true
+          },
+          {
+            "name": "admin author can read pending detail",
+            "passed": true
+          },
+          {
+            "name": "published detail remains public",
+            "passed": true
+          },
+          {
+            "name": "ordinary author can read own pending detail",
+            "passed": true
+          },
+          {
+            "name": "collection hides newly pending post",
+            "passed": true
+          },
+          {
+            "name": "collection restores published post",
+            "passed": true
+          },
+          {
+            "name": "collection excludes deleted posts",
+            "passed": true
+          }
+        ]
+      },
+      "agentBrowser": {
+        "version": "0.33.0",
+        "modules": [
+          {
+            "error": false,
+            "menuClosed": true,
+            "scroll": 390,
+            "title": "知识库",
+            "width": 390
+          },
+          {
+            "error": false,
+            "menuClosed": true,
+            "scroll": 390,
+            "title": "召回评测",
+            "width": 390
+          },
+          {
+            "error": false,
+            "menuClosed": true,
+            "scroll": 390,
+            "title": "社区审核",
+            "width": 390
+          },
+          {
+            "error": false,
+            "menuClosed": true,
+            "scroll": 390,
+            "title": "用户与权限",
+            "width": 390
+          },
+          {
+            "error": false,
+            "menuClosed": true,
+            "scroll": 390,
+            "title": "索引任务",
+            "width": 390
+          },
+          {
+            "error": false,
+            "menuClosed": true,
+            "scroll": 390,
+            "title": "审计日志",
+            "width": 390
+          }
+        ],
+        "flows": [
+          "390x844 real UI admin/learner login after short-lived Redis OTP precondition",
+          "Personal content page 2 edit, actual save and return; profile edit/reload persisted",
+          "Notification preview read persists, closes, opens content and returns to exact filtered page",
+          "Actual MQ/WebSocket targeted notification updates visible page without reload; disabled toast preference retains persisted/live notification",
+          "Notification delete cancel/confirm and sole last-page record deletion clamps to page 1; mark-all-read empties unread tab",
+          "KB real creation, duplicate error/input retention, update/reread, empty deletion; history-containing deletion refused without model and dialog retained",
+          "23-KB starting collection; selected older KB outside first 20 loads correctly, return preserves search and page 3",
+          "Controlled stored chunk draft save, build/retry actual MQ missing-model failure, original publication/draft retained, return through filtered doc list to KB page 2",
+          "Ordinary avatar omits admin, direct metadata management denies access; notification target pending content error returns to own notifications",
+          "320x740 notification page and metadata dialog (288px), 1440x1000 management table have no whole-page horizontal overflow"
+        ],
+        "a11y": {
+          "kb": {
+            "counts": {
+              "inapplicable": 39,
+              "incomplete": 1,
+              "passes": 21,
+              "violations": 0
+            },
+            "incomplete": [
+              {
+                "id": "aria-hidden-focus",
+                "help": "ARIA hidden element must not be focusable or contain focusable elements"
+              }
+            ]
+          },
+          "notification": {
+            "counts": {
+              "inapplicable": 34,
+              "incomplete": 1,
+              "passes": 26,
+              "violations": 0
+            },
+            "incomplete": [
+              {
+                "id": "color-contrast",
+                "help": "Elements must meet minimum color contrast ratio thresholds"
+              }
+            ]
+          },
+          "learner": {
+            "counts": {
+              "inapplicable": 32,
+              "incomplete": 0,
+              "passes": 28,
+              "violations": 0
+            },
+            "incomplete": []
+          },
+          "desktop": {
+            "counts": {
+              "inapplicable": 35,
+              "incomplete": 0,
+              "passes": 25,
+              "violations": 0
+            },
+            "incomplete": []
+          }
+        },
+        "a11yBoundary": "Zero violations in samples; aria-hidden-focus in dialog and footer contrast under transient toast remain incomplete/manual checks. No WCAG certification."
+      },
+      "supplierBoundary": "OTP preconditions do not verify email delivery. One persisted document/chunk was an explicitly controlled SQL precondition, not model output. No successful real Embedding/vector publication/recall, COS or OAuth acceptance claimed. No Figma nodes edited.",
+      "cleanup": {
+        "removedOnlyScopedRecords": true,
+        "scopedSessionsRevoked": true,
+        "activeCounts": {
+          "user": 1,
+          "post": 1,
+          "knowledge_base": 1,
+          "document": 0,
+          "document_chunk": 0
+        },
+        "scopedTotals": {
+          "accounts": 2,
+          "posts": 7,
+          "knowledgeBases": 22,
+          "notifications": 16,
+          "controlledDocuments": 1,
+          "controlledChunks": 1
+        },
+        "rateLimitRecovery": "Initial cleanup hit gateway rate limit; resumed exact IDs with throttled reads/deletes and verified DB state. No test records recreated."
+      },
+      "retention": "Current DESIGN/DES-05/DES-06/plan/HANDOVER/audit updated in place; no dated snapshots or extra design exports."
+    }
+  },
+  "visualizerAcceptance": {
+    "baseCommit": "d484e280eaabe9bd634b85be0d94e7ec402b7c28",
+    "pushedTransportFix": "f613cec0ef80ee8fa8a4838203e2058fe16c2644",
+    "visualImplementation": "uncommitted worktree changes; seven UI source files over the baseline",
+    "previewUrl": "http://127.0.0.1:3131/visualizer?algorithm=insertion&array=16,28,42,63,35,81,54,72&step=7",
+    "existing3111": "not restarted; existing backend and gateway reused",
+    "checks": {
+      "typecheck": "passed",
+      "lint": "passed",
+      "unitTests": {
+        "passed": 20,
+        "failed": 0,
+        "skipped": 0
+      },
+      "productionBuild": "passed",
+      "agentBrowserControlledSmoke": "passed"
+    },
+    "desktop": {
+      "viewport": [
+        1440,
+        900
+      ],
+      "cardHeights": [
+        640,
+        640
+      ],
+      "horizontalOverflow": false,
+      "axeViolations": 0,
+      "screenshot": "frontend-desktop.png"
+    },
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "executionCardWidth": 350,
+      "executionCardHeight": 595,
+      "playButtonBottom": 811,
+      "touchControlsHeight": 44,
+      "horizontalOverflow": false,
+      "axeViolations": 0,
+      "screenshot": "visualizer-mobile.png"
+    },
+    "verifiedInteractions": [
+      "next and previous step",
+      "play and pause",
+      "keyboard slider Home and ArrowRight",
+      "data validation and apply",
+      "algorithm switch",
+      "RAG controlled completion and source context",
+      "RAG interrupt preserves partial response",
+      "navigation sheet close",
+      "empty algorithm search",
+      "mobile data validation retains input and step",
+      "mobile settings Escape restores trigger focus",
+      "mobile AI dialog Escape restores trigger focus and step"
+    ],
+    "remoteCI": {
+      "commit": "f613cec0ef80ee8fa8a4838203e2058fe16c2644",
+      "runId": 39936981137,
+      "conclusion": "success",
+      "url": "https://github.com/StephenQiu30/algoflow/actions/runs/39936981137"
+    },
+    "boundary": "Knowledge-base and successful SSE responses in smoke are explicit fixtures. No new real model, retrieval, supplier, or per-screen Figma runtime acceptance. Parallel later knowledge edits excluded from this source snapshot.",
+    "sourceFileHashesSha256": {
+      "frontend/src/components/design/page-shell.tsx": "f90449afca50c7ad1321b6b11acaa728c6d9691691d6426b3d4b47045e66d364",
+      "frontend/src/components/sorting/CodeHighlighter.tsx": "573eb39b57efb2787302417457ac6eece0422b308226a061c40bf6b03ff2b055",
+      "frontend/src/components/sorting/RAGChatPanel.tsx": "cb2bb01c5725030ea7d0f894f7930cf3af78303064def20ebc02a37c725e32ed",
+      "frontend/src/components/sorting/SortingVisualizer.tsx": "b79299fe10f2752777b4b483ba087719ba1b1c60acad7635e549c1258cf10b14",
+      "frontend/src/components/sorting/workbench.tsx": "5c58a3bbfe4bbcb70dc6011649aa2f677bed7461d764ae887ee17114a9db018b",
+      "frontend/src/components/ui/card.tsx": "20281260b29d0c64f63374eda255c1d8bb5ada27ccfc69c4b934837b420e0e28",
+      "frontend/src/components/ui/slider.tsx": "56f3b97d9d29b4ab26644bc6e520b6bbe29db93a90d2afa5fd1f3c8ea4778c85",
+      "frontend/tests/browser-smoke.sh": "ff7d3855c0cc015c201528cc2333337b93fc68de796bba64ee1668f39093a93f"
+    },
+    "tablet": {
+      "viewport": [
+        768,
+        1024
+      ],
+      "cardWidth": 704,
+      "pageMargin": 32,
+      "singleColumn": true,
+      "horizontalOverflow": false
+    },
+    "dark": {
+      "mobileViewport": [
+        320,
+        844
+      ],
+      "cardBackground": "rgb(23, 23, 23)",
+      "desktopCardHeights": [
+        640,
+        640
+      ],
+      "horizontalOverflow": false,
+      "axeViolations": 0,
+      "axeIncomplete": 1,
+      "manualCodeContrast": {
+        "reason": "axe could not infer background on partially clipped lines in the local horizontal code scroller",
+        "text": "rgb(237, 237, 237)",
+        "lineNumber": "rgb(161, 161, 161)",
+        "background": "rgb(23, 23, 23)",
+        "textRatio": 15.31,
+        "lineNumberRatio": 6.94
+      }
+    },
+    "largeArray": {
+      "elements": 50,
+      "arrayRegionScrolls": true,
+      "pageHorizontalOverflow": false
+    },
+    "axeCounts": {
+      "desktop": {
+        "inapplicable": 45,
+        "incomplete": 0,
+        "passes": 44,
+        "violations": 0
+      },
+      "mobile": {
+        "inapplicable": 46,
+        "incomplete": 0,
+        "passes": 43,
+        "violations": 0
+      },
+      "dark": {
+        "inapplicable": 46,
+        "incomplete": 1,
+        "passes": 43,
+        "violations": 0
+      }
+    }
+  },
+  "knowledgeAcceptance": {
+    "checkedAt": "2026-10-23T10:40:07.320866+00:00",
+    "scope": "Current working tree, actual gateway 8080 and existing native dependencies, production frontend 3111; no replacement environment or intercepted business responses.",
+    "baseCommit": "f613cec",
+    "sourceHashes": {
+      "frontend/src/api/ai/knowledgeEditing.ts": "ae552c96eb05c0abc502ba6c332ca29ac3ce27eb27cfecbf2111f0cf121fa6b5",
+      "frontend/src/components/admin/chunk-editor.tsx": "f67443cd6da8ba0ac8a539f48537c97f733ba124f36ab12fac94b164a6bd177d",
+      "frontend/src/components/admin/document-workspace.tsx": "f0c0d09e76bcdc0d1439a3dbfaa1e4d0b62ea171b6f43835474a7ec839c8d7a0",
+      "backend/algorithm-service/algorithm-ai-service/src/main/java/com/stephen/cloud/ai/service/impl/KnowledgeEditingServiceImpl.java": "30d3864f99d4e65cc519baeb772445c8c16a7f928603841781bcd1a80a836cc8",
+      "backend/algorithm-service/algorithm-ai-service/src/main/java/com/stephen/cloud/ai/mapper/DocumentChunkMapper.java": "b24e1f6c86f0d24a1429a67d6644e81cbc689e88f336f041d6b0fc219d53c92c",
+      "backend/sql/migrations/20261023_chunk_editing.sql": "93d63f1f5f8db27adc60d4d80abb5ec7346228d1630a144e8c0ba76c4bb7bd9a"
+    },
+    "implementation": [
+      "Admin-only chunk draft title/path/content editing with document revision CAS and 40900 conflicts",
+      "Draft isolation from published content; current locking read after parent lock prevents snapshot/revision mismatch",
+      "Persistent PENDING dispatch, revision-scoped messages, atomic claim, timeout/retry and fenced publication",
+      "Shared knowledge/task detail, server search/pagination, dirty close confirmation, explicit conflict comparison and account-isolated session draft recovery"
+    ],
+    "verification": {
+      "frontend": [
+        "typecheck: passed",
+        "lint: passed, zero warnings",
+        "test: 20 passed, zero failures/skips",
+        "production build: passed; source hashes unchanged afterwards"
+      ],
+      "backend": {
+        "allModuleTest": "Passed: user 12, post 9, AI 38 before final current-read fix",
+        "latestAIInstall": "Passed after final fix: 39 tests, zero failures/skips; includes package",
+        "uniqueCasesAcrossLatestModules": 60
+      },
+      "actualApi": [
+        {
+          "name": "learner denied /ai/chunk/manage/page",
+          "passed": true
+        },
+        {
+          "name": "learner denied /ai/chunk/edit",
+          "passed": true
+        },
+        {
+          "name": "learner denied /ai/doc/retry",
+          "passed": true
+        },
+        {
+          "name": "learner draft detail denied",
+          "passed": true
+        },
+        {
+          "name": "concurrent edit exactly one accepted",
+          "passed": true
+        },
+        {
+          "name": "public chunk preserves old content and hides drafts",
+          "passed": true
+        },
+        {
+          "name": "draft persisted via real API",
+          "passed": true
+        },
+        {
+          "name": "concurrent retry exactly one accepted",
+          "passed": true
+        },
+        {
+          "name": "real MQ consumer persists missing model failure",
+          "passed": true
+        },
+        {
+          "name": "failed build keeps published revision",
+          "passed": true
+        },
+        {
+          "name": "failed build keeps draft",
+          "passed": true
+        },
+        {
+          "name": "empty content rejected",
+          "passed": true
+        },
+        {
+          "name": "stale editor rejected after retry",
+          "passed": true
+        },
+        {
+          "name": "real chunk page 1",
+          "passed": true
+        },
+        {
+          "name": "real chunk page 2",
+          "passed": true
+        },
+        {
+          "name": "chunk pagination has no duplicates",
+          "passed": true
+        },
+        {
+          "name": "draft search implemented on server",
+          "passed": true
+        },
+        {
+          "name": "search draft field 并发验收章节",
+          "passed": true
+        },
+        {
+          "name": "search draft field 排序 / 并发",
+          "passed": true
+        },
+        {
+          "name": "oversized content rejected before mutation",
+          "passed": true
+        }
+      ],
+      "concurrentSnapshot": {
+        "waitedForParentLock": true,
+        "latestContentMatchesRevision": true
+      },
+      "crashRecovery": {
+        "pendingPersistedDuringRestart": true,
+        "consumedAfterRestart": true,
+        "sameRevision": true,
+        "publishedRevisionPreserved": true
+      }
+    },
+    "agentBrowser": {
+      "version": "0.33.0",
+      "viewports": [
+        "390x844 full scoped flows",
+        "320x740 editor and page overflow check",
+        "1440x1000 detail/editor layout"
+      ],
+      "mobileFlows": [
+        "Real UI admin/learner login after scoped Redis OTP precondition",
+        "Avatar to admin, detail pagination 5 + 2 and boundary controls",
+        "Dirty close confirmation, continue editing",
+        "Two real tabs conflict, keep my edits with new CAS and adopt latest paths",
+        "Index queue, actual MQ missing-model failure, manual retry and preserved publication/drafts",
+        "Task detail return preserves FAILED filter and page",
+        "Real 401, re-login and recovery of unsaved editor text",
+        "Learner deep link denies admin access"
+      ],
+      "a11y": {
+        "conflict": {
+          "inapplicable": 38,
+          "incomplete": 1,
+          "passes": 22,
+          "violations": 0
+        },
+        "retry": {
+          "inapplicable": 35,
+          "incomplete": 0,
+          "passes": 25,
+          "violations": 0
+        },
+        "320": {
+          "inapplicable": 38,
+          "incomplete": 1,
+          "passes": 22,
+          "violations": 0
+        },
+        "desktop": {
+          "inapplicable": 35,
+          "incomplete": 0,
+          "passes": 25,
+          "violations": 0
+        }
+      },
+      "manualFollowup": "Dialog aria-hidden-focus incomplete requires manual keyboard/screen-reader review; zero violations does not certify WCAG.",
+      "screenshot": "knowledge-mobile.png"
+    },
+    "boundaries": [
+      "Existing 7 published chunks were controlled SQL starting records, not produced by a model; OTP setup does not verify email delivery",
+      "No DashScope configured at user request: actual missing-model failure/recovery verified, successful Embedding/vector publication/recall remains pending",
+      "Successful/stale publication paths covered by controlled unit tests, not provider acceptance",
+      "No Figma nodes edited or new per-screen Figma acceptance claimed"
+    ],
+    "cleanup": {
+      "controlledRowsRemoved": true,
+      "testAccountsRevoked": true,
+      "activeCounts": {
+        "user": 1,
+        "post": 1,
+        "knowledge_base": 1,
+        "document": 0,
+        "document_chunk": 0
+      }
+    },
+    "retention": "Only current documentation, audit and knowledge-mobile.png updated; private logs/configuration remain outside Git in /tmp/algoflow-live."
   }
 }

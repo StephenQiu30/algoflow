@@ -9,7 +9,12 @@ import { listMyNotificationVoByPage } from '@/api/notification/notificationContr
 import { useAppSelector } from '@/store/hooks'
 import { PageState } from '@/components/design/page-state'
 import { notificationHref } from '@/lib/notification'
+import { markNotificationRead } from '@/api/notification/notificationController'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 export function NotificationPreview() {
+  const router = useRouter()
+  const [pending, setPending] = useState(false)
   const [open, setOpen] = useState(false),
     [retry, setRetry] = useState(0),
     { user } = useAppSelector(s => s.user)
@@ -34,6 +39,23 @@ export function NotificationPreview() {
     '通知暂时无法加载',
     open && !!user
   )
+  async function visit(n: NotificationAPI.NotificationVO) {
+    if (pending) return
+    setPending(true)
+    try {
+      if (n.isRead !== 1) {
+        const result = await markNotificationRead({ id: n.id })
+        if (result.code !== 0) throw Error(result.message || '无法标记已读')
+        window.dispatchEvent(new Event('notification-updated'))
+      }
+      setOpen(false)
+      router.push(notificationHref(n, '/user/notifications'))
+    } catch {
+      toast.error('无法打开通知，请重试')
+    } finally {
+      setPending(false)
+    }
+  }
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -59,15 +81,17 @@ export function NotificationPreview() {
             <Button
               variant="ghost"
               className="h-auto min-h-11 justify-start py-3 text-left whitespace-normal"
-              asChild
+              disabled={pending}
+              onClick={() => void visit(n)}
               key={n.id}
             >
-              <Link href={notificationHref(n)} onClick={() => setOpen(false)}>
-                <span className="flex flex-col gap-1">
-                  <span>{n.title || '通知'}</span>
-                  <span className="text-muted-foreground line-clamp-2 text-xs">{n.content}</span>
+              <span className="flex flex-col gap-1">
+                <span>{n.title || '通知'}</span>
+                <span className="text-muted-foreground line-clamp-2 text-xs">{n.content}</span>
+                <span className="text-muted-foreground text-xs">
+                  {n.isRead === 1 ? '已读' : '未读'}
                 </span>
-              </Link>
+              </span>
             </Button>
           ))
         )}

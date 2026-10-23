@@ -36,6 +36,9 @@ public class KnowledgeEditingServiceImpl implements KnowledgeEditingService {
                 .eq(DocumentChunk::getDocumentId, request.getDocumentId());
         if (request.getSearchText() != null && !request.getSearchText().isBlank()) {
             query.and(q -> q.like(DocumentChunk::getSectionTitle, request.getSearchText())
+                    .or().like(DocumentChunk::getDraftSectionTitle, request.getSearchText())
+                    .or().like(DocumentChunk::getSectionPath, request.getSearchText())
+                    .or().like(DocumentChunk::getDraftSectionPath, request.getSearchText())
                     .or().like(DocumentChunk::getContent, request.getSearchText())
                     .or().like(DocumentChunk::getDraftContent, request.getSearchText()));
         }
@@ -61,7 +64,7 @@ public class KnowledgeEditingServiceImpl implements KnowledgeEditingService {
         ThrowUtils.throwIf(initial == null, ErrorCode.NOT_FOUND_ERROR);
         Document document = documents.lockForEdit(initial.getDocumentId());
         ThrowUtils.throwIf(document == null, ErrorCode.NOT_FOUND_ERROR);
-        DocumentChunk row = chunks.selectById(id);
+        DocumentChunk row = chunks.selectForEdit(id);
         ThrowUtils.throwIf(row == null, ErrorCode.NOT_FOUND_ERROR);
         ChunkManageVO vo = new ChunkManageVO();
         BeanUtils.copyProperties(row, vo);
